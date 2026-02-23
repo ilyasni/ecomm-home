@@ -1,0 +1,59 @@
+---
+description: Next.js 16 App Router conventions для frontend-сервиса.
+globs: ["frontend/**/*.{ts,tsx,mts}"]
+alwaysApply: false
+---
+
+# Next.js 16 — Frontend Rules
+
+## App Router
+
+- Файловая маршрутизация в `frontend/src/app/`.
+- `layout.tsx` — серверный компонент, обёртка со шрифтами и провайдерами.
+- `page.tsx` — серверный компонент по умолчанию.
+
+## Server vs Client Components
+
+**Серверные (по умолчанию):**
+- `layout.tsx`, `page.tsx`, data-fetching обёртки.
+- Не используют хуки, обработчики событий, browser API.
+
+**Клиентские (`"use client"`):**
+- Интерактивные секции, формы, слайдеры, модалки.
+- Добавляй `"use client"` только при необходимости.
+
+```typescript
+// Плохо: "use client" в page.tsx без причины
+"use client";
+export default function Page() { return <div>Static</div>; }
+
+// Хорошо: серверный page с клиентскими секциями
+import { Hero } from "@/components/home/Hero"; // "use client" внутри Hero
+export default function Page() { return <Hero />; }
+```
+
+## Data Fetching
+
+- Strapi API через `src/lib/strapi.ts` (серверная сторона).
+- `fetch` с revalidation / ISR для кеширования.
+- Моки в `src/data/` — временно, заменяются Strapi-запросами.
+
+## Images
+
+- Внешние изображения: `next.config.ts → images.remotePatterns` (Strapi uploads).
+- Ассеты проекта: `public/assets/figma/`, через `<img>` с `loading="lazy"`.
+- `next/image` — для Strapi-контента (оптимизация на продакшене).
+
+## Path Aliases
+
+- `@/*` → `./src/*` (настроено в `tsconfig.json`).
+
+## Шрифт
+
+- Onest (Google Fonts) — единственный шрифт. Не добавляй другие.
+
+## Запрещено
+
+- Default exports для компонентов (только named exports).
+- `getServerSideProps` / `getStaticProps` (Pages Router API).
+- Прямые `fetch` к Strapi из клиентских компонентов.

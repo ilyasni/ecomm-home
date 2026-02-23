@@ -1,0 +1,438 @@
+---
+description: Правила дизайн-системы Vita Brava Home для реализации Figma-макетов. Покрывает организацию компонентов, стилизацию, дизайн-токены, типографику, ассеты и рабочий процесс Figma-to-code.
+globs: ["frontend/src/components/**", "frontend/src/design-system/**", "frontend/src/app/**/*.tsx"]
+alwaysApply: false
+---
+
+# Vita Brava Home — Design System Rules
+
+## Стек и контекст проекта
+
+- **Framework:** Next.js 16+ (App Router), React 19+
+- **Язык:** TypeScript (strict)
+- **Стилизация:** Tailwind CSS 4 (через `@tailwindcss/postcss`, без `tailwind.config.ts`)
+- **Шрифт:** Onest (Google Fonts), язык интерфейса — `ru`
+- **Карусели:** Swiper 12
+- **Path alias:** `@/*` → `./src/*`
+
+---
+
+## 1. Структура каталогов
+
+```
+src/
+├── app/                    # Next.js App Router (страницы, layout, globals.css)
+├── components/
+│   ├── home/               # Секции главной страницы (Header, Hero, Footer, …)
+│   ├── catalog/            # Компоненты каталога
+│   └── ui/                 # Переиспользуемые UI-виджеты (Carousel, …)
+├── data/                   # Статические данные / моки
+└── design-system/          # Атомарные примитивы дизайн-системы
+    ├── tokens.ts           # Дизайн-токены (цвета, радиусы, типографика)
+    ├── components/         # Button, Input, Badge, Select, …
+    │   └── index.ts        # Barrel-реэкспорт
+    └── icons/              # Icon компонент + icon-map
+        └── index.ts        # Barrel-реэкспорт
+```
+
+### Правила размещения файлов
+
+- IMPORTANT: Атомарные UI-примитивы (кнопки, инпуты, бейджи, чекбоксы) — **только** в `src/design-system/components/`
+- Секционные компоненты страниц — в `src/components/<page-name>/` (например `home/`, `catalog/`)
+- Переиспользуемые виджеты (карусели, модалки) — в `src/components/ui/`
+- Статические данные и моки — в `src/data/`
+- Каждый компонент — **один файл**, **один named export**
+- Barrel-файлы `index.ts` для реэкспорта
+
+---
+
+## 2. Цветовая палитра (из Figma UI-Kit)
+
+### Маппинг: Figma → CSS-переменная → hex
+
+| Figma-имя | CSS-переменная | Hex | Роль | Tailwind |
+|-----------|---------------|-----|------|----------|
+| White | — | `#FFFFFF` | Чистый белый | `bg-white` |
+| Background | `--background` | `#FCFBF9` | Фон страницы | `bg-background` |
+| Light | `--color-light` | `#FEFAF4` | Текст на тёмном фоне (text-inverse) | `bg-[var(--color-light)]` |
+| Selection color | `--color-selection` | `#E9E5E0` | Выделение, подложка | `bg-[var(--color-selection)]` |
+| Gray light | `--color-gray-light` | `#D9D5D0` | Границы, разделители (border-light) | `border-[var(--color-gray-light)]` |
+| Gray | `--color-gray` | `#898885` | Placeholder, вторичный текст | `text-[var(--color-gray)]` |
+| Dark gray | `--color-dark-gray` | `#494846` | Вторичный текст (темнее) | `text-[var(--color-dark-gray)]` |
+| Black | `--color-black` | `#22201D` | Заголовки, основной текст (headline) | `text-[var(--color-black)]` |
+| Footer | `--foreground` | `#22201D` | Фон футера | `bg-foreground` |
+| Brown | `--color-brown` | `#8C8074` | Tertiary, границы при заполнении | `text-[var(--color-brown)]` |
+| Gold | `--color-gold` | `#BDA06A` | Secondary, акценты, hover кнопок | `bg-[var(--color-gold)]` |
+| Button / Primary | `--color-button` / `--color-brand` | `#600D11` | Основная кнопка, бренд-цвет | `bg-[var(--color-button)]` |
+| Error | `--color-error` | `#D7111A` | Ошибки | `text-[var(--color-error)]` |
+
+### CSS-переменные (источник истины: `src/app/globals.css`)
+
+```css
+:root {
+  --background: #fcfbf9;
+  --foreground: #22201d;
+  --color-light: #fefaf4;
+  --color-selection: #e9e5e0;
+  --color-gray: #898885;
+  --color-gray-light: #d9d5d0;
+  --color-dark: #494846;
+  --color-brown: #8c8074;
+  --color-gold: #bda06a;
+  --color-brand: #600d11;
+  --color-button: #600d11;
+  --color-error: #d7111a;
+  --color-black: #22201d;
+  --color-dark-gray: #494846;
+}
+```
+
+### Tailwind CSS v4 `@theme` (из Context7 docs)
+
+В Tailwind CSS v4 директива `@theme` регистрирует CSS-переменные как дизайн-токены и автоматически генерирует утилиты. Проект использует `@theme inline`.
+
+**Текущее состояние:** зарегистрированы только `--color-background`, `--color-foreground`, `--font-sans`. Остальные через произвольные значения.
+
+**Рекомендация (при рефакторинге):** зарегистрировать все цвета в `@theme inline` для утилит `bg-brand`, `text-gold` и т.п.
+
+### Правила токенов
+
+- IMPORTANT: **Никогда не хардкодь hex-цвета** — используй `var(--color-*)` через произвольные значения Tailwind
+- IMPORTANT: При добавлении нового цвета — добавь в `globals.css :root` **и** в `src/design-system/tokens.ts`
+- IMPORTANT: При переводе Figma-макета — **сверяй hex-цвета с таблицей выше** и подставляй CSS-переменную
+
+### Радиусы
+
+| Токен | Значение | Использование |
+|-------|----------|---------------|
+| `sm`  | `4px`    | Мелкие элементы |
+| `md`  | `5px`    | Кнопки, инпуты (`rounded-[5px]`) |
+| `full`| `9999px` | Пилюли, аватары |
+
+---
+
+## 3. Типографика (из Figma UI-Kit)
+
+Шрифт: **Onest** (все стили).
+
+### Desktop (1920px)
+
+| Стиль | Weight | Size | Line Height | Особенности |
+|-------|--------|------|-------------|-------------|
+| **H1** | Medium (500) | 40px | 110% | |
+| **H2** | Medium (500) | 32px | 110% | |
+| **H3** | Medium (500) | 24px | auto | |
+| **H4** | Medium (500) | 18px | 130% | |
+| TEXT 16 CAPS SEMIBOLD | Regular (400) | 16px | 130% | uppercase |
+| Text 16 semibold | Medium (500) | 16px | 130% | |
+| **Text 16 regular** | Regular (400) | 16px | 130% | Основной текст |
+| link_16 regular | Regular (400) | 16px | 130% | underline |
+| TEXT 14 CAPS REGULAR | Regular (400) | 14px | 130% | uppercase |
+| Text 14 semibold | SemiBold (600) | 14px | 130% | |
+| Text 14 regular | Regular (400) | 14px | 130% | |
+| link_14 regular | Regular (400) | 14px | 130% | underline |
+| Text 12 semibold | SemiBold (600) | 12px | 110% | |
+| Text regular 12 | Regular (400) | 12px | 110% | |
+| **Price** | Medium (500) | 24px | 130% | |
+| Price old 20 | Medium (500) | 20px | auto | line-through |
+| Price small | Medium (500) | 16px | 110% | |
+| Price old 14 | Regular (400) | 14px | 150% | line-through |
+| Tooltip | Regular (400) | 10px | 110% | |
+
+### Mobile (320px)
+
+| Стиль | Weight | Size | Line Height |
+|-------|--------|------|-------------|
+| **H1** | Medium (500) | 30px | 110% |
+| **H2** | Medium (500) | 26px | 110% |
+| **H3** | Medium (500) | 20px | 110% |
+| **H4** | Medium (500) | 16px | 110% |
+| **H5** | Medium (500) | 14px | 110% |
+| Text 16 semibold | Medium (500) | 16px | 130% |
+| Text 16 reg | Regular (400) | 16px | 130% |
+| Text 14 semibold | SemiBold (600) | 14px | 130% |
+| Text 14 regular | Regular (400) | 14px | 130% |
+| link_14 regular | Regular (400) | 14px | 130% |
+| Text 12 semibold | SemiBold (600) | 12px | 110% |
+| Text 12 reg | Regular (400) | 12px | 110% |
+| link 12 regular | Regular (400) | 12px | 110% |
+| Price small 16 | Medium (500) | 16px | 110% |
+| Price small 14 | Medium (500) | 14px | 110% |
+| Price old 14 | Regular (400) | 14px | 150% |
+| Price old 12 | Regular (400) | 12px | 150% |
+
+### Правила типографики
+
+- IMPORTANT: Шрифт **Onest** — единственный шрифт проекта. Не добавляй другие шрифты.
+- `font-medium` = weight 500 (заголовки, цены)
+- `font-normal` = weight 400 (текст, кнопки)
+- `font-semibold` = weight 600 (акцентные подписи)
+- Заголовки на mobile уменьшаются: H1 40→30, H2 32→26, H3 24→20, H4 18→16
+- Line-height: заголовки `leading-[1.1]`, текст `leading-[1.3]`, зачёркнутые цены `leading-[1.5]`
+
+---
+
+## 4. Компоненты дизайн-системы (с Figma-спецификациями)
+
+### Кнопки (из Figma)
+
+**Button Primary (filled):**
+- `bg-[var(--color-button)]`, `text-[var(--color-light)]`, `rounded-[5px]`
+- Padding: `px-[32px] py-[12px]`
+- Font: Onest Regular 16px / 1.3
+- Hover: bg меняется на gold `bg-[var(--color-gold)]`
+- Disabled: border `border-[var(--color-gray)]`, text `text-[var(--color-gray)]`, bg transparent
+
+**Button Secondary (outlined):**
+- `border border-[var(--color-button)]`, `text-[var(--color-button)]`, bg transparent, `rounded-[5px]`
+- Padding: `px-[24px] py-[12px]`
+- Hover: bg меняется на `bg-[var(--color-button)]`, text на `text-[var(--color-light)]`
+
+**Варианты из Figma:**
+- `Default_1920`, `Default_375`, `Hover_1920`, `Hover_375`, `Default small_1920`, `Hover small_1920`, `Disabled`, `Loading`
+
+### Input (из Figma)
+
+- Default: `border border-[var(--color-gray-light)]`, placeholder `text-[var(--color-gray)]`, `rounded-[5px]`, `p-[12px]`
+- Fill: `border-[var(--color-brown)]`, текст `text-[var(--color-dark-gray)]`
+- Error: `border-[var(--color-error)]`
+- Font: Onest Regular 16px / 1.3
+- States в Figma: `Default`, `Fill`, `Typing`, `Error`, `password`
+
+### Checkbox (из Figma)
+
+- Box: `18×18px`, `border border-[var(--color-gray)]`, `rounded-[2px]`
+- Gap box↔text: `8px`
+- Text: Onest Regular 16px / 1.3, `text-[var(--color-black)]`
+
+### Полный список компонентов
+
+| Компонент | Props | Описание |
+|-----------|-------|----------|
+| `Button` | `variant`: primary/secondary/tertiary, `size`: small/medium/large, `isLoading`, `fullWidth` | Кнопка с forwardRef |
+| `Input` | `state`: default/fill/typing/error/disabled, `label`, `helperText`, `errorText`, `fullWidth` | Текстовое поле с forwardRef |
+| `Select` | `state`: default/fill/disabled, `options[]`, `label`, `helperText` | Выпадающий список с forwardRef |
+| `Textarea` | Аналогично Input | Текстовая область |
+| `SearchInput` | — | Поле поиска |
+| `PhoneInput` | — | Телефонный ввод с выбором страны |
+| `Checkbox` | `checked`, `onChange`, `label` | Чекбокс |
+| `Radio` | — | Радиокнопка |
+| `Badge` | `tone`: exclusive/new/sale, `size`: desktop/mobile | Бейдж |
+| `ArrowLink` | `tone`: light/dark, `label` | Ссылка со стрелкой |
+| `IconButton` | `size`: 24/40, `tone` | Кнопка-иконка |
+| `SliderButtons` | — | Пара prev/next кнопок (размеры 24/40/50/60) |
+| `SliderDots` | — | Пагинация слайдера (варианты: light/dark) |
+| `Quantity` | — | +/- управление количеством (размеры: 48/40/small) |
+
+### Импорт
+
+```typescript
+import { Button, Input, Badge } from "@/design-system/components";
+import { Icon } from "@/design-system/icons";
+import { colors, radii } from "@/design-system/tokens";
+import { Button, Icon, colors } from "@/design-system";
+```
+
+- IMPORTANT: **Всегда проверяй** `src/design-system/components/` перед созданием нового примитива
+- IMPORTANT: **Не устанавливай сторонние UI-библиотеки** без явного запроса
+
+---
+
+## 5. Иконочная система
+
+- Иконки рендерятся через `<img>` тег (не inline SVG)
+- Источник: `public/assets/figma/` (организованы по секциям)
+- Маппинг: `src/design-system/icons/icon-map.ts`
+- Варианты: `default` и `scroll` (для шапки при скролле)
+- Ленивая загрузка: `loading="lazy"`, fallback на `default` вариант
+
+### Доступные иконки (22 шт.)
+
+`logo`, `burger`, `chevronDown`, `search`, `user`, `favorite`, `bag`, `telegram`, `whatsapp`, `arrowRight`, `play`, `rating`, `diamond`, `diamondAlt`, `email`, `phone`, `instagram`, `vk`, `loading`, `arrowUp`, `arrowDown`, `close`, `minus`, `plus`
+
+- IMPORTANT: При добавлении новой иконки — добавь в `icon-map.ts` и файл в `public/assets/figma/`
+- IMPORTANT: **Не добавляй иконочные пакеты** — все иконки из Figma-ассетов
+
+---
+
+## 6. Паттерны кодирования
+
+### Директива `"use client"`
+
+- Компоненты дизайн-системы и интерактивные секции — **клиентские** (`"use client"`)
+- `layout.tsx` и `page.tsx` (главная) — **серверные**
+- Добавляй `"use client"` только при использовании хуков, обработчиков или browser API
+
+### Props и типизация
+
+```typescript
+// Дизайн-система — interface + extends HTMLAttributes + forwardRef
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(...);
+Button.displayName = "Button";
+
+// Секционные компоненты — type без forwardRef
+type HeroProps = { ... };
+export function Hero({ ... }: HeroProps) { ... }
+```
+
+- Варианты — строковые union-типы: `"primary" | "secondary" | "tertiary"`
+- Все компоненты принимают `className?: string`
+- `displayName` обязателен для `forwardRef` компонентов
+
+### Стилизация
+
+- Классы через шаблонные строки: `` `${baseClasses} ${variantClasses} ${className}` ``
+- Утилита `clsx`/`cn` **не используется**
+- Паттерн вариантов: `const variantClasses = { primary: "...", secondary: "..." }`
+- IMPORTANT: Произвольные значения Tailwind: `bg-[var(--color-brand)]`, `text-[var(--color-gold)]`
+
+### Именование
+
+- **Файлы компонентов:** PascalCase (`Button.tsx`, `ProductCard.tsx`)
+- **Файлы данных/утилит:** camelCase (`home.ts`, `icon-map.ts`)
+- **CSS-переменные:** kebab-case `--color-*`
+- **Токены в TS:** camelCase (`colors.grayLight`)
+
+---
+
+## 7. Figma MCP — рабочий процесс
+
+### Обязательный порядок (не пропускать)
+
+1. **`get_design_context`** — структурированное представление node
+2. При обрезке — **`get_metadata`** → повторный `get_design_context` для конкретных узлов
+3. **`get_screenshot`** — визуальная референция
+4. Скачать ассеты → начать имплементацию
+5. Перевести React+Tailwind выход в конвенции проекта
+6. Валидировать 1:1 против Figma
+
+### Правила имплементации
+
+- Figma MCP выдаёт React + Tailwind — это **референс**, не финальный код
+- Заменяй Tailwind-цвета на CSS-переменные по таблице в секции 2
+- Переиспользуй компоненты из `src/design-system/components/`
+- IMPORTANT: **1:1 визуальное соответствие** с Figma-макетом
+- Серверные компоненты — страницы; клиентские — секции и UI
+
+### Figma UI-Kit — карта секций (node `3137:19501`)
+
+| Секция | Node ID | Содержимое |
+|--------|---------|------------|
+| Colors & Typography | `3146:2250044` | Палитра 16 цветов, типо-шкала 1920 + 320 |
+| Buttons | `3149:2265381` | 12 типов кнопок (primary/secondary/tertiary/links/play) |
+| Inputs | `3149:2265385` | Text Input, Phone Input, Dropdown, Quantity, Textarea, Search |
+| UI Elements | `3149:2265393` | Slider Dots/Buttons, Checkbox, Radio, Pagination, Sort, Arrows |
+| Headers, Footer | `3149:2265390` | Header (dark/light/authorized), Breadcrumbs, Footer |
+| Components_card | `3149:2265387` | Product Card, News Card, Quick View, Recommendations |
+| Filters | `3400:36961` | Filter popup, Size popup, Order inputs, Boutiques popup |
+| Tables | `3149:2265396` | Size table |
+| Banner | `3351:51470` | Banner variants (image+text, slider, certification) |
+
+---
+
+## 8. Обработка ассетов
+
+- IMPORTANT: Если Figma MCP возвращает localhost-источник — **используй напрямую**
+- IMPORTANT: **Не создавай плейсхолдеры** при наличии localhost-источника
+- IMPORTANT: **Не добавляй иконочные пакеты**
+- Ассеты → `public/assets/figma/<section>/`
+- SVG-иконки → регистрируй в `icon-map.ts`
+- Изображения: `<img>` с `loading="lazy"` (Next.js Image Optimization отключена)
+
+---
+
+## 9. Layout-паттерны (из Figma-анализа)
+
+### Контейнер страницы
+- Desktop (1920px): контент центрирован в `max-w-[1400px] mx-auto`, **без** внутреннего padding
+- Tablet (768px): контент с `px-[39px]`
+- Mobile (375px): контент с `px-4` (16px)
+- Tailwind: `mx-auto max-w-[1400px] px-4 md:px-[39px] min-[1400px]:px-0`
+
+### Отступы между секциями
+- Desktop: `py-[80px]` для внутренних секций (Categories, Hits, About, Feedback, Designers, News)
+- Mobile: `py-10` (40px)
+- Полноширинные баннеры (Hero, Collections Banner, Special Offers, Certificate): без вертикального padding — высота задана явно
+
+### Gap между элементами
+- IMPORTANT: **gap-2 (8px)** — единый gap для grid/flex-контейнеров (карточки, колонки About/Designers, Advantages grid, Feedback cards, News cards)
+- Исключения: Boutique images↔form: `gap-[48px]`, Header nav items: `gap-[32px]`
+
+### Высоты секций (Desktop 1920px)
+| Секция | Высота |
+|--------|--------|
+| Header | 111px (top-bar + bottom-bar) |
+| Hero | 850px |
+| Categories | auto (py:80, cards 440px) |
+| Collections Banner | 700px |
+| Hit Products | auto (py:80, cards ~616px) |
+| Budget Collections | 944px (py:80, cards 700px) |
+| Special Offers | 660px |
+| Advantages | auto (2 rows × 461px + 8px gap) |
+| About | auto (py:80, content 688px) |
+| Feedback | auto (pb:80, cards ~400px) |
+| Certificate | 660px |
+| Designers | auto (py:80, content 660px) |
+| Boutique | 591px |
+| News | auto (cards ~492px) |
+| Footer | 600px |
+
+### Колоночные секции (About, Designers)
+- 2 колонки: 696px + 696px, gap 8px = 1400px
+- Текстовая колонка: `bg-[var(--color-selection)]`, `px-[56px]`-`px-[78px]`, контент центрирован вертикально
+- Колонка с изображением: `object-cover`, высота равна текстовой колонке
+
+### Breakpoints
+| Breakpoint | Ширина | Tailwind prefix |
+|------------|--------|-----------------|
+| Mobile | 375px | (default) |
+| Tablet | 768px | `md:` |
+| Desktop | 1400px+ | `min-[1400px]:` |
+
+- IMPORTANT: Основной desktop breakpoint — `min-[1400px]:` (не `lg:`), т.к. контейнер 1400px
+- Отступы шапки: `pt-[78px]` (mobile), `min-[1400px]:pt-[111px]` (desktop)
+
+---
+
+## 10. Качество кода
+
+### Обязательно
+
+- TypeScript strict, никаких `any`
+- `aria-label` или связанный `<label>` для интерактивных элементов
+- `forwardRef` + `displayName` для форм-элементов дизайн-системы
+- Named exports
+
+### Запрещено
+
+- Хардкод hex-цветов
+- Сторонние UI-библиотеки без запроса
+- Inline-стили вместо Tailwind
+- Дублирование компонентов (проверь `design-system/`)
+- `any` типы
+- Default exports
+- Другие шрифты кроме Onest
+
+---
+
+## 11. Карусели и слайдеры
+
+- **Swiper 12** (установлен)
+- Навигация: `SliderButtons`, `SliderDots` из дизайн-системы
+- SliderDots варианты: `1920`, `375_light`, `375_dark`, `1920 dark`
+- SliderButtons размеры: 24, 40, 50, 60
+- Стили пагинации: `globals.css` (`.swiper-pagination-bullet`)
+- IMPORTANT: **Не добавляй другие библиотеки каруселей**
+
+---
+
+## 12. Данные и состояние
+
+- Статические данные: `src/data/` (типизированные объекты)
+- State: React-хуки (`useState`, `useEffect`)
+- API: отсутствует (статический контент)
+- Роутинг: Next.js App Router (file-based)

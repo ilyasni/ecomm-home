@@ -1,0 +1,48 @@
+---
+description: Общие стандарты проекта Vita Brava Home. Язык, стек, структура монорепо, обязательное использование Context7.
+globs: 
+alwaysApply: true
+---
+
+# Vita Brava Home — General Rules
+
+## Проект
+
+E-commerce интернет-магазин премиального домашнего текстиля. Монорепо.
+
+## Стек
+
+- **Frontend:** Next.js 16+ (App Router), React 19+, TypeScript strict, Tailwind CSS 4
+- **CMS:** Strapi 5 (headless, REST API)
+- **Database:** PostgreSQL 16
+- **Cache:** Redis 7
+- **Infra:** Docker Compose
+- **Future:** Medusa v2 (e-commerce engine)
+
+## Структура монорепо
+
+```
+ecomm-home/
+├── frontend/          # Next.js (App Router)
+├── cms/               # Strapi 5
+├── docker-compose.yml
+├── .env.example
+└── .cursor/rules/
+```
+
+## Язык
+
+- Ответы, комментарии в коде, документация — на русском.
+- Идентификаторы, имена файлов, ключевые слова — на английском.
+
+## Context7 (MCP)
+
+- При реализации ВСЕГДА используй MCP Context7 для получения актуальной документации по библиотекам (Next.js, Strapi, Tailwind, Medusa и др.).
+- Вызывай `resolve-library-id` → `query-docs` перед началом работы с незнакомым API.
+
+## Качество
+
+- Запускай линтеры после изменений.
+- Не коммить .env, секреты, токены.
+- Минимальные и безопасные изменения.
+- При критичных правках — описывай rollback-план.

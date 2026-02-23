@@ -1,0 +1,55 @@
+---
+description: TypeScript strict mode conventions для всего проекта.
+globs: ["**/*.{ts,tsx}"]
+alwaysApply: false
+---
+
+# TypeScript Rules
+
+## Strict Mode
+
+- `strict: true` в tsconfig.json (и frontend, и cms).
+- Никаких `any` — используй `unknown` + type guards.
+
+## Типизация
+
+```typescript
+// Плохо
+const data: any = await fetchData();
+const items = data.results;
+
+// Хорошо
+interface StrapiResponse<T> {
+  data: T[];
+  meta: { pagination: PaginationMeta };
+}
+const { data, meta } = await fetchData<StrapiResponse<Product>>();
+```
+
+## Именование
+
+- **Типы/Интерфейсы:** PascalCase (`ProductCard`, `StrapiResponse`).
+- **Переменные/функции:** camelCase (`fetchProducts`, `isLoading`).
+- **Константы:** UPPER_SNAKE_CASE для env-like, camelCase для остальных.
+- **Файлы компонентов:** PascalCase (`Button.tsx`).
+- **Файлы утилит/данных:** camelCase (`strapi.ts`, `home.ts`).
+
+## Импорты
+
+- Path alias `@/*` для frontend (`import { Button } from "@/design-system/components"`).
+- Barrel-файлы `index.ts` для реэкспорта модулей.
+- Группировка: external → internal → types.
+
+## Props
+
+- Дизайн-система: `interface` + `extends HTMLAttributes` + `forwardRef`.
+- Секционные компоненты: `type` без forwardRef.
+- Все компоненты принимают `className?: string`.
+- Варианты — string union types: `"primary" | "secondary"`.
+
+## Запрещено
+
+- `any` типы.
+- `@ts-ignore` / `@ts-nocheck`.
+- Неиспользуемые переменные и импорты.
+- `as` type assertions без проверки (prefer type guards).

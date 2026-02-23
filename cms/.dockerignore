@@ -1,0 +1,11 @@
+node_modules
+.tmp
+.cache
+build
+dist
+.strapi
+.git
+.gitignore
+.dockerignore
+.env*
+*.md

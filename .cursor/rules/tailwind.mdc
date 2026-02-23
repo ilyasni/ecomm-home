@@ -1,0 +1,56 @@
+---
+description: Tailwind CSS 4 conventions и дизайн-токены.
+globs: ["frontend/**/*.{tsx,css}"]
+alwaysApply: false
+---
+
+# Tailwind CSS 4 Rules
+
+## Конфигурация
+
+- Tailwind 4 через `@tailwindcss/postcss` (без `tailwind.config.ts`).
+- Кастомные токены через `@theme inline` в `globals.css`.
+- CSS-переменные — источник истины для цветов.
+
+## Цвета
+
+- Все цвета определены как CSS-переменные в `:root` (`globals.css`).
+- Используй произвольные значения: `bg-[var(--color-brand)]`, `text-[var(--color-gold)]`.
+
+```css
+/* Плохо */
+.btn { background: #600d11; }
+
+/* Хорошо */
+.btn { @apply bg-[var(--color-button)]; }
+```
+
+- Никогда не хардкодь hex-значения. Сверяй с таблицей цветов в `figma-design-system.mdc`.
+
+## Breakpoints
+
+| Breakpoint | Ширина  | Prefix            |
+|------------|---------|-------------------|
+| Mobile     | 375px   | (default)         |
+| Tablet     | 768px   | `md:`             |
+| Desktop    | 1400px+ | `min-[1400px]:`   |
+
+- Основной desktop breakpoint — `min-[1400px]:` (не `lg:`).
+- Mobile-first подход.
+
+## Контейнер
+
+- `mx-auto max-w-[1400px] px-4 md:px-[39px] min-[1400px]:px-0`.
+
+## Стилизация компонентов
+
+- Классы через шаблонные строки: `` `${base} ${variant} ${className}` ``.
+- Утилита `clsx`/`cn` не используется.
+- Variant-паттерн: `const variants = { primary: "...", secondary: "..." }`.
+
+## Запрещено
+
+- Inline-стили (`style={}`) вместо Tailwind-классов.
+- Хардкод hex-цветов.
+- `@apply` с произвольными значениями в CSS-файлах (кроме globals.css).
+- Импорт Tailwind-конфига (его нет в v4).

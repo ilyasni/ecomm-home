@@ -1,0 +1,54 @@
+---
+description: Docker и Docker Compose conventions для инфраструктуры проекта.
+globs: ["docker-compose*", "Dockerfile*", "docker/**", "**/Dockerfile"]
+alwaysApply: false
+---
+
+# Docker Rules
+
+## Сервисы (docker-compose.yml)
+
+| Сервис    | Образ / Build    | Порт  |
+|-----------|------------------|-------|
+| postgres  | postgres:16-alpine | 5432 |
+| redis     | redis:7-alpine    | 6379 |
+| cms       | ./cms/Dockerfile  | 1337 |
+| frontend  | ./frontend/Dockerfile | 3000 |
+
+## Best Practices
+
+- Все параметры через `.env` файл (не хардкодить в compose).
+- `depends_on` с `condition: service_healthy` для postgres/redis.
+- Named volumes для persistent данных (postgres_data, redis_data, strapi_uploads).
+- `restart: unless-stopped` для всех сервисов.
+
+## Dockerfile
+
+- Base image: `node:22-alpine` (для Strapi), `node:20-alpine` (для Next.js).
+- Multi-stage builds для production.
+- `.dockerignore` для исключения node_modules, .git, .next.
+
+## Команды
+
+```bash
+# Поднять все сервисы
+docker compose up -d
+
+# Пересобрать конкретный сервис
+docker compose up -d --build cms
+
+# Логи сервиса
+docker compose logs -f cms
+
+# Остановить
+docker compose down
+
+# Остановить и удалить volumes
+docker compose down -v
+```
+
+## Запрещено
+
+- `latest` тег для production-образов (фиксируй версии).
+- Секреты в Dockerfile или docker-compose.yml.
+- `privileged: true` без обоснования.

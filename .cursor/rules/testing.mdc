@@ -1,0 +1,38 @@
+---
+description: Тестирование — conventions для unit и integration тестов.
+globs: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/vitest*"]
+alwaysApply: false
+---
+
+# Testing Rules
+
+## Стек (планируется)
+
+- **Runner:** Vitest
+- **Components:** React Testing Library
+- **E2E:** Playwright (в будущем)
+
+## Структура
+
+- Тестовые файлы рядом с исходными: `Button.test.tsx` рядом с `Button.tsx`.
+- Или в `__tests__/` директории внутри модуля.
+
+## Правила
+
+- Тестируй поведение, не реализацию.
+- Один `describe` блок на компонент/функцию.
+- Именование тестов: описывай ожидаемое поведение на русском.
+
+```typescript
+describe("Button", () => {
+  it("вызывает onClick при клике", () => { /* ... */ });
+  it("отображает loading-спиннер при isLoading=true", () => { /* ... */ });
+  it("неактивна при disabled=true", () => { /* ... */ });
+});
+```
+
+## Запрещено
+
+- Тесты, зависящие от внешних API без моков.
+- Snapshot-тесты для стилей (используй visual regression).
+- `any` в тестовых данных.

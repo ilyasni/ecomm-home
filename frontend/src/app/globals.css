@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fcfbf9;
+  --foreground: #22201d;
+  --color-light: #fefaf4;
+  --color-selection: #e9e5e0;
+  --color-gray: #898885;
+  --color-gray-light: #d9d5d0;
+  --color-dark: #494846;
+  --color-brown: #8c8074;
+  --color-gold: #bda06a;
+  --color-brand: #600d11;
+  --color-button: #600d11;
+  --color-error: #d7111a;
+  --color-black: #22201d;
+  --color-dark-gray: #494846;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-onest);
+}
+
+@theme {
+  --breakpoint-desktop: 87.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-onest), Arial, Helvetica, sans-serif;
+}
+
+img {
+  display: block;
+}
+
+.swiper-pagination-bullet {
+  background: var(--color-selection);
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--color-light);
+}
+
+input[type="range"].price-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 0;
+  outline: none;
+}
+
+input[type="range"].price-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50px;
+  background: var(--color-brown);
+  cursor: pointer;
+}
+
+input[type="range"].price-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50px;
+  background: var(--color-brown);
+  cursor: pointer;
+  border: none;
+}

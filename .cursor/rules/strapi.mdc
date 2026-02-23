@@ -1,0 +1,48 @@
+---
+description: Strapi 5 CMS conventions для cms-сервиса.
+globs: ["cms/**/*.{ts,js,json}"]
+alwaysApply: false
+---
+
+# Strapi 5 — CMS Rules
+
+## Структура проекта
+
+```
+cms/
+├── config/           # database, server, admin, middlewares, plugins
+├── src/
+│   ├── api/          # Content Types (collection/single types)
+│   ├── admin/        # Admin panel customization
+│   └── index.ts      # Lifecycle hooks
+├── types/generated/  # Auto-generated types
+└── public/uploads/   # Media uploads
+```
+
+## Content Types
+
+- Создавай через Strapi Admin Panel → Content-Types Builder.
+- Файлы генерируются автоматически в `src/api/<content-type>/`.
+- Каждый content type: `content-types/`, `controllers/`, `routes/`, `services/`.
+
+## Конфигурация БД
+
+- PostgreSQL 16 (не SQLite) — определено в `config/database.ts`.
+- Все параметры через env-переменные (`DATABASE_HOST`, `DATABASE_PORT` и т.д.).
+
+## API
+
+- REST API по умолчанию (endpoint: `/api/<content-type>`).
+- Пагинация, фильтрация, populate — через query params.
+- API Token для доступа из Next.js (env: `STRAPI_API_TOKEN`).
+
+## Локализация
+
+- Плагин `i18n` включён, `defaultLocale: "ru"`.
+- Контент-типы с локализацией: добавляй `pluginOptions.i18n.localized: true`.
+
+## Запрещено
+
+- Прямая модификация auto-generated types в `types/generated/`.
+- Хардкод credentials в конфигах (только env-переменные).
+- Удаление или переименование полей content type на продакшене без миграции.
