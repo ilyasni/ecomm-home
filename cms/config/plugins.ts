@@ -4,10 +4,4 @@ export default ({ env }) => ({
       jwtSecret: env("JWT_SECRET"),
     },
   },
-  i18n: {
-    enabled: true,
-    config: {
-      defaultLocale: "ru",
-    },
-  },
 });
