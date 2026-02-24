@@ -6,29 +6,27 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
       DATABASE_CLIENT: postgres
-      DATABASE_HOST: ${POSTGRES_HOST:?}
-      DATABASE_PORT: ${POSTGRES_PORT:?5432}
-      DATABASE_NAME: ${POSTGRES_DB:?}
-      DATABASE_USERNAME: ${POSTGRES_USER:?}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?}
-      HOST: ${STRAPI_HOST:?0.0.0.0}
-      PORT: ${STRAPI_PORT:?1337}
+      DATABASE_HOST: ${DATABASE_HOST:?}
+      DATABASE_PORT: ${DATABASE_PORT:?}
+      DATABASE_NAME: ${DATABASE_NAME:?}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:?}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?}
+      REDIS_HOST: ${REDIS_HOST:-}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       APP_KEYS: ${STRAPI_APP_KEYS:?}
       API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT:?}
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET:?}
-      ADMIN_ENCRYPTION_KEY: ${ADMIN_ENCRYPTION_KEY:?}
-      ADMIN_REFRESH_TOKEN_MAX_LIFESPAN: ${ADMIN_REFRESH_TOKEN_MAX_LIFESPAN:?604800}
-      ADMIN_SESSION_MAX_LIFESPAN: ${ADMIN_SESSION_MAX_LIFESPAN:?86400}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT:?}
       JWT_SECRET: ${STRAPI_JWT_SECRET:?}
-      REDIS_HOST: ${REDIS_HOST:-}
-      REDIS_PORT: ${REDIS_PORT:-}
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      ADMIN_ENCRYPTION_KEY: ${STRAPI_ADMIN_ENCRYPTION_KEY:?}
+      ADMIN_SESSION_MAX_LIFESPAN: ${STRAPI_ADMIN_SESSION_MAX_LIFESPAN:-86400}
+      ADMIN_REFRESH_TOKEN_MAX_LIFESPAN: ${STRAPI_ADMIN_REFRESH_TOKEN_MAX_LIFESPAN:-2592000}
     volumes:
       - strapi_uploads:/opt/app/public/uploads
-    expose:
-      - "1337"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:1337/_health || exit 1"]
       interval: 15s
@@ -46,19 +44,18 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
+      PORT: 3000
       NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:?}
       NEXT_PUBLIC_STRAPI_MEDIA_URL: ${NEXT_PUBLIC_STRAPI_MEDIA_URL:?}
-      STRAPI_MEDIA_HOSTNAME: ${STRAPI_MEDIA_HOSTNAME:?}
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:?}
       STRAPI_INTERNAL_URL: http://cms:1337
-    expose:
-      - "3000"
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:?}
+      STRAPI_MEDIA_HOSTNAME: ${STRAPI_MEDIA_HOSTNAME:?}
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000 || exit 1"]
       interval: 15s
-      timeout: 5s
+      timeout: 10s
       retries: 10
-      start_period: 30s
+      start_period: 60s
 
 volumes:
   strapi_uploads:
