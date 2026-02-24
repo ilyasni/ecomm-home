@@ -13,7 +13,7 @@
   "lint-staged": {
     "frontend/src/**/*.{ts,tsx}": [
       "prettier --write --config .prettierrc",
-      "eslint --fix"
+      "npm --prefix frontend run lint -- --fix"
     ],
     "frontend/src/**/*.{css,json}": [
       "prettier --write --config .prettierrc"
