@@ -10,6 +10,7 @@ RUN npm config set fetch-retries 5 -g \
   && npm config set fetch-retry-mintimeout 20000 -g \
   && npm config set fetch-retry-maxtimeout 1200000 -g \
   && npm install node-addon-api \
+  && npm install @swc/core-linux-x64-gnu \
   && npm ci --include=optional
 ENV PATH=/opt/node_modules/.bin:$PATH
 
