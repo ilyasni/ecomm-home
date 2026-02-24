@@ -1,26 +1,41 @@
 "use client";
 
 import Image from "next/image";
-import { contactInfo } from "@/data/contacts";
+import { contactInfo as defaultContactInfo } from "@/data/contacts";
 
-export function ContactInfo() {
+interface ContactInfoProps {
+  data?: {
+    phone: string;
+    email: string;
+    socials: { label: string; href: string }[];
+    image?: string;
+  };
+}
+
+export function ContactInfo({ data }: ContactInfoProps) {
+  const contactInfo = {
+    ...defaultContactInfo,
+    ...data,
+    image: data?.image ?? defaultContactInfo.image,
+  };
+
   return (
-    <div className="flex flex-col md:flex-row gap-0">
+    <div className="flex flex-col gap-0 md:flex-row">
       <div className="relative h-[322px] w-full md:w-1/2">
-        <Image
-          src={contactInfo.image}
-          alt="Бутик Vita Brava Home"
-          fill
-          className="object-cover"
-          unoptimized
-        />
+        {contactInfo.image && (
+          <Image
+            src={contactInfo.image}
+            alt="Бутик Vita Brava Home"
+            fill
+            className="object-cover"
+            unoptimized
+          />
+        )}
       </div>
-      <div className="bg-[var(--color-selection)] p-6 md:p-8 desktop:p-10 md:w-1/2 flex flex-col justify-center">
+      <div className="desktop:p-10 flex flex-col justify-center bg-[var(--color-selection)] p-6 md:w-1/2 md:p-8">
         <div>
-          <p className="text-base font-medium leading-[1.3]">
-            Позвонить и написать
-          </p>
-          <div className="mt-4 flex flex-col md:flex-row gap-3 md:gap-6">
+          <p className="text-base leading-[1.3] font-medium">Позвонить и написать</p>
+          <div className="mt-4 flex flex-col gap-3 md:flex-row md:gap-6">
             <a
               href={`tel:${contactInfo.phone.replace(/\s/g, "")}`}
               className="flex items-center gap-2 text-sm text-[var(--color-brand)] underline"
@@ -37,7 +52,7 @@ export function ContactInfo() {
         </div>
 
         <div className="mt-10">
-          <p className="text-base font-medium leading-[1.3]">Мы в соцсетях</p>
+          <p className="text-base leading-[1.3] font-medium">Мы в соцсетях</p>
           <div className="mt-4 flex gap-6">
             {contactInfo.socials.map((s) => (
               <a

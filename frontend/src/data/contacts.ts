@@ -5,7 +5,7 @@ export const contactInfo = {
     { label: "ВКонтакте", href: "#" },
     { label: "Telegram", href: "#" },
   ],
-  image: "/assets/figma/contacts/boutique.jpg",
+  image: "/assets/figma/placeholder.svg",
 };
 
 export type BoutiqueAddress = {
@@ -32,7 +32,7 @@ export const boutiques: BoutiqueAddress[] = [
     scheduleTime: "ПН-СБ с 11:00 до 21:00",
     phone: "+7 926 000 35 92",
     email: "vahome@mail.ru",
-    mapImage: "/assets/figma/contacts/map.jpg",
+    mapImage: "/assets/figma/placeholder.svg",
   },
   {
     id: "krasnodar",
@@ -44,7 +44,7 @@ export const boutiques: BoutiqueAddress[] = [
     scheduleTime: "ПН-СБ с 11:00 до 21:00",
     phone: "+7 926 000 35 92",
     email: "vahome@mail.ru",
-    mapImage: "/assets/figma/contacts/map.jpg",
+    mapImage: "/assets/figma/placeholder.svg",
   },
   {
     id: "spb",
@@ -56,6 +56,6 @@ export const boutiques: BoutiqueAddress[] = [
     scheduleTime: "ПН-СБ с 11:00 до 21:00",
     phone: "+7 926 000 35 92",
     email: "vahome@mail.ru",
-    mapImage: "/assets/figma/contacts/map.jpg",
+    mapImage: "/assets/figma/placeholder.svg",
   },
 ];

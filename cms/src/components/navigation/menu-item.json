@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_navigation_menu_items",
+  "info": {
+    "displayName": "Menu Item",
+    "icon": "link",
+    "description": "Пункт меню навигации"
+  },
+  "attributes": {
+    "label": { "type": "string", "required": true },
+    "href": { "type": "string", "required": true },
+    "isHighlighted": { "type": "boolean", "default": false },
+    "openInNewTab": { "type": "boolean", "default": false }
+  }
+}

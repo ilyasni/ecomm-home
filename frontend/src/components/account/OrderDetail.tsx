@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { Order } from "@/data/account";
 
 export function OrderDetail({ order }: { order: Order }) {
@@ -13,36 +14,27 @@ export function OrderDetail({ order }: { order: Order }) {
     <div className="flex flex-col gap-6">
       <Link
         href="/account/orders"
-        className="flex items-center gap-2 text-sm text-[var(--color-dark-gray)] hover:text-[var(--color-black)] transition-colors"
+        className="flex items-center gap-2 text-sm text-[var(--color-dark-gray)] transition-colors hover:text-[var(--color-black)]"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path
-            d="M12.5 15L7.5 10L12.5 5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="1.5" />
         </svg>
         Вернуться в заказы
       </Link>
 
       <div className="rounded-[5px] border border-[var(--color-gray-light)] p-4 md:p-6">
         {/* Header */}
-        <div className="flex flex-wrap items-center gap-4 md:gap-8 text-sm">
+        <div className="flex flex-wrap items-center gap-4 text-sm md:gap-8">
           <div className="flex items-center gap-2">
             <span className="text-[var(--color-gray)]">СТАТУС ЗАКАЗА</span>
-            <span className={`rounded px-2 py-0.5 text-xs ${statusColor}`}>
-              {order.status}
-            </span>
+            <span className={`rounded px-2 py-0.5 text-xs ${statusColor}`}>{order.status}</span>
           </div>
           <span className="text-[var(--color-gray)]">
-            НОМЕР ЗАКАЗА{" "}
-            <span className="text-[var(--color-black)]">{order.number}</span>
+            НОМЕР ЗАКАЗА <span className="text-[var(--color-black)]">{order.number}</span>
           </span>
           <span className="text-[var(--color-dark-gray)]">
             {order.paymentMethod}{" "}
-            <span className="font-medium text-[var(--color-black)]">
-              {order.total}
-            </span>
+            <span className="font-medium text-[var(--color-black)]">{order.total}</span>
           </span>
         </div>
 
@@ -57,13 +49,15 @@ export function OrderDetail({ order }: { order: Order }) {
         </div>
 
         {/* Product cards */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {order.products.map((product) => (
             <div key={product.id} className="flex flex-col gap-2">
-              <div className="relative aspect-[167/295] rounded-[5px] overflow-hidden bg-[var(--color-selection)]">
-                <img
+              <div className="relative aspect-[167/295] overflow-hidden rounded-[5px] bg-[var(--color-selection)]">
+                <Image
                   src={product.image}
                   alt={product.title}
+                  fill
+                  unoptimized
                   className="h-full w-full object-cover"
                 />
                 {product.badge && (
@@ -73,10 +67,10 @@ export function OrderDetail({ order }: { order: Order }) {
                 )}
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-medium text-[var(--color-black)] line-clamp-2">
+                <span className="line-clamp-2 text-xs font-medium text-[var(--color-black)]">
                   {product.title}
                 </span>
-                <span className="text-[10px] text-[var(--color-gray)] line-clamp-2">
+                <span className="line-clamp-2 text-[10px] text-[var(--color-gray)]">
                   {product.description}
                 </span>
                 <div className="flex items-center gap-2">
@@ -90,7 +84,7 @@ export function OrderDetail({ order }: { order: Order }) {
                   )}
                 </div>
                 {product.colors && (
-                  <div className="flex gap-1 mt-1">
+                  <div className="mt-1 flex gap-1">
                     {product.colors.map((color) => (
                       <span
                         key={color.name}

@@ -1,0 +1,36 @@
+{
+  "kind": "singleType",
+  "collectionName": "navigations",
+  "info": {
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation",
+    "description": "Навигация сайта — хедер, меню, контактные данные"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "topBarText": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "telegramUrl": {
+      "type": "string"
+    },
+    "whatsappUrl": {
+      "type": "string"
+    },
+    "topMenuItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "navigation.menu-item"
+    },
+    "catalogCategories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "navigation.catalog-category"
+    }
+  }
+}

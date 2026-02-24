@@ -2,16 +2,28 @@
 
 import Image from "next/image";
 import { Button } from "@/design-system/components";
-import { bonusSection } from "@/data/special-offers";
+import { bonusSection as defaultBonusSection } from "@/data/special-offers";
 
-export function BonusSection() {
+type BonusSectionData = {
+  title: string;
+  description: string;
+  buttonLabel: string;
+  image: string;
+};
+
+type BonusSectionProps = {
+  data?: BonusSectionData;
+};
+
+export function BonusSection({ data }: BonusSectionProps) {
+  const bonusSection = data ?? defaultBonusSection;
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="flex flex-col justify-center bg-[var(--color-selection)] p-8 md:p-10 desktop:p-16 md:w-1/2">
-        <h2 className="text-[22px] md:text-[26px] desktop:text-[32px] font-medium leading-[1.1]">
+      <div className="desktop:p-16 flex flex-col justify-center bg-[var(--color-selection)] p-8 md:w-1/2 md:p-10">
+        <h2 className="desktop:text-[32px] text-[22px] leading-[1.1] font-medium md:text-[26px]">
           {bonusSection.title}
         </h2>
-        <p className="mt-6 text-sm text-[var(--color-dark)] leading-[1.5] desktop:text-base max-w-[512px]">
+        <p className="desktop:text-base mt-6 max-w-[512px] text-sm leading-[1.5] text-[var(--color-dark)]">
           {bonusSection.description}
         </p>
         <div className="mt-8">

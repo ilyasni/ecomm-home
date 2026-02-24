@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_loyalty_steps",
+  "info": {
+    "displayName": "Loyalty Step",
+    "icon": "shoe-prints",
+    "description": "Шаг программы лояльности"
+  },
+  "attributes": {
+    "iconsCount": {
+      "type": "integer",
+      "required": true,
+      "default": 1
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

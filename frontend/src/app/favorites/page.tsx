@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/home/Header";
 import { Footer } from "@/components/home/Footer";
@@ -8,37 +8,44 @@ import { Button } from "@/design-system/components";
 import { Icon } from "@/design-system/icons";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ClearCartModal } from "@/components/checkout/modals/ClearCartModal";
-import { favoriteProducts as initialFavorites, recentlyViewed } from "@/data/account";
+import { recentlyViewed } from "@/data/account";
+import {
+  clearFavorites,
+  getCommerceSnapshot,
+  subscribeCommerce,
+  toggleFavorite,
+} from "@/lib/commerce";
+import type { CommerceProductRef } from "@/lib/commerce";
 
 type SortOption = "default" | "price-asc" | "price-desc";
 
-type FavoriteProduct = (typeof initialFavorites)[number];
+type FavoriteProduct = CommerceProductRef;
 
 function RecentlyViewedSection() {
   if (recentlyViewed.length === 0) return null;
 
   return (
     <section className="mt-10 md:mt-16">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-[22px] md:text-[28px] font-medium">Ранее вы смотрели</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-[22px] font-medium md:text-[28px]">Ранее вы смотрели</h2>
         <div className="flex gap-2">
           <button
             type="button"
-            className="w-10 h-10 rounded-full border border-[var(--color-gray-light)] flex items-center justify-center hover:bg-[var(--color-beige)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-gray-light)] hover:bg-[var(--color-beige)]"
             aria-label="Назад"
           >
             <Icon name="arrowRight" size={14} className="rotate-180" />
           </button>
           <button
             type="button"
-            className="w-10 h-10 rounded-full border border-[var(--color-gray-light)] flex items-center justify-center hover:bg-[var(--color-beige)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-gray-light)] hover:bg-[var(--color-beige)]"
             aria-label="Вперёд"
           >
             <Icon name="arrowRight" size={14} />
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {recentlyViewed.map((product) => (
           <ProductCard
             key={product.id}
@@ -61,8 +68,8 @@ function RecentlyViewedSection() {
 function EmptyFavorites() {
   return (
     <>
-      <div className="bg-[var(--color-beige)] rounded-[5px] py-6 px-4 text-center mb-6">
-        <p className="text-[14px] md:text-[16px] leading-[1.5]">
+      <div className="mb-6 rounded-[5px] bg-[var(--color-beige)] px-4 py-6 text-center">
+        <p className="text-[14px] leading-[1.5] md:text-[16px]">
           Вы ещё не добавили ни одного товара в избранное.
           <br className="hidden md:block" />
           Посмотрите наши{" "}
@@ -77,7 +84,7 @@ function EmptyFavorites() {
         </p>
       </div>
 
-      <div className="flex justify-center mb-10">
+      <div className="mb-10 flex justify-center">
         <Link href="/catalog">
           <Button variant="primary">Перейти в каталог</Button>
         </Link>
@@ -113,16 +120,12 @@ function FavoritesGrid({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <button
           type="button"
           onClick={() =>
             setSort((prev) =>
-              prev === "default"
-                ? "price-asc"
-                : prev === "price-asc"
-                ? "price-desc"
-                : "default"
+              prev === "default" ? "price-asc" : prev === "price-asc" ? "price-desc" : "default"
             )
           }
           className="flex items-center gap-1.5 text-[14px] text-[var(--color-dark)] hover:text-[var(--color-black)]"
@@ -139,7 +142,7 @@ function FavoritesGrid({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 desktop:grid-cols-3 gap-4 md:gap-6 mb-12">
+      <div className="desktop:grid-cols-3 mb-12 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         {sortedProducts.map((product) => (
           <ProductCard
             key={product.id}
@@ -151,9 +154,9 @@ function FavoritesGrid({
               oldPrice: product.oldPrice,
               image: product.image,
               badge: product.badge,
-              colors: product.colors,
             }}
             variant="large"
+            onFavorite={() => toggleFavorite(product)}
           />
         ))}
       </div>
@@ -164,13 +167,21 @@ function FavoritesGrid({
 }
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<FavoriteProduct[]>(initialFavorites);
+  const [favorites, setFavorites] = useState<FavoriteProduct[]>([]);
   const [clearModalOpen, setClearModalOpen] = useState(false);
+
+  useEffect(() => {
+    const sync = () => {
+      setFavorites(getCommerceSnapshot().favorites);
+    };
+    sync();
+    return subscribeCommerce(sync);
+  }, []);
 
   const isEmpty = favorites.length === 0;
 
   const handleClearAll = () => {
-    setFavorites([]);
+    clearFavorites();
     setClearModalOpen(false);
   };
 
@@ -179,10 +190,10 @@ export default function FavoritesPage() {
       <Header variant="solid" />
 
       <main className="pt-[111px] md:pt-[143px]">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 pb-12 md:pb-20">
-          <h1 className="text-center text-[28px] md:text-[36px] font-medium leading-[1.2] mb-6 md:mb-8">
+        <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 pb-12 md:px-[39px] md:pb-20">
+          <h1 className="mb-6 text-center text-[28px] leading-[1.2] font-medium md:mb-8 md:text-[36px]">
             Избранное{" "}
-            <span className="text-[16px] md:text-[18px] font-normal text-[var(--color-dark)]">
+            <span className="text-[16px] font-normal text-[var(--color-dark)] md:text-[18px]">
               ({favorites.length})
             </span>
           </h1>
@@ -190,10 +201,7 @@ export default function FavoritesPage() {
           {isEmpty ? (
             <EmptyFavorites />
           ) : (
-            <FavoritesGrid
-              products={favorites}
-              onClearAll={() => setClearModalOpen(true)}
-            />
+            <FavoritesGrid products={favorites} onClearAll={() => setClearModalOpen(true)} />
           )}
         </div>
       </main>

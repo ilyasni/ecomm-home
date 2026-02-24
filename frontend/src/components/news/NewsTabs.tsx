@@ -1,27 +1,27 @@
 "use client";
 
-import { newsCategories, type NewsCategory } from "@/data/news";
+import { newsCategories as defaultNewsCategories, type NewsCategory } from "@/data/news";
 
 type NewsTabsProps = {
   active: NewsCategory;
   onChange: (category: NewsCategory) => void;
+  categories?: NewsCategory[];
   className?: string;
 };
 
-export function NewsTabs({ active, onChange, className }: NewsTabsProps) {
+export function NewsTabs({ active, onChange, categories, className }: NewsTabsProps) {
+  const items = categories ?? defaultNewsCategories;
   return (
     <div
-      className={`flex items-center justify-center gap-6 text-[16px] font-normal leading-[1.3] text-[var(--color-black)] overflow-x-auto scrollbar-none ${className || ""}`}
+      className={`scrollbar-none flex items-center justify-center gap-6 overflow-x-auto text-[16px] leading-[1.3] font-normal text-[var(--color-black)] ${className || ""}`}
     >
-      {newsCategories.map((cat) => (
+      {items.map((cat) => (
         <button
           key={cat}
           type="button"
           onClick={() => onChange(cat)}
-          className={`capitalize transition-colors whitespace-nowrap ${
-            active === cat
-              ? "underline underline-offset-4"
-              : "hover:text-[var(--color-brand)]"
+          className={`whitespace-nowrap capitalize transition-colors ${
+            active === cat ? "underline underline-offset-4" : "hover:text-[var(--color-brand)]"
           }`}
         >
           {cat === "все" ? "Все" : cat.charAt(0).toUpperCase() + cat.slice(1)}

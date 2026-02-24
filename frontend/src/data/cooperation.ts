@@ -3,8 +3,8 @@ export const cooperationHero = {
   subtitle:
     "Открыты для сотрудничества с дизайнерами и готовы порадовать представителей данной профессии специальными условиями",
   buttonLabel: "Стать партнёром",
-  desktopImage: "/assets/figma/cooperation/hero-desktop.jpg",
-  mobileImage: "/assets/figma/cooperation/hero-mobile.jpg",
+  desktopImage: "/assets/figma/placeholder.svg",
+  mobileImage: "/assets/figma/placeholder.svg",
 };
 
 export const cooperationIntro =
@@ -35,8 +35,7 @@ export const partnerOfferItems = [
   {
     id: "po-5",
     title: "Гибкие сроки",
-    description:
-      "быстрая поставка большинства товаров на 14 дней; возможность обмена на аналоги",
+    description: "быстрая поставка большинства товаров на 14 дней; возможность обмена на аналоги",
   },
   {
     id: "po-6",
@@ -53,14 +52,14 @@ export const cooperationAdvantages = [
 ];
 
 export const cooperationAdvantageImages = [
-  "/assets/figma/cooperation/advantage-1.jpg",
-  "/assets/figma/cooperation/advantage-2.jpg",
-  "/assets/figma/cooperation/advantage-3.jpg",
+  "/assets/figma/placeholder.svg",
+  "/assets/figma/placeholder.svg",
+  "/assets/figma/placeholder.svg",
 ];
 
 export const partnershipForm = {
   title: "Программа VITA BRAVA HOME",
   subtitle:
     "Для вступления в партнёрскую программу позвоните нам по телефону +7 926 000 35 92 или заполните эту анкету",
-  image: "/assets/figma/cooperation/form-image.jpg",
+  image: "/assets/figma/placeholder.svg",
 };

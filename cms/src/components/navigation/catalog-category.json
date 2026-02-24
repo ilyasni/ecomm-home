@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_navigation_catalog_categories",
+  "info": {
+    "displayName": "Catalog Category",
+    "icon": "apps",
+    "description": "Категория каталога в навигации с подкатегориями"
+  },
+  "attributes": {
+    "label": { "type": "string", "required": true },
+    "href": { "type": "string", "required": true },
+    "hasSubmenu": { "type": "boolean", "default": false },
+    "subcategories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "navigation.menu-item"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_home_promo_items",
+  "info": {
+    "displayName": "Promo Item",
+    "icon": "star",
+    "description": "Элемент промо-баннера на главной"
+  },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "description": { "type": "string" },
+    "icon": { "type": "string" }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_about_collection_previews",
+  "info": {
+    "displayName": "Collection Preview",
+    "icon": "images",
+    "description": "Превью коллекции на странице О бренде"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

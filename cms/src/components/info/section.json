@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_info_sections",
+  "info": {
+    "displayName": "Info Section",
+    "icon": "align-left",
+    "description": "Секция информационной страницы (заголовок + абзацы)"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "paragraphs": {
+      "type": "json"
+    }
+  }
+}

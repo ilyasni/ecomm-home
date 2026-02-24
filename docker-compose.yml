@@ -37,6 +37,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DATABASE_CLIENT: postgres
       DATABASE_HOST: ${POSTGRES_HOST}
@@ -49,6 +51,9 @@ services:
       APP_KEYS: ${STRAPI_APP_KEYS}
       API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      ADMIN_ENCRYPTION_KEY: ${ADMIN_ENCRYPTION_KEY}
+      ADMIN_REFRESH_TOKEN_MAX_LIFESPAN: ${ADMIN_REFRESH_TOKEN_MAX_LIFESPAN}
+      ADMIN_SESSION_MAX_LIFESPAN: ${ADMIN_SESSION_MAX_LIFESPAN}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
     ports:
@@ -57,6 +62,12 @@ services:
       - ./cms:/opt/app
       - cms_node_modules:/opt/app/node_modules
       - strapi_uploads:/opt/app/public/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://0.0.0.0:1337/_health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
 
   frontend:
     build:
@@ -64,10 +75,12 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      - cms
+      cms:
+        condition: service_healthy
     environment:
-      NEXT_PUBLIC_STRAPI_URL: http://cms:1337
+      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
       NEXT_PUBLIC_STRAPI_MEDIA_URL: http://localhost:1337
+      STRAPI_INTERNAL_URL: http://cms:1337
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       STRAPI_MEDIA_HOSTNAME: cms
     ports:

@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_customer_info_delivery_tabs",
+  "info": {
+    "displayName": "Delivery Tab",
+    "icon": "truck",
+    "description": "Таб доставки"
+  },
+  "attributes": {
+    "tabId": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

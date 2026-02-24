@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      - name: TypeScript check
+        run: npm run type-check
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:run
+
+      - name: Smoke e2e checks
+        run: npm run test:e2e:smoke
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+  build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build containers
+        run: docker compose build
+        env:
+          POSTGRES_DB: strapi
+          POSTGRES_USER: strapi
+          POSTGRES_PASSWORD: ci-test-password
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: "5432"
+          STRAPI_HOST: 0.0.0.0
+          STRAPI_PORT: "1337"
+          STRAPI_APP_KEYS: key1,key2,key3,key4
+          STRAPI_API_TOKEN_SALT: ci-salt
+          STRAPI_ADMIN_JWT_SECRET: ci-admin-jwt
+          STRAPI_TRANSFER_TOKEN_SALT: ci-transfer-salt
+          STRAPI_JWT_SECRET: ci-jwt-secret
+          STRAPI_API_TOKEN: ci-api-token

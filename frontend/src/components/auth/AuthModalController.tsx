@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import { AuthPromptModal } from "./AuthPromptModal";
 import { LoginModal } from "./LoginModal";
 import { RegisterModal } from "./RegisterModal";
@@ -56,9 +50,7 @@ export function AuthModalProvider({
   }, [onGuest, close]);
 
   return (
-    <AuthModalContext.Provider
-      value={{ openLogin, openRegister, openPrompt, close }}
-    >
+    <AuthModalContext.Provider value={{ openLogin, openRegister, openPrompt, close }}>
       {children}
 
       <AuthPromptModal
@@ -72,14 +64,20 @@ export function AuthModalProvider({
         open={view === "login"}
         onClose={close}
         onSwitchToRegister={openRegister}
-        onSubmit={onLoginSubmit}
+        onSubmit={(data) => {
+          onLoginSubmit?.(data);
+          close();
+        }}
       />
 
       <RegisterModal
         open={view === "register"}
         onClose={close}
         onSwitchToLogin={openLogin}
-        onSubmit={onRegisterSubmit}
+        onSubmit={(data) => {
+          onRegisterSubmit?.(data);
+          close();
+        }}
       />
     </AuthModalContext.Provider>
   );

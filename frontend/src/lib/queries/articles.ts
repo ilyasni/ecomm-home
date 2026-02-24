@@ -6,7 +6,7 @@ export async function getArticles(params?: {
   category?: string;
 }) {
   const queryParams: Record<string, string> = {
-    "populate[image]": "*",
+    populate: "*",
     "sort[0]": "date:desc",
     "pagination[page]": String(params?.page ?? 1),
     "pagination[pageSize]": String(params?.pageSize ?? 10),
@@ -23,13 +23,12 @@ export async function getArticles(params?: {
 }
 
 export async function getArticleBySlug(slug: string) {
-  return strapiFindBySlug("articles", slug, {
-    "populate[image]": "*",
-    "populate[toc]": "*",
-    "populate[sections][on][article.section-heading][populate]": "*",
-    "populate[sections][on][article.section-text][populate]": "*",
-    "populate[sections][on][article.section-list][populate]": "*",
-    "populate[sections][on][article.section-images][populate]": "*",
-    "populate[sections][on][article.section-table][populate]": "*",
-  }, { revalidate: 60, tags: ["articles"] });
+  return strapiFindBySlug(
+    "articles",
+    slug,
+    {
+      populate: "*",
+    },
+    { revalidate: 60, tags: ["articles"] }
+  );
 }

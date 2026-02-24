@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_article_section_lists",
+  "info": {
+    "displayName": "Section List",
+    "icon": "list-ul",
+    "description": "Список в статье"
+  },
+  "attributes": {
+    "items": {
+      "type": "json"
+    }
+  }
+}

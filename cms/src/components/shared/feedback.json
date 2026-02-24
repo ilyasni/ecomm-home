@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_shared_feedbacks",
+  "info": {
+    "displayName": "Feedback",
+    "icon": "message",
+    "description": "Отзыв клиента"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "city": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": ["yandex", "2gis", "google"]
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer",
+      "default": 5,
+      "min": 1,
+      "max": 5
+    }
+  }
+}

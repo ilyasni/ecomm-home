@@ -1,16 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { specialOffers } from "@/data/special-offers";
+import { specialOffers as defaultSpecialOffers } from "@/data/special-offers";
+import type { SpecialOffer } from "@/data/special-offers";
 
-export function OffersGrid() {
+type OffersGridProps = {
+  data?: SpecialOffer[];
+};
+
+export function OffersGrid({ data }: OffersGridProps) {
+  const specialOffers = data ?? defaultSpecialOffers;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
       {specialOffers.map((offer) => (
         <a
           key={offer.id}
           href="#"
-          className="group relative h-[220px] md:h-[340px] desktop:h-[450px] overflow-hidden"
+          className="group desktop:h-[450px] relative h-[220px] overflow-hidden md:h-[340px]"
         >
           <Image
             src={offer.image}
@@ -20,13 +26,11 @@ export function OffersGrid() {
             unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 text-[var(--color-light)]">
-            <h3 className="text-lg md:text-xl desktop:text-2xl font-medium leading-[1.1]">
+          <div className="absolute right-6 bottom-6 left-6 text-[var(--color-light)]">
+            <h3 className="desktop:text-2xl text-lg leading-[1.1] font-medium md:text-xl">
               {offer.title}
             </h3>
-            <p className="mt-2 text-sm leading-[1.3] opacity-90">
-              {offer.subtitle}
-            </p>
+            <p className="mt-2 text-sm leading-[1.3] opacity-90">{offer.subtitle}</p>
           </div>
         </a>
       ))}

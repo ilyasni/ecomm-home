@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_about_difference_items",
+  "info": {
+    "displayName": "Difference Item",
+    "icon": "star",
+    "description": "Что нас отличает (карточка)"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

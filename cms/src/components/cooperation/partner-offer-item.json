@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_cooperation_partner_offer_items",
+  "info": {
+    "displayName": "Partner Offer Item",
+    "icon": "handshake",
+    "description": "Пункт партнёрского предложения"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

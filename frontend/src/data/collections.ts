@@ -25,23 +25,21 @@ export const collections: Collection[] = [
     heroSubtitle:
       "Коллекция Medium — идеальное решение для\nсовременного интерьера и комфортного сна",
     heroImages: [
-      "/assets/figma/collections/collection.jpg",
-      "/assets/figma/collections/collection.jpg",
-      "/assets/figma/collections/collection.jpg",
+      "/assets/figma/placeholder.svg",
+      "/assets/figma/placeholder.svg",
+      "/assets/figma/placeholder.svg",
     ],
-    descriptionTitle:
-      "Коллекция Medium — вдохновлённая спокойствием океана",
+    descriptionTitle: "Коллекция Medium — вдохновлённая спокойствием океана",
     descriptionParagraphs: [
       "Линейка нашей коллекции — прекрасная! Ты сможешь в белом, голубом и её цвета окунуться в мировой океан. Они доступны в нежной палитре, спокойные тона которой напомнят о стелющихся средиземноморских волнах.",
       "Коллекция Medium — это элегантное и удобное постельное бельё, подходящее для ежедневного использования. Мы создали эту линейку, чтобы каждый мог позволить себе ощущение роскоши дома.",
     ],
-    mediaImage: "/assets/figma/collections/advantage-1.jpg",
-    mediaVideo: "/assets/figma/collections/advantage-2.jpg",
+    mediaImage: "/assets/figma/placeholder.svg",
+    mediaVideo: "/assets/figma/placeholder.svg",
     bannerTitle: "Какая подушка подойдет именно вам?",
-    bannerDescription:
-      "Специальный тест поможет подобрать идеальную подушку для вас",
+    bannerDescription: "Специальный тест поможет подобрать идеальную подушку для вас",
     bannerButtonLabel: "Пройти тест",
-    bannerImage: "/assets/figma/collections/featured.jpg",
+    bannerImage: "/assets/figma/placeholder.svg",
     products: [
       {
         id: "col-1",
@@ -49,7 +47,7 @@ export const collections: Collection[] = [
         description: "Белый утиный пух в хлопке-батисте",
         price: "от 45 000 ₽",
         oldPrice: "50 000 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         rating: 5,
       },
       {
@@ -57,7 +55,7 @@ export const collections: Collection[] = [
         title: "Наволочка Чёрный Соболь",
         description: "Белый утиный пух в хлопке-батисте",
         price: "15 000 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         badge: "-15%",
         rating: 5,
       },
@@ -66,7 +64,7 @@ export const collections: Collection[] = [
         title: "Плед",
         description: "Белый утиный пух в хлопке-батисте",
         price: "15 000 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         rating: 5,
       },
       {
@@ -74,7 +72,7 @@ export const collections: Collection[] = [
         title: "Наволочка Гладкий Соболь",
         description: "Белый утиный пух в хлопке-батисте",
         price: "15 000 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         rating: 5,
       },
       {
@@ -82,7 +80,7 @@ export const collections: Collection[] = [
         title: "Кашемировая подушка",
         description: "Белый утиный пух в хлопке-батисте",
         price: "15 000 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         rating: 5,
       },
       {
@@ -90,7 +88,7 @@ export const collections: Collection[] = [
         title: "Микро-гель подушка",
         description: "Белый утиный пух в хлопке-батисте",
         price: "15 850 ₽",
-        image: "/assets/figma/collections/featured.jpg",
+        image: "/assets/figma/placeholder.svg",
         rating: 5,
       },
     ],

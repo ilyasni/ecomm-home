@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_product_set_items",
+  "info": {
+    "displayName": "Set Item",
+    "icon": "layer-group",
+    "description": "Элемент комплекта"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "price": {
+      "type": "string",
+      "required": true
+    },
+    "oldPrice": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "sizes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.size-option"
+    }
+  }
+}

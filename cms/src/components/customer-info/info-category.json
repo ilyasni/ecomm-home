@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_customer_info_info_categories",
+  "info": {
+    "displayName": "Info Category",
+    "icon": "folder-open",
+    "description": "Категория информации для покупателя"
+  },
+  "attributes": {
+    "categoryId": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "tabs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "customer-info.delivery-tab"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "customer-info.info-card"
+    }
+  }
+}

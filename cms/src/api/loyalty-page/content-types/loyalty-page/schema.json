@@ -1,0 +1,46 @@
+{
+  "kind": "singleType",
+  "collectionName": "loyalty_pages",
+  "info": {
+    "singularName": "loyalty-page",
+    "pluralName": "loyalty-pages",
+    "displayName": "Loyalty Page",
+    "description": "Страница Программа лояльности"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroTitle": {
+      "type": "string",
+      "required": true
+    },
+    "heroDescription": {
+      "type": "text"
+    },
+    "heroButtonLabel": {
+      "type": "string"
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "loyalty.step"
+    },
+    "balanceCheck": {
+      "type": "component",
+      "repeatable": false,
+      "component": "loyalty.balance-check"
+    },
+    "faq": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.faq-item"
+    }
+  }
+}

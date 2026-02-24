@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_customer_info_info_cards",
+  "info": {
+    "displayName": "Info Card",
+    "icon": "id-card",
+    "description": "Информационная карточка (доставка, оплата и т.д.)"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "paragraphs": {
+      "type": "json"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "customer-info.info-link"
+    }
+  }
+}

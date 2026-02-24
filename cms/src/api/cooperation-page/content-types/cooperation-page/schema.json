@@ -1,0 +1,65 @@
+{
+  "kind": "singleType",
+  "collectionName": "cooperation_pages",
+  "info": {
+    "singularName": "cooperation-page",
+    "pluralName": "cooperation-pages",
+    "displayName": "Cooperation Page",
+    "description": "Страница Сотрудничество"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroTitle": {
+      "type": "text",
+      "required": true
+    },
+    "heroSubtitle": {
+      "type": "text"
+    },
+    "heroButtonLabel": {
+      "type": "string"
+    },
+    "heroDesktopImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroMobileImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "introText": {
+      "type": "text"
+    },
+    "partnerOfferItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "cooperation.partner-offer-item"
+    },
+    "advantages": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.advantage"
+    },
+    "advantageImages": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "partnershipFormTitle": {
+      "type": "string"
+    },
+    "partnershipFormSubtitle": {
+      "type": "text"
+    },
+    "partnershipFormImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_article_toc_items",
+  "info": {
+    "displayName": "TOC Item",
+    "icon": "list",
+    "description": "Элемент оглавления статьи"
+  },
+  "attributes": {
+    "anchorId": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

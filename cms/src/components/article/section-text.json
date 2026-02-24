@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_article_section_texts",
+  "info": {
+    "displayName": "Section Text",
+    "icon": "align-left",
+    "description": "Текстовая секция статьи"
+  },
+  "attributes": {
+    "content": {
+      "type": "richtext",
+      "required": true
+    }
+  }
+}

@@ -1,30 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { loyaltyFaq } from "@/data/loyalty";
+import { loyaltyFaq as defaultLoyaltyFaq } from "@/data/loyalty";
+import type { LoyaltyFaqItem } from "@/data/loyalty";
 
-export function LoyaltyFAQ() {
+type LoyaltyFAQProps = {
+  data?: LoyaltyFaqItem[];
+};
+
+export function LoyaltyFAQ({ data }: LoyaltyFAQProps) {
+  const loyaltyFaq = data ?? defaultLoyaltyFaq;
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
     <section className="bg-[var(--color-selection)]">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 py-10 md:py-12 desktop:py-20">
-        <div className="flex flex-col desktop:flex-row gap-6 desktop:gap-[162px] desktop:items-start">
-          <h2 className="text-[22px] md:text-[28px] desktop:text-[40px] font-medium leading-[1.1] text-[var(--color-foreground)] desktop:shrink-0">
+      <div className="desktop:px-0 desktop:py-20 mx-auto max-w-[1400px] px-4 py-10 md:px-[39px] md:py-12">
+        <div className="desktop:flex-row desktop:gap-[162px] desktop:items-start flex flex-col gap-6">
+          <h2 className="desktop:text-[40px] desktop:shrink-0 text-[22px] leading-[1.1] font-medium text-[var(--color-foreground)] md:text-[28px]">
             Часто задаваемые вопросы
           </h2>
-          <div className="flex-1 desktop:max-w-[593px]">
+          <div className="desktop:max-w-[593px] flex-1">
             {loyaltyFaq.map((item) => {
               const isOpen = openId === item.id;
               return (
-                <div
-                  key={item.id}
-                  className="border-b border-[var(--color-gray-light)]"
-                >
+                <div key={item.id} className="border-b border-[var(--color-gray-light)]">
                   <button
                     type="button"
                     onClick={() => setOpenId(isOpen ? null : item.id)}
-                    className="flex w-full items-center justify-between py-3 text-left text-sm desktop:text-base font-medium text-[var(--color-foreground)] hover:text-[var(--color-brand)] transition-colors"
+                    className="desktop:text-base flex w-full items-center justify-between py-3 text-left text-sm font-medium text-[var(--color-foreground)] transition-colors hover:text-[var(--color-brand)]"
                   >
                     <span className="pr-4">{item.question}</span>
                     <svg

@@ -2,23 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/home/Header";
 import { Footer } from "@/components/home/Footer";
 import { Button } from "@/design-system/components";
 import { Icon } from "@/design-system/icons";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { successOrderMock, recommendedProducts } from "@/data/account";
+import { getCommerceSnapshot } from "@/lib/commerce";
 
 function ThankYouBanner() {
   return (
-    <div className="bg-[var(--color-beige)] rounded-[5px] p-6 md:p-10 text-center mb-6 md:mb-8">
-      <div className="flex justify-center mb-3">
+    <div className="mb-6 rounded-[5px] bg-[var(--color-beige)] p-6 text-center md:mb-8 md:p-10">
+      <div className="mb-3 flex justify-center">
         <Icon name="checkCircle" size={40} />
       </div>
-      <h1 className="text-[24px] md:text-[32px] font-medium leading-[1.2] mb-2">
+      <h1 className="mb-2 text-[24px] leading-[1.2] font-medium md:text-[32px]">
         Спасибо за заказ!
       </h1>
-      <p className="text-[14px] md:text-[16px] text-[var(--color-dark)] max-w-[500px] mx-auto">
+      <p className="mx-auto max-w-[500px] text-[14px] text-[var(--color-dark)] md:text-[16px]">
         Мы уже начали его обрабатывать. Вы получите уведомление, когда заказ будет готов.
       </p>
     </div>
@@ -26,41 +29,64 @@ function ThankYouBanner() {
 }
 
 function OrderSummary() {
-  const order = successOrderMock;
+  const searchParams = useSearchParams();
+  const order = useMemo(() => {
+    const orderId = searchParams.get("orderId");
+    if (!orderId) return successOrderMock;
+    const stored = getCommerceSnapshot().orders.find((item) => item.id === orderId);
+    if (!stored) return successOrderMock;
+    return {
+      orderNumber: stored.id,
+      total: stored.total,
+      paymentLabel: stored.paymentMethod,
+      status: `Заказ №${stored.id} поступил в обработку`,
+      statusDescription: "Ваш заказ принят и передан на сборку.",
+      deliveryAddress: stored.deliveryAddress,
+      deliveryDate: "Срок уточняется",
+      recipient: stored.customerName,
+      recipientPhone: stored.phone,
+      products: stored.items.map((item) => ({
+        id: item.id,
+        title: item.title,
+        image: item.image,
+        quantity: item.quantity,
+      })),
+    };
+  }, [searchParams]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 md:gap-8 mb-10 md:mb-16">
+    <div className="mb-10 flex flex-col gap-6 md:mb-16 md:flex-row md:gap-8">
       {/* Детали заказа */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <Link
           href="/catalog"
-          className="inline-flex items-center gap-2 text-[14px] text-[var(--color-dark)] hover:text-[var(--color-black)] mb-4"
+          className="mb-4 inline-flex items-center gap-2 text-[14px] text-[var(--color-dark)] hover:text-[var(--color-black)]"
         >
           <Icon name="arrowRight" size={14} className="rotate-180" />
           Продолжить покупки
         </Link>
 
         {/* Сумма */}
-        <div className="border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6 mb-4">
-          <p className="text-[20px] md:text-[22px] font-medium">{order.total}</p>
-          <p className="text-[14px] text-[var(--color-dark)] mt-1">{order.paymentLabel}</p>
+        <div className="mb-4 rounded-[5px] border border-[var(--color-gray-light)] p-4 md:p-6">
+          <p className="text-[20px] font-medium md:text-[22px]">{order.total}</p>
+          <p className="mt-1 text-[14px] text-[var(--color-dark)]">{order.paymentLabel}</p>
         </div>
 
         {/* Статус */}
-        <div className="border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6 mb-4">
+        <div className="mb-4 rounded-[5px] border border-[var(--color-gray-light)] p-4 md:p-6">
           <p className="text-[16px] font-medium">{order.status}</p>
-          <p className="text-[14px] text-[var(--color-dark)] mt-2 leading-[1.5]">
+          <p className="mt-2 text-[14px] leading-[1.5] text-[var(--color-dark)]">
             {order.statusDescription}
           </p>
         </div>
 
         {/* Информация о доставке */}
-        <div className="border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6 mb-4">
-          <h3 className="text-[16px] font-medium mb-3">Информация о доставке</h3>
+        <div className="mb-4 rounded-[5px] border border-[var(--color-gray-light)] p-4 md:p-6">
+          <h3 className="mb-3 text-[16px] font-medium">Информация о доставке</h3>
           <div className="space-y-2 text-[14px]">
             <div className="flex justify-between">
               <span className="text-[var(--color-dark)]">Адрес</span>
-              <span className="text-right max-w-[60%]">{order.deliveryAddress}</span>
+              <span className="max-w-[60%] text-right">{order.deliveryAddress}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--color-dark)]">Дата доставки</span>
@@ -78,15 +104,15 @@ function OrderSummary() {
         </div>
 
         {/* Состав заказа */}
-        <div className="border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6">
-          <h3 className="text-[16px] font-medium mb-1">Состав заказа</h3>
-          <p className="text-[14px] text-[var(--color-dark)] mb-3">
+        <div className="rounded-[5px] border border-[var(--color-gray-light)] p-4 md:p-6">
+          <h3 className="mb-1 text-[16px] font-medium">Состав заказа</h3>
+          <p className="mb-3 text-[14px] text-[var(--color-dark)]">
             {order.products.length} товар(а)
           </p>
           <div className="flex gap-2 overflow-x-auto">
             {order.products.map((product) => (
               <div key={product.id} className="shrink-0">
-                <div className="w-[80px] h-[80px] relative rounded overflow-hidden bg-[var(--color-beige)]">
+                <div className="relative h-[80px] w-[80px] overflow-hidden rounded bg-[var(--color-beige)]">
                   <Image
                     src={product.image}
                     alt={product.title}
@@ -95,7 +121,7 @@ function OrderSummary() {
                     unoptimized
                   />
                 </div>
-                <p className="text-[11px] text-[var(--color-dark)] mt-1 text-center">
+                <p className="mt-1 text-center text-[11px] text-[var(--color-dark)]">
                   {product.quantity} шт.
                 </p>
               </div>
@@ -105,10 +131,10 @@ function OrderSummary() {
       </div>
 
       {/* Боковая панель — кнопки */}
-      <aside className="w-full md:w-[447px] shrink-0 border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6 h-fit">
-        <p className="text-[14px] text-[var(--color-dark)] mb-4">
+      <aside className="h-fit w-full shrink-0 rounded-[5px] border border-[var(--color-gray-light)] p-4 md:w-[447px] md:p-6">
+        <p className="mb-4 text-[14px] text-[var(--color-dark)]">
           Детали заказа отправлены на вашу почту. Отследить статус можно в{" "}
-          <Link href="/account/orders" className="underline font-medium text-[var(--color-black)]">
+          <Link href="/account/orders" className="font-medium text-[var(--color-black)] underline">
             личном кабинете
           </Link>
           .
@@ -133,26 +159,26 @@ function RecommendationsSection() {
 
   return (
     <section className="mb-12">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-[22px] md:text-[28px] font-medium">Рекомендуем</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-[22px] font-medium md:text-[28px]">Рекомендуем</h2>
         <div className="flex gap-2">
           <button
             type="button"
-            className="w-10 h-10 rounded-full border border-[var(--color-gray-light)] flex items-center justify-center hover:bg-[var(--color-beige)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-gray-light)] hover:bg-[var(--color-beige)]"
             aria-label="Назад"
           >
             <Icon name="arrowRight" size={14} className="rotate-180" />
           </button>
           <button
             type="button"
-            className="w-10 h-10 rounded-full border border-[var(--color-gray-light)] flex items-center justify-center hover:bg-[var(--color-beige)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-gray-light)] hover:bg-[var(--color-beige)]"
             aria-label="Вперёд"
           >
             <Icon name="arrowRight" size={14} />
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {recommendedProducts.map((product) => (
           <ProductCard
             key={product.id}
@@ -178,7 +204,7 @@ export default function CheckoutSuccessPage() {
       <Header variant="solid" />
 
       <main className="pt-[111px] md:pt-[143px]">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 pb-12 md:pb-20">
+        <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 pb-12 md:px-[39px] md:pb-20">
           <ThankYouBanner />
           <OrderSummary />
           <RecommendationsSection />

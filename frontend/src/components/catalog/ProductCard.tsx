@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/design-system/components";
 import { Icon } from "@/design-system/icons";
 
 export type Product = {
   id: string;
+  slug?: string;
   title: string;
   description?: string;
   price: string;
@@ -44,18 +46,39 @@ export function ProductCard({
     compact: "aspect-[167/200]",
   };
 
+  const productHref = `/catalog/${product.slug ?? product.id}`;
+
   return (
     <article className={`group ${className || ""}`}>
       <div className={`relative w-full overflow-hidden ${imageHeight[variant]}`}>
-        <Image
-          src={product.image}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          unoptimized
-        />
+        {onQuickView ? (
+          <button
+            type="button"
+            onClick={() => onQuickView(product)}
+            className="relative h-full w-full text-left"
+            aria-label={`Быстрый просмотр: ${product.title}`}
+          >
+            <Image
+              src={product.image}
+              alt={product.title}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              unoptimized
+            />
+          </button>
+        ) : (
+          <Link href={productHref} aria-label={`Открыть товар: ${product.title}`}>
+            <Image
+              src={product.image}
+              alt={product.title}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              unoptimized
+            />
+          </Link>
+        )}
         {product.badge && (
-          <div className="absolute left-3 top-3">
+          <div className="absolute top-3 left-3">
             <Badge
               label={product.badge}
               tone={product.badge.includes("%") ? "sale" : "exclusive"}
@@ -63,11 +86,11 @@ export function ProductCard({
             />
           </div>
         )}
-        <div className="absolute right-3 top-3 flex gap-2">
+        <div className="absolute top-3 right-3 flex gap-2">
           <button
             type="button"
             onClick={() => onFavorite?.(product.id)}
-            className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-brown)] hover:opacity-80 transition-opacity"
+            className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
             aria-label="Добавить в избранное"
           >
             <Icon name="favorite" size={18} />
@@ -76,7 +99,7 @@ export function ProductCard({
         <button
           type="button"
           onClick={() => onAddToCart?.(product.id)}
-          className="absolute bottom-3 right-3 flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-light)] hover:opacity-80 transition-opacity"
+          className="absolute right-3 bottom-3 flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-light)] transition-opacity hover:opacity-80"
           aria-label="Добавить в корзину"
         >
           <Icon name="bag" size={18} />
@@ -85,38 +108,50 @@ export function ProductCard({
           <button
             type="button"
             onClick={() => onQuickView(product)}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-[var(--color-light)] text-[var(--color-dark-gray)] px-6 py-3 rounded-[5px] text-sm whitespace-nowrap hidden desktop:flex items-center justify-center"
+            className="desktop:flex absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[5px] bg-[var(--color-light)] px-6 py-3 text-sm whitespace-nowrap text-[var(--color-dark-gray)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           >
             Быстрый просмотр
           </button>
         )}
       </div>
-      <div className="mt-2 space-y-1 desktop:mt-3 desktop:space-y-2">
-        <h3 className={`font-medium leading-[1.1] ${
-          variant === "compact" ? "text-[14px]" : "text-[14px] md:text-[16px]"
-        }`}>
-          {product.title}
+      <div className="desktop:mt-3 desktop:space-y-2 mt-2 space-y-1">
+        <h3
+          className={`leading-[1.1] font-medium ${
+            variant === "compact" ? "text-[14px]" : "text-[14px] md:text-[16px]"
+          }`}
+        >
+          <Link href={productHref} className="hover:underline">
+            {product.title}
+          </Link>
         </h3>
         {product.description && (
-          <p className={`text-[var(--color-dark)] line-clamp-1 leading-[1.3] ${
-            variant === "compact" ? "text-[12px]" : "text-[14px]"
-          }`}>
+          <p
+            className={`line-clamp-1 leading-[1.3] text-[var(--color-dark)] ${
+              variant === "compact" ? "text-[12px]" : "text-[14px]"
+            }`}
+          >
             {product.description}
           </p>
         )}
-        <div className={`flex items-center gap-2 ${
-          variant === "compact" ? "flex-col items-start gap-1" : ""
-        }`}>
+        <div
+          className={`flex items-center gap-2 ${
+            variant === "compact" ? "flex-col items-start gap-1" : ""
+          }`}
+        >
           <div className="flex items-center gap-2">
-            <span className={`font-medium leading-[1.1] ${
-              variant === "compact" ? "text-[14px]" : "text-[14px] md:text-[16px]"
-            }`}>
+            <span
+              className={`leading-[1.1] font-medium ${
+                variant === "compact" ? "text-[14px]" : "text-[14px] md:text-[16px]"
+              }`}
+            >
               {product.price}
             </span>
             {product.oldPrice && (
-              <span className={`text-[var(--color-brown)] line-through ${
-                variant === "compact" ? "text-[12px]" : "text-[14px]"
-              }`}>
+              <span
+                className={`text-[var(--color-brown)] line-through ${
+                  variant === "compact" ? "text-[12px]" : "text-[14px]"
+                }`}
+              >
                 {product.oldPrice}
               </span>
             )}

@@ -1,26 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import { aboutCollections } from "@/data/about";
+import { aboutCollections as defaultAboutCollections } from "@/data/about";
 
-export function AboutCollections() {
+interface AboutCollectionsProps {
+  data?: {
+    title: string;
+    subtitle: string;
+    items: { id: string; title: string; image: string }[];
+  };
+}
+
+export function AboutCollections({ data }: AboutCollectionsProps) {
+  const aboutCollections = data ?? defaultAboutCollections;
+
   return (
-    <section className="py-10 desktop:py-[80px]">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0">
+    <section className="desktop:py-[80px] py-10">
+      <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 md:px-[39px]">
         <div className="text-center">
-          <h2 className="text-[26px] md:text-[32px] desktop:text-[40px] font-medium leading-[1.1]">
+          <h2 className="desktop:text-[40px] text-[26px] leading-[1.1] font-medium md:text-[32px]">
             {aboutCollections.title}
           </h2>
-          <p className="mt-4 text-sm text-[var(--color-dark)] leading-[1.3] desktop:text-base">
+          <p className="desktop:text-base mt-4 text-sm leading-[1.3] text-[var(--color-dark)]">
             {aboutCollections.subtitle}
           </p>
         </div>
-        <div className="mt-8 desktop:mt-10 grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div className="desktop:mt-10 mt-8 grid grid-cols-1 gap-2 md:grid-cols-3">
           {aboutCollections.items.map((item) => (
             <a
               key={item.id}
               href="#"
-              className="group relative h-[460px] md:h-[500px] desktop:h-[700px] overflow-hidden"
+              className="group desktop:h-[700px] relative h-[460px] overflow-hidden md:h-[500px]"
             >
               <Image
                 src={item.image}
@@ -31,7 +41,7 @@ export function AboutCollections() {
               />
               <div className="absolute inset-0 bg-[rgba(0,0,0,0.3)]" />
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-[var(--color-light)]">
-                <p className="text-xl md:text-2xl desktop:text-[28px] font-medium leading-[1.1] whitespace-nowrap">
+                <p className="desktop:text-[28px] text-xl leading-[1.1] font-medium whitespace-nowrap md:text-2xl">
                   {item.title}
                 </p>
               </div>

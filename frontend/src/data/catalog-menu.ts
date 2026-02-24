@@ -127,6 +127,6 @@ export const catalogExtraLinks: CatalogExtraLink[] = [
 export const catalogInfoLinks: CatalogInfoLink[] = [
   { label: "О бренде", href: "/about" },
   { label: "Новости", href: "/news" },
-  { label: "Специальные предложения", href: "/offers" },
-  { label: "Сотрудничество", href: "/partnership" },
+  { label: "Специальные предложения", href: "/special-offers" },
+  { label: "Сотрудничество", href: "/cooperation" },
 ];

@@ -169,6 +169,11 @@ cd cms
 npm run develop    # Dev-сервер с hot-reload
 npm run build      # Production-сборка
 npm run start      # Production-запуск
+
+# Seed — наполнение Strapi контентом
+# 1. Создай API Token: Strapi Admin → Settings → API Tokens → Full Access
+# 2. Запусти:
+STRAPI_ADMIN_TOKEN=<token> npx ts-node --esm cms/scripts/seed.ts
 ```
 
 ## Cursor Rules

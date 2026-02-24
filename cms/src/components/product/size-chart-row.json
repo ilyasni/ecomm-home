@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_product_size_chart_rows",
+  "info": {
+    "displayName": "Size Chart Row",
+    "icon": "grid",
+    "description": "Строка таблицы размеров"
+  },
+  "attributes": {
+    "size": { "type": "string", "required": true },
+    "dimensions": { "type": "string" },
+    "price": { "type": "decimal" }
+  }
+}

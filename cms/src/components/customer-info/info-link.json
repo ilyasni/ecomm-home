@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_customer_info_info_links",
+  "info": {
+    "displayName": "Info Link",
+    "icon": "link",
+    "description": "Ссылка в информационной карточке"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

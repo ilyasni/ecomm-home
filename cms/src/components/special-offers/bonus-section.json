@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_special_offers_bonus_sections",
+  "info": {
+    "displayName": "Bonus Section",
+    "icon": "gift",
+    "description": "Блок бонусов"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "buttonLabel": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

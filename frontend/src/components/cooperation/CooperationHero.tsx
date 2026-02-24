@@ -1,24 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/design-system/components";
 import { ArrowLink } from "@/design-system/components";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { cooperationHero } from "@/data/cooperation";
+import { cooperationHero as defaultCooperationHero } from "@/data/cooperation";
 
-const breadcrumbs = [
-  { label: "Главная", href: "/" },
-  { label: "Сотрудничество" },
-];
+const breadcrumbs = [{ label: "Главная", href: "/" }, { label: "Сотрудничество" }];
 
-export function CooperationHero() {
+interface CooperationHeroProps {
+  title?: string;
+  subtitle?: string;
+  buttonLabel?: string;
+  desktopImage?: string;
+  mobileImage?: string;
+}
+
+export function CooperationHero(props: CooperationHeroProps) {
+  const cooperationHero = {
+    title: props.title ?? defaultCooperationHero.title,
+    subtitle: props.subtitle ?? defaultCooperationHero.subtitle,
+    buttonLabel: props.buttonLabel ?? defaultCooperationHero.buttonLabel,
+    desktopImage: props.desktopImage ?? defaultCooperationHero.desktopImage,
+    mobileImage: props.mobileImage ?? defaultCooperationHero.mobileImage,
+  };
+
   return (
-    <section className="relative h-[500px] md:h-[503px] desktop:h-[700px] overflow-hidden">
+    <section className="desktop:h-[700px] relative h-[500px] overflow-hidden md:h-[503px]">
       <Image
         src={cooperationHero.desktopImage}
         alt="Сотрудничество"
         fill
-        className="hidden object-cover desktop:block"
+        className="desktop:block hidden object-cover"
         priority
         unoptimized
       />
@@ -26,21 +38,21 @@ export function CooperationHero() {
         src={cooperationHero.mobileImage}
         alt="Сотрудничество"
         fill
-        className="object-cover desktop:hidden"
+        className="desktop:hidden object-cover"
         priority
         unoptimized
       />
       <div className="absolute inset-0 bg-[rgba(17,10,0,0.35)]" />
 
-      <div className="relative mx-auto flex h-full max-w-[1400px] flex-col px-4 md:px-[39px] desktop:px-0">
-        <div className="mt-4 desktop:mt-8">
+      <div className="desktop:px-0 relative mx-auto flex h-full max-w-[1400px] flex-col px-4 md:px-[39px]">
+        <div className="desktop:pt-[119px] pt-[86px] md:pt-[89px]">
           <Breadcrumbs items={breadcrumbs} variant="light" />
         </div>
-        <div className="mt-auto mb-10 desktop:mb-16 max-w-[500px] text-[var(--color-light)]">
-          <h1 className="text-[26px] md:text-[32px] desktop:text-[40px] font-medium leading-[1.1] whitespace-pre-line">
+        <div className="desktop:mb-16 mt-auto mb-10 max-w-[500px] text-[var(--color-light)]">
+          <h1 className="desktop:text-[40px] text-[26px] leading-[1.1] font-medium whitespace-pre-line md:text-[32px]">
             {cooperationHero.title}
           </h1>
-          <p className="mt-4 text-sm leading-[1.3] desktop:text-base opacity-90">
+          <p className="desktop:text-base mt-4 text-sm leading-[1.3] opacity-90">
             {cooperationHero.subtitle}
           </p>
           <div className="mt-6">

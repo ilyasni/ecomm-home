@@ -1,7 +1,7 @@
 export const aboutHero = {
   title: "VITA BRAVA HOME —\n10 лет на рынке\nтекстиля в России",
-  desktopImage: "/assets/figma/about/hero-desktop.jpg",
-  mobileImage: "/assets/figma/about/hero-mobile.jpg",
+  desktopImage: "/assets/figma/placeholder.svg",
+  mobileImage: "/assets/figma/placeholder.svg",
 };
 
 export const aboutIntro = {
@@ -16,9 +16,9 @@ export const aboutAdvantages = [
 ];
 
 export const aboutAdvantageImages = [
-  "/assets/figma/about/advantage-1.jpg",
-  "/assets/figma/about/advantage-2.jpg",
-  "/assets/figma/about/advantage-3.jpg",
+  "/assets/figma/placeholder.svg",
+  "/assets/figma/placeholder.svg",
+  "/assets/figma/placeholder.svg",
 ];
 
 export const aboutHistory = {
@@ -38,19 +38,19 @@ export const whatMakesUsDifferent = {
       id: "diff-1",
       title: "Качество",
       subtitle: "Мы используем только проверенные материалы",
-      image: "/assets/figma/about/different-1.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
     {
       id: "diff-2",
       title: "Комфорт",
       subtitle: "Наш текстиль создан для максимального удобства",
-      image: "/assets/figma/about/different-2.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
     {
       id: "diff-3",
       title: "Доступность",
       subtitle: "Премиальное качество по разумной цене",
-      image: "/assets/figma/about/different-3.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
   ],
 };
@@ -62,17 +62,17 @@ export const aboutCollections = {
     {
       id: "coll-light",
       title: "Коллекция Light",
-      image: "/assets/figma/about/collection-light.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
     {
       id: "coll-medium",
       title: "Коллекция Medium",
-      image: "/assets/figma/about/collection-medium.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
     {
       id: "coll-premium",
       title: "Коллекция Premium",
-      image: "/assets/figma/about/collection-premium.jpg",
+      image: "/assets/figma/placeholder.svg",
     },
   ],
 };
@@ -84,29 +84,25 @@ export const aboutProduction = {
       id: "step-1",
       icon: "/assets/figma/about/icon-search.svg",
       title: "Исследование рынка",
-      description:
-        "Изучаем мировые тренды и выбираем лучшие материалы для наших коллекций",
+      description: "Изучаем мировые тренды и выбираем лучшие материалы для наших коллекций",
     },
     {
       id: "step-2",
       icon: "/assets/figma/about/icon-fabric.svg",
       title: "Тестирование тканей",
-      description:
-        "Проверяем каждую ткань на прочность, мягкость и устойчивость к стирке",
+      description: "Проверяем каждую ткань на прочность, мягкость и устойчивость к стирке",
     },
     {
       id: "step-3",
       icon: "/assets/figma/about/icon-factory.svg",
       title: "Производство",
-      description:
-        "Контролируем каждый этап производства на фабриках-партнёрах",
+      description: "Контролируем каждый этап производства на фабриках-партнёрах",
     },
     {
       id: "step-4",
       icon: "/assets/figma/about/icon-check.svg",
       title: "Проверка",
-      description:
-        "Финальная проверка качества перед отправкой клиенту",
+      description: "Финальная проверка качества перед отправкой клиенту",
     },
   ],
 };
@@ -117,13 +113,13 @@ export const aboutCreating = {
     {
       id: "creating-1",
       text: "VITA BRAVA HOME – создана для тех, кто ценит не только уют, но и эстетику повседневной жизни",
-      image: "/assets/figma/about/creating-1.jpg",
+      image: "/assets/figma/placeholder.svg",
       imagePosition: "left" as const,
     },
     {
       id: "creating-2",
       text: "VITA BRAVA HOME – не просто текстиль, это здоровый сон и утро, начинающееся в атмосфере уюта.",
-      image: "/assets/figma/about/creating-2.jpg",
+      image: "/assets/figma/placeholder.svg",
       imagePosition: "right" as const,
     },
   ],

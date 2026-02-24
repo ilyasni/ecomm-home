@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_about_production_steps",
+  "info": {
+    "displayName": "Production Step",
+    "icon": "cog",
+    "description": "Этап производства"
+  },
+  "attributes": {
+    "icon": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

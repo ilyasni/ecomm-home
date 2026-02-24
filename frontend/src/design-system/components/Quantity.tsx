@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Icon } from "@/design-system/icons";
 
 export type QuantitySize = "small" | "medium" | "large";
 
@@ -56,7 +55,7 @@ export function Quantity({
 
   return (
     <div
-      className={`border border-[var(--color-gray-light)] rounded-[5px] flex items-center justify-center ${sizeClasses[size]} ${className}`}
+      className={`flex items-center justify-center rounded-[5px] border border-[var(--color-gray-light)] ${sizeClasses[size]} ${className}`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -64,13 +63,13 @@ export function Quantity({
         type="button"
         onClick={handleDecrement}
         disabled={value <= min}
-        className={`flex items-center justify-center leading-[1.2] text-[var(--color-black)] disabled:text-[var(--color-gray)] disabled:cursor-not-allowed ${buttonSizeClasses[size]}`}
+        className={`flex items-center justify-center leading-[1.2] text-[var(--color-black)] disabled:cursor-not-allowed disabled:text-[var(--color-gray)] ${buttonSizeClasses[size]}`}
         aria-label="Уменьшить количество"
       >
         –
       </button>
       <span
-        className={`font-normal leading-[1.5] text-[var(--color-black)] uppercase ${textSizeClasses[size]}`}
+        className={`leading-[1.5] font-normal text-[var(--color-black)] uppercase ${textSizeClasses[size]}`}
       >
         {value}
       </span>
@@ -80,7 +79,7 @@ export function Quantity({
         disabled={max !== undefined && value >= max}
         className={`flex items-center justify-center leading-[1.2] ${
           isHovering ? "text-[var(--color-gold)]" : "text-[var(--color-black)]"
-        } disabled:text-[var(--color-gray)] disabled:cursor-not-allowed ${buttonSizeClasses[size]}`}
+        } disabled:cursor-not-allowed disabled:text-[var(--color-gray)] ${buttonSizeClasses[size]}`}
         aria-label="Увеличить количество"
       >
         +

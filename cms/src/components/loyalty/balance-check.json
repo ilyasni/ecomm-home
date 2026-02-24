@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_loyalty_balance_checks",
+  "info": {
+    "displayName": "Balance Check",
+    "icon": "wallet",
+    "description": "Блок проверки баланса"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "buttonLabel": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

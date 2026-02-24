@@ -35,13 +35,7 @@ export interface ArticleData {
   sections: ArticleSection[];
 }
 
-export const newsCategories: NewsCategory[] = [
-  "все",
-  "новости",
-  "идеи",
-  "новинки",
-  "ткани",
-];
+export const newsCategories: NewsCategory[] = ["все", "новости", "идеи", "новинки", "ткани"];
 
 export const newsList: NewsItem[] = [
   {
@@ -52,7 +46,7 @@ export const newsList: NewsItem[] = [
     title: "Долгожданное открытие нового бутика VA Home в центре Москвы",
     excerpt:
       "На прошлой неделе состоялось долгожданное открытие нового бутика VA Home в центре Москвы. На торжественном открытии присутствовали знаменитые гости. Атмосфера праздника ощущалась уже с самого...",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-2",
@@ -62,7 +56,7 @@ export const newsList: NewsItem[] = [
     title: "Новая коллекция этой весны уже в наличии  в бутиках",
     excerpt:
       "Встречайте весеннюю коллекцию постельного белья из натуральных тканей — лён, хлопок, шёлк.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-3",
@@ -72,7 +66,7 @@ export const newsList: NewsItem[] = [
     title: "Мужская одежда для дома уже в наличии",
     excerpt:
       "Новая линейка мужской домашней одежды из премиальных тканей уже доступна в наших бутиках.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-4",
@@ -80,9 +74,8 @@ export const newsList: NewsItem[] = [
     category: "новинки",
     date: "12.07.2025",
     title: "Новая коллекция этой весны уже в наличии  в бутиках",
-    excerpt:
-      "Обновлённая палитра цветов для спальни — нежные оттенки лаванды, мяты и персика.",
-    image: "/assets/figma/news/news-1.jpg",
+    excerpt: "Обновлённая палитра цветов для спальни — нежные оттенки лаванды, мяты и персика.",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-5",
@@ -92,7 +85,7 @@ export const newsList: NewsItem[] = [
     title: "Идеи для хранения текстиля в гардеробной",
     excerpt:
       "Для хранения текстиля в гардеробной с открытым типом хранения можно использовать полки, рейлинг...",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-6",
@@ -102,7 +95,7 @@ export const newsList: NewsItem[] = [
     title: "Как подобрать полотенца",
     excerpt:
       "Для хранения текстиля в гардеробной с открытым типом хранения можно использовать полки, рейлинг...",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-7",
@@ -112,7 +105,7 @@ export const newsList: NewsItem[] = [
     title: "Идеи для хранения текстиля в гардеробной",
     excerpt:
       "Для хранения текстиля в гардеробной с открытым типом хранения можно использовать полки, рейлинг...",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-8",
@@ -122,18 +115,17 @@ export const newsList: NewsItem[] = [
     title: "Как ухаживать за кухонным текстилем. Советы для хозяек",
     excerpt:
       "Для хранения текстиля в гардеробной с открытым типом хранения можно использовать полки, рейлинг...",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-9",
     slug: "boutique-opening-2",
     category: "новости",
     date: "01.07.2025",
-    title:
-      "Долгожданное открытие нового бутика VA Home в центре Москвы",
+    title: "Долгожданное открытие нового бутика VA Home в центре Москвы",
     excerpt:
       "Мы рады сообщить о открытии пространства для вдохновения, наполненного авторскими моделями, домашним декором и дизайнерскими аксессуарами.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-10",
@@ -143,7 +135,7 @@ export const newsList: NewsItem[] = [
     title: "Осенняя коллекция уже в продаже",
     excerpt:
       "Тёплые оттенки, мягкие ткани и уютные текстуры — всё для создания идеальной атмосферы дома.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-11",
@@ -153,7 +145,7 @@ export const newsList: NewsItem[] = [
     title: "Сатин: что это за ткань и в чем ее преимущество",
     excerpt:
       "Постельное белье из сатина — прекрасный выбор для тех, кто ценит комфортный сон и красивый интерьер.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "news-12",
@@ -163,7 +155,7 @@ export const newsList: NewsItem[] = [
     title: "Шёлк vs хлопок: что выбрать для спальни",
     excerpt:
       "Сравниваем два популярных материала для постельного белья — их свойства, уход и долговечность.",
-    image: "/assets/figma/news/news-1.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
 ];
 
@@ -171,7 +163,7 @@ export const articleData: ArticleData = {
   slug: "how-to-choose-towels",
   category: "идеи",
   title: "Как подобрать полотенца",
-  image: "/assets/figma/news/news-1.jpg",
+  image: "/assets/figma/placeholder.svg",
   date: "08.07.2025",
   toc: [
     { id: "sizes", label: "Размеры" },
@@ -180,8 +172,7 @@ export const articleData: ArticleData = {
   sections: [
     {
       type: "text",
-      content:
-        "Есть разное количество, один подходит вам и удобен для вашей ванной комнаты.",
+      content: "Есть разное количество, один подходит вам и удобен для вашей ванной комнаты.",
     },
     {
       type: "list",
@@ -205,15 +196,15 @@ export const articleData: ArticleData = {
       type: "images",
       images: [
         {
-          src: "/assets/figma/news/news-1.jpg",
+          src: "/assets/figma/placeholder.svg",
           alt: "Полотенца разных размеров",
         },
         {
-          src: "/assets/figma/news/news-1.jpg",
+          src: "/assets/figma/placeholder.svg",
           alt: "Полотенца в ванной",
         },
         {
-          src: "/assets/figma/news/news-1.jpg",
+          src: "/assets/figma/placeholder.svg",
           alt: "Полотенце на крючке",
         },
       ],
@@ -235,32 +226,16 @@ export const articleData: ArticleData = {
           ],
         },
         {
-          cells: [
-            "Лицевое (детское)",
-            "30×60 см",
-            "Небольшое: используется для лица, рук",
-          ],
+          cells: ["Лицевое (детское)", "30×60 см", "Небольшое: используется для лица, рук"],
         },
         {
-          cells: [
-            "Полотенце для тела",
-            "50×90 см",
-            "Удобный размер для ежедневного использования",
-          ],
+          cells: ["Полотенце для тела", "50×90 см", "Удобный размер для ежедневного использования"],
         },
         {
-          cells: [
-            "Полотенце-полуторное",
-            "50×100 см",
-            "Идеально размер для взрослого",
-          ],
+          cells: ["Полотенце-полуторное", "50×100 см", "Идеально размер для взрослого"],
         },
         {
-          cells: [
-            "Банное полотенце",
-            "70×140 см",
-            "Большой размер, подходит для бани и SPA",
-          ],
+          cells: ["Банное полотенце", "70×140 см", "Большой размер, подходит для бани и SPA"],
         },
         {
           cells: [
@@ -343,7 +318,7 @@ export const recommendedProducts = [
     title: "Полотенце банное Филигрань",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -351,7 +326,7 @@ export const recommendedProducts = [
     title: "Набор полотенец для лица",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -359,7 +334,7 @@ export const recommendedProducts = [
     title: "Комплект банных полотенец",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -367,7 +342,7 @@ export const recommendedProducts = [
     title: "Набор постельного для лица",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
 ];

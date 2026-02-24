@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_special_offers_offers",
+  "info": {
+    "displayName": "Offer",
+    "icon": "tag",
+    "description": "Специальное предложение"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

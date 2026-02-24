@@ -1,18 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/design-system/icons";
 import { CatalogMenu } from "@/components/catalog/CatalogMenu";
-import { useAuthModal } from "@/components/auth";
+import { useAuthModal, useAuthSession } from "@/components/auth";
+import type { NavigationData } from "@/lib/queries/navigation";
+import { getCartCount, getFavoritesCount, subscribeCommerce } from "@/lib/commerce";
+
+const defaultTopMenuItems = [
+  { label: "О бренде", href: "/about" },
+  { label: "Новости", href: "/news" },
+  { label: "Специальные предложения", href: "/special-offers" },
+  { label: "Покупателям", href: "/customer-info" },
+  { label: "Сотрудничество", href: "/cooperation" },
+  { label: "Контакты", href: "/contacts" },
+  { label: "Бутики", href: "/contacts" },
+];
+
+const defaultCatalogLinks = [
+  { label: "Постельное белье", href: "/catalog/bed-linen", hasSubmenu: true },
+  { label: "Домашний текстиль", href: "/catalog/home-textile", hasSubmenu: true },
+  { label: "Одеяла", href: "/catalog/blankets" },
+  { label: "Подушки", href: "/catalog/pillows" },
+  { label: "Пледы", href: "/catalog/plaids" },
+  { label: "Полотенца", href: "/catalog/towels" },
+  { label: "Будуарные наряды", href: "/catalog/boudoir" },
+  { label: "Подарочные сертификаты", href: "/catalog/gift-certificates" },
+];
 
 type HeaderProps = {
   variant?: "transparent" | "solid";
+  navigation?: NavigationData | null;
 };
 
-export function Header({ variant = "transparent" }: HeaderProps) {
+export function Header({ variant = "transparent", navigation }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
+  const router = useRouter();
   const { openLogin } = useAuthModal();
+  const { user } = useAuthSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,139 +54,150 @@ export function Header({ variant = "transparent" }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const sync = () => {
+      setFavoritesCount(getFavoritesCount());
+      setCartCount(getCartCount());
+    };
+    sync();
+    return subscribeCommerce(sync);
+  }, []);
+
   const useDarkStyle = variant === "solid" || isScrolled;
 
-  const bottomBarBg = useDarkStyle
-    ? "bg-[var(--color-light)] shadow-md"
-    : "bg-transparent";
-  const bottomBarText = useDarkStyle
-    ? "text-[var(--color-black)]"
-    : "text-[var(--color-light)]";
+  const bottomBarBg = useDarkStyle ? "bg-[var(--color-light)] shadow-md" : "bg-transparent";
+  const bottomBarText = useDarkStyle ? "text-[var(--color-black)]" : "text-[var(--color-light)]";
   const bottomBarIconVariant = useDarkStyle ? "scroll" : "default";
 
+  const topMenuItems = navigation?.topMenuItems ?? defaultTopMenuItems;
+  const catalogCategories = navigation?.catalogCategories ?? defaultCatalogLinks;
+  const phone = navigation?.phone ?? "8 800 888-80-80";
+  const topBarText = navigation?.topBarText ?? "Летние коллекции уже в наличии";
+  const telegramUrl = navigation?.telegramUrl ?? "#";
+  const whatsappUrl = navigation?.whatsappUrl ?? "#";
+
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-[var(--color-light)] md:bg-transparent">
+    <header className="fixed top-0 left-0 z-50 w-full bg-[var(--color-light)] md:bg-transparent">
       {/* ===== DESKTOP (1400px+): Top bar ===== */}
-      <div className="hidden desktop:block bg-[var(--color-brown)] text-[var(--color-light)]">
+      <div className="desktop:block hidden bg-[var(--color-brown)] text-[var(--color-light)]">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between py-2">
           <div className="flex items-center gap-12 whitespace-nowrap">
             <Icon name="logo" variant="scroll" size={173} height={31} alt="Vita Brava Home" />
             <nav className="flex items-center gap-6 text-sm leading-[1.3]">
-              <a href="/about" className="hover:opacity-80 transition-opacity">
-                О бренде
-              </a>
-              <a href="/news" className="hover:opacity-80 transition-opacity">
-                Новости
-              </a>
-              <a href="/special-offers" className="hover:opacity-80 transition-opacity">
-                Специальные предложения
-              </a>
-              <a href="/customer-info" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                Покупателям
-                <Icon name="chevronDown" size={24} />
-              </a>
-              <a href="/cooperation" className="hover:opacity-80 transition-opacity">
-                Сотрудничество
-              </a>
-              <a href="/contacts" className="hover:opacity-80 transition-opacity">
-                Контакты
-              </a>
-              <a href="/contacts" className="hover:opacity-80 transition-opacity">
-                Бутики
-              </a>
+              {topMenuItems.map((item, idx) => (
+                <a
+                  key={`${item.href}-${idx}`}
+                  href={item.href}
+                  className="transition-opacity hover:opacity-80"
+                >
+                  {item.label}
+                </a>
+              ))}
             </nav>
           </div>
           <div className="flex items-center gap-6 text-sm">
-            <span className="text-base leading-[1.3]">8 800 888-80-80</span>
+            <span className="text-base leading-[1.3]">{phone}</span>
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              <a
+                href={telegramUrl}
+                className="flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="Telegram"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Icon name="telegram" size={24} />
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              </a>
+              <a
+                href={whatsappUrl}
+                className="flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Icon name="whatsapp" size={24} />
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </div>
 
       {/* ===== DESKTOP (1400px+): Bottom bar ===== */}
-      <div className={`hidden desktop:block transition-all duration-300 ${bottomBarBg} ${bottomBarText}`}>
+      <div
+        className={`desktop:block hidden transition-all duration-300 ${bottomBarBg} ${bottomBarText}`}
+      >
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-2 py-4">
-          <div className="flex items-center gap-[47px] text-sm leading-[1.3] whitespace-nowrap overflow-hidden h-8">
+          <div className="flex h-8 items-center gap-[47px] overflow-hidden text-sm leading-[1.3] whitespace-nowrap">
             <button
               type="button"
               onClick={() => setCatalogOpen(!catalogOpen)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
-              <Icon name={catalogOpen ? "close" : "burger"} variant={bottomBarIconVariant} size={24} />
+              <Icon
+                name={catalogOpen ? "close" : "burger"}
+                variant={bottomBarIconVariant}
+                size={24}
+              />
               <span>Каталог</span>
             </button>
             <nav className="flex items-center gap-8">
-              <a href="#" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                Постельное белье
-                <Icon name="chevronDown" variant={bottomBarIconVariant} size={24} />
-              </a>
-              <a href="#" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                Домашний текстиль
-                <Icon name="chevronDown" variant={bottomBarIconVariant} size={24} />
-              </a>
-              <a href="#" className="hover:opacity-80 transition-opacity">Одеяла</a>
-              <a href="#" className="hover:opacity-80 transition-opacity">Подушки</a>
-              <a href="#" className="hover:opacity-80 transition-opacity">Пледы</a>
-              <a href="#" className="hover:opacity-80 transition-opacity">Полотенца</a>
-              <a href="#" className="hover:opacity-80 transition-opacity">Будуарные наряды</a>
-              <a href="#" className="hover:opacity-80 transition-opacity">
-                Подарочные сертификаты
-              </a>
+              {catalogCategories.map((cat, idx) => (
+                <a
+                  key={`${cat.href}-${idx}`}
+                  href={cat.href}
+                  className={`transition-opacity hover:opacity-80 ${cat.hasSubmenu ? "flex items-center gap-1" : ""}`}
+                >
+                  {cat.label}
+                  {cat.hasSubmenu && (
+                    <Icon name="chevronDown" variant={bottomBarIconVariant} size={24} />
+                  )}
+                </a>
+              ))}
             </nav>
           </div>
           <div className="flex items-start gap-2">
-            <button
-              type="button"
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+            <Link
+              href="/search"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Поиск"
             >
               <Icon name="search" variant={bottomBarIconVariant} size={24} />
-            </button>
+            </Link>
             <button
               type="button"
-              onClick={openLogin}
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              onClick={() => {
+                if (user) {
+                  router.push("/account");
+                  return;
+                }
+                openLogin();
+              }}
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Профиль"
             >
               <Icon name="user" variant={bottomBarIconVariant} size={24} />
             </button>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              <Link
+                href="/favorites"
+                className="flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="Избранное"
               >
                 <Icon name="favorite" variant={bottomBarIconVariant} size={24} />
-              </button>
+              </Link>
               <div className="flex h-6 items-end justify-center pb-[14px]">
-                <span className="text-xs leading-[1.1]">(0)</span>
+                <span className="text-xs leading-[1.1]">({favoritesCount})</span>
               </div>
             </div>
             <div className="flex items-center pr-[3px]">
-              <button
-                type="button"
-                className="-mr-[3px] flex items-center justify-center hover:opacity-80 transition-opacity"
+              <Link
+                href="/cart"
+                className="-mr-[3px] flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="Корзина"
               >
                 <Icon name="bag" variant={bottomBarIconVariant} size={24} />
-              </button>
+              </Link>
               <div className="-mr-[3px] flex h-6 items-end justify-center pb-[14px]">
-                <span className="text-xs leading-[1.1]">(0)</span>
+                <span className="text-xs leading-[1.1]">({cartCount})</span>
               </div>
             </div>
           </div>
@@ -164,73 +205,88 @@ export function Header({ variant = "transparent" }: HeaderProps) {
       </div>
 
       {/* ===== TABLET (768px–1399px): Top bar ===== */}
-      <div className="max-md:hidden desktop:hidden bg-[var(--color-brown)] text-[var(--color-light)]">
+      <div className="desktop:hidden bg-[var(--color-brown)] text-[var(--color-light)] max-md:hidden">
         <div className="flex items-center justify-between px-[39px] py-2">
           <div className="flex items-center gap-12">
             <Icon name="logo" variant="scroll" size={145} height={25} alt="Vita Brava Home" />
             <nav className="flex items-center gap-8 text-sm leading-[1.3]">
-              <a href="/customer-info" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+              <a
+                href="/customer-info"
+                className="flex items-center gap-1 transition-opacity hover:opacity-80"
+              >
                 Покупателям
                 <Icon name="chevronDown" size={24} />
               </a>
-              <a href="/contacts" className="hover:opacity-80 transition-opacity">
+              <a href="/contacts" className="transition-opacity hover:opacity-80">
                 Контакты
               </a>
-              <a href="/contacts" className="hover:opacity-80 transition-opacity">
+              <a href="/contacts" className="transition-opacity hover:opacity-80">
                 Бутики
               </a>
             </nav>
           </div>
-          <span className="text-base leading-[1.3]">8 800 888-80-80</span>
+          <span className="text-base leading-[1.3]">{phone}</span>
         </div>
       </div>
 
       {/* ===== TABLET (768px–1399px): Bottom bar ===== */}
-      <div className={`max-md:hidden desktop:hidden transition-all duration-300 ${bottomBarBg} ${bottomBarText}`}>
-        <div className="flex items-center justify-between px-[39px] py-2 h-10">
+      <div
+        className={`desktop:hidden transition-all duration-300 max-md:hidden ${bottomBarBg} ${bottomBarText}`}
+      >
+        <div className="flex h-10 items-center justify-between px-[39px] py-2">
           <button
             type="button"
             onClick={() => setCatalogOpen(!catalogOpen)}
-            className="flex items-center gap-2 text-sm leading-[1.3] hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 text-sm leading-[1.3] transition-opacity hover:opacity-80"
           >
-            <Icon name={catalogOpen ? "close" : "burger"} variant={bottomBarIconVariant} size={24} />
+            <Icon
+              name={catalogOpen ? "close" : "burger"}
+              variant={bottomBarIconVariant}
+              size={24}
+            />
             <span>Каталог</span>
           </button>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+            <Link
+              href="/search"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Поиск"
             >
               <Icon name="search" variant={bottomBarIconVariant} size={24} />
-            </button>
+            </Link>
             <button
               type="button"
-              onClick={openLogin}
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              onClick={() => {
+                if (user) {
+                  router.push("/account");
+                  return;
+                }
+                openLogin();
+              }}
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Профиль"
             >
               <Icon name="user" variant={bottomBarIconVariant} size={24} />
             </button>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              <Link
+                href="/favorites"
+                className="flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="Избранное"
               >
                 <Icon name="favorite" variant={bottomBarIconVariant} size={24} />
-              </button>
-              <span className="text-xs leading-[1.1] self-start mt-0.5">(0)</span>
+              </Link>
+              <span className="mt-0.5 self-start text-xs leading-[1.1]">({favoritesCount})</span>
             </div>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              <Link
+                href="/cart"
+                className="flex items-center justify-center transition-opacity hover:opacity-80"
                 aria-label="Корзина"
               >
                 <Icon name="bag" variant={bottomBarIconVariant} size={24} />
-              </button>
-              <span className="text-xs leading-[1.1] self-start mt-0.5">(0)</span>
+              </Link>
+              <span className="mt-0.5 self-start text-xs leading-[1.1]">({cartCount})</span>
             </div>
           </div>
         </div>
@@ -238,51 +294,48 @@ export function Header({ variant = "transparent" }: HeaderProps) {
 
       {/* ===== MOBILE (<768px) ===== */}
       <div className="md:hidden">
-        <div className="bg-[var(--color-brown)] text-[var(--color-light)] h-10 flex items-center justify-center overflow-hidden">
-          <span className="text-sm leading-[1.3]">Летние коллекции уже в наличии</span>
+        <div className="flex h-10 items-center justify-center overflow-hidden bg-[var(--color-brown)] text-[var(--color-light)]">
+          <span className="text-sm leading-[1.3]">{topBarText}</span>
         </div>
-        <div className="flex items-center justify-between px-4 bg-[var(--color-light)] text-[var(--color-black)]">
+        <div className="flex items-center justify-between bg-[var(--color-light)] px-4 text-[var(--color-black)]">
           <div className="flex items-center gap-[10px] py-[10px]">
             <button
               type="button"
               onClick={() => setCatalogOpen(!catalogOpen)}
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Меню"
             >
               <Icon name={catalogOpen ? "close" : "burger"} variant="scroll" size={24} />
             </button>
-            <button
-              type="button"
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+            <Link
+              href="/search"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Поиск"
             >
               <Icon name="search" variant="scroll" size={24} />
-            </button>
+            </Link>
           </div>
           <Icon name="logo" variant="scroll" size={170} height={27} alt="Vita Brava Home" />
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+            <Link
+              href="/favorites"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Избранное"
             >
               <Icon name="favorite" variant="scroll" size={24} />
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+            </Link>
+            <Link
+              href="/cart"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Корзина"
             >
               <Icon name="bag" variant="scroll" size={24} />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
 
-      <CatalogMenu
-        isOpen={catalogOpen}
-        onClose={() => setCatalogOpen(false)}
-      />
+      <CatalogMenu isOpen={catalogOpen} onClose={() => setCatalogOpen(false)} />
     </header>
   );
 }

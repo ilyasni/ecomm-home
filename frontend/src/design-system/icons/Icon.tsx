@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import type { SyntheticEvent } from "react";
 import { iconMap, type IconName, type IconVariant } from "./icon-map";
 
 type IconProps = {
@@ -21,65 +21,40 @@ export function Icon({
   className,
 }: IconProps) {
   const iconData = iconMap[name];
+
   if (!iconData) {
     console.warn(`Icon "${name}" not found in iconMap`);
     return null;
   }
 
-  // Determine the source path - paths should start with / (relative to public folder)
   const primarySource = iconData[variant] ?? iconData.default;
   const fallbackSource = iconData.default;
+  if (!primarySource) {
+    return null;
+  }
 
-  const [imgSrc, setImgSrc] = useState<string>(primarySource);
-  const [hasError, setHasError] = useState(false);
-  const hasTriedFallback = useRef(false);
-
-  // Reset when name or variant changes
-  useEffect(() => {
-    setImgSrc(primarySource);
-    setHasError(false);
-    hasTriedFallback.current = false;
-  }, [name, variant, primarySource]);
-
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // Prevent infinite loop - only try fallback once
-    if (hasTriedFallback.current) {
-      setHasError(true);
+  const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    const alreadyTriedFallback = img.dataset.fallbackApplied === "true";
+    if (!alreadyTriedFallback && fallbackSource && img.getAttribute("src") !== fallbackSource) {
+      img.dataset.fallbackApplied = "true";
+      img.src = fallbackSource;
       return;
     }
-
-    // If we haven't tried fallback yet and current source is not the fallback
-    if (fallbackSource && imgSrc !== fallbackSource && imgSrc === primarySource) {
-      // Try fallback if primary source failed
-      hasTriedFallback.current = true;
-      setImgSrc(fallbackSource);
-    } else {
-      // Already on fallback or no fallback available
-      hasTriedFallback.current = true;
-      setHasError(true);
-    }
+    img.style.display = "none";
   };
 
-  if (!imgSrc) {
-    return null;
-  }
-
-  // If both sources failed, return null or a placeholder
-  if (hasError && hasTriedFallback.current) {
-    return null;
-  }
-
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
-      key={`${name}-${variant}-${imgSrc}`}
-      src={imgSrc}
+      key={`${name}-${variant}`}
+      src={primarySource}
       alt={alt || name}
       width={size}
       height={height ?? size}
       className={className}
       loading="lazy"
       onError={handleError}
-      onLoad={() => setHasError(false)}
     />
   );
 }

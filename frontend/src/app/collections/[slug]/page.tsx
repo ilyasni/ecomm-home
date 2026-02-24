@@ -1,82 +1,80 @@
-"use client";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getCollectionBySlug as getCollectionFromStrapi } from "@/lib/queries/collections";
+import { withFallback } from "@/lib/with-fallback";
+import { mapMedia, mapMediaOrPlaceholder, mapMediaArray, formatPrice } from "@/lib/mappers";
+import { getCollectionBySlug as getCollectionFromMock } from "@/data/collections";
+import type { Collection } from "@/data/collections";
+import type { Product } from "@/components/catalog/ProductCard";
+import { CollectionPageClient } from "./CollectionPageClient";
 
-import { use } from "react";
-import { Header } from "@/components/home/Header";
-import { Footer } from "@/components/home/Footer";
-import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import {
-  CollectionHero,
-  CollectionDescription,
-  CollectionMedia,
-  CollectionProducts,
-  CollectionBanner,
-} from "@/components/collections";
-import { getCollectionBySlug } from "@/data/collections";
-
-type PageProps = {
+interface PageProps {
   params: Promise<{ slug: string }>;
-};
+}
 
-export default function CollectionPage({ params }: PageProps) {
-  const { slug } = use(params);
-  const collection = getCollectionBySlug(slug);
+function mapStrapiCollection(raw: Record<string, unknown>): Collection {
+  const products = ((raw.products as Array<Record<string, unknown>>) ?? []).map(
+    (p): Product => ({
+      id: (p.documentId as string) ?? String(p.id),
+      title: p.title as string,
+      description: (p.description as string) ?? "",
+      price: p.price ? formatPrice(p.price as number) : "",
+      oldPrice: p.oldPrice ? formatPrice(p.oldPrice as number) : undefined,
+      image: mapMediaOrPlaceholder(p.image as never),
+    })
+  );
 
-  if (!collection) {
-    return (
-      <div className="bg-[var(--background)] text-[var(--foreground)]">
-        <Header variant="solid" />
-        <main className="pt-[78px] md:pt-[81px] desktop:pt-[111px] min-h-[60vh] flex items-center justify-center">
-          <p className="text-lg text-[var(--color-gray)]">
-            Коллекция не найдена
-          </p>
-        </main>
-        <Footer />
-      </div>
-    );
+  return {
+    slug: raw.slug as string,
+    title: (raw.title as string) ?? "",
+    heroTitle: (raw.heroTitle as string) ?? "",
+    heroSubtitle: (raw.heroSubtitle as string) ?? "",
+    heroImages: mapMediaArray(raw.heroImages as never),
+    descriptionTitle: (raw.descriptionTitle as string) ?? "",
+    descriptionParagraphs: (raw.descriptionParagraphs as string[]) ?? [],
+    mediaImage: mapMediaOrPlaceholder(raw.mediaImage as never),
+    mediaVideo: mapMedia(raw.mediaVideo as never) ?? "",
+    bannerTitle: (raw.bannerTitle as string) ?? "",
+    bannerDescription: (raw.bannerDescription as string) ?? "",
+    bannerButtonLabel: (raw.bannerButtonLabel as string) ?? "",
+    bannerImage: mapMediaOrPlaceholder(raw.bannerImage as never),
+    products,
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const data = await withFallback(async () => {
+    const res = await getCollectionFromStrapi(slug);
+    return res.data;
+  }, null);
+
+  const title = (data?.title as string) ?? getCollectionFromMock(slug)?.title ?? "Коллекция";
+
+  return {
+    title,
+    description: `Коллекция ${title} — Vita Brava Home`,
+  };
+}
+
+export default async function CollectionPage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const strapiData = await withFallback(async () => {
+    const res = await getCollectionFromStrapi(slug);
+    return res.data as Record<string, unknown>;
+  }, null);
+
+  let collection: Collection | undefined;
+
+  if (strapiData) {
+    collection = mapStrapiCollection(strapiData);
+  } else {
+    collection = getCollectionFromMock(slug);
   }
 
-  const breadcrumbs = [
-    { label: "Главная", href: "/" },
-    { label: "Каталог", href: "/catalog" },
-    { label: collection.title },
-  ];
+  if (!collection) notFound();
 
-  return (
-    <div className="bg-[var(--background)] text-[var(--foreground)]">
-      <Header variant="solid" />
-      <main className="pt-[78px] md:pt-[81px] desktop:pt-[111px]">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 mt-4 md:mt-6">
-          <Breadcrumbs items={breadcrumbs} />
-        </div>
-
-        <div className="mt-4 md:mt-6">
-          <CollectionHero
-            title={collection.heroTitle}
-            subtitle={collection.heroSubtitle}
-            images={collection.heroImages}
-          />
-        </div>
-
-        <CollectionDescription
-          title={collection.descriptionTitle}
-          paragraphs={collection.descriptionParagraphs}
-        />
-
-        <CollectionMedia
-          image={collection.mediaImage}
-          video={collection.mediaVideo}
-        />
-
-        <CollectionProducts products={collection.products} />
-
-        <CollectionBanner
-          title={collection.bannerTitle}
-          description={collection.bannerDescription}
-          buttonLabel={collection.bannerButtonLabel}
-          image={collection.bannerImage}
-        />
-      </main>
-      <Footer />
-    </div>
-  );
+  return <CollectionPageClient collection={collection} />;
 }

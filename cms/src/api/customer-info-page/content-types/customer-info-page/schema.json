@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "customer_info_pages",
+  "info": {
+    "singularName": "customer-info-page",
+    "pluralName": "customer-info-pages",
+    "displayName": "Customer Info Page",
+    "description": "Страница Покупателю (доставка, оплата, возврат)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "categories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "customer-info.info-category"
+    }
+  }
+}

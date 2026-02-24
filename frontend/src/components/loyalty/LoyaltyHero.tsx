@@ -3,35 +3,44 @@
 import Image from "next/image";
 import { Button } from "@/design-system/components";
 import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { loyaltyHero } from "@/data/loyalty";
+import { loyaltyHero as defaultLoyaltyHero } from "@/data/loyalty";
 
-const breadcrumbs = [
-  { label: "Главная", href: "/" },
-  { label: "Программа лояльности" },
-];
+const breadcrumbs = [{ label: "Главная", href: "/" }, { label: "Программа лояльности" }];
 
-export function LoyaltyHero() {
+type LoyaltyHeroData = {
+  title: string;
+  description: string;
+  buttonLabel: string;
+  image: string;
+};
+
+type LoyaltyHeroProps = {
+  data?: LoyaltyHeroData;
+};
+
+export function LoyaltyHero({ data }: LoyaltyHeroProps) {
+  const loyaltyHero = data ?? defaultLoyaltyHero;
   return (
-    <section className="relative bg-[var(--color-selection)] overflow-hidden">
-      <div className="relative mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 min-h-[400px] md:min-h-[480px] desktop:min-h-[600px]">
-        <div className="pt-6 desktop:pt-8">
+    <section className="relative overflow-hidden bg-[var(--color-selection)]">
+      <div className="desktop:px-0 desktop:min-h-[600px] relative mx-auto min-h-[400px] max-w-[1400px] px-4 md:min-h-[480px] md:px-[39px]">
+        <div className="desktop:pt-8 pt-6">
           <Breadcrumbs items={breadcrumbs} />
         </div>
-        <div className="flex flex-col justify-center py-8 md:py-10 desktop:py-12 max-w-[500px]">
-          <h1 className="text-[30px] md:text-[36px] desktop:text-[40px] font-medium leading-[1.1] text-[var(--color-foreground)]">
+        <div className="desktop:py-12 flex max-w-[500px] flex-col justify-center py-8 md:py-10">
+          <h1 className="desktop:text-[40px] text-[30px] leading-[1.1] font-medium text-[var(--color-foreground)] md:text-[36px]">
             {loyaltyHero.title}
           </h1>
-          <p className="mt-4 desktop:mt-6 text-sm desktop:text-base leading-[1.3] text-[var(--color-dark)]">
+          <p className="desktop:mt-6 desktop:text-base mt-4 text-sm leading-[1.3] text-[var(--color-dark)]">
             {loyaltyHero.description}
           </p>
-          <div className="mt-6 desktop:mt-8">
+          <div className="desktop:mt-8 mt-6">
             <Button variant="primary" type="button">
               {loyaltyHero.buttonLabel}
             </Button>
           </div>
         </div>
       </div>
-      <div className="hidden md:block absolute top-0 right-0 h-full w-[50%] desktop:w-[55%]">
+      <div className="desktop:w-[55%] absolute top-0 right-0 hidden h-full w-[50%] md:block">
         <Image
           src={loyaltyHero.image}
           alt="Программа лояльности"
@@ -40,7 +49,7 @@ export function LoyaltyHero() {
           unoptimized
         />
       </div>
-      <div className="md:hidden relative h-[300px] w-full">
+      <div className="relative h-[300px] w-full md:hidden">
         <Image
           src={loyaltyHero.image}
           alt="Программа лояльности"

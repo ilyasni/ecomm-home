@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "info_pages",
+  "info": {
+    "singularName": "info-page",
+    "pluralName": "info-pages",
+    "displayName": "Info Page",
+    "description": "Информационная страница (оферта, политика и т.д.)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "breadcrumbLabel": {
+      "type": "string"
+    },
+    "sections": {
+      "type": "component",
+      "repeatable": true,
+      "component": "info.section"
+    }
+  }
+}

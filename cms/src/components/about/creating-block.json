@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_about_creating_blocks",
+  "info": {
+    "displayName": "Creating Block",
+    "icon": "pencil-alt",
+    "description": "Блок Создаём для вас (текст + изображение)"
+  },
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "imagePosition": {
+      "type": "enumeration",
+      "enum": ["left", "right"],
+      "default": "left"
+    }
+  }
+}

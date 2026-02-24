@@ -15,12 +15,12 @@ import { CheckoutSidebar } from "@/components/checkout/CheckoutSidebar";
 import { BoutiquePickupModal } from "@/components/checkout/modals/BoutiquePickupModal";
 import { CitySelectionModal } from "@/components/checkout/modals/CitySelectionModal";
 import {
-  cartItems as initialCartItems,
   accountUser,
   type PaymentMethodType,
   type DeliveryMethodType,
   type CheckoutFormData,
 } from "@/data/account";
+import { createOrder, getCommerceSnapshot } from "@/lib/commerce";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -50,7 +50,19 @@ export default function CheckoutPage() {
   const [promoStatus, setPromoStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [promoMessage, setPromoMessage] = useState("");
 
-  const items = initialCartItems;
+  const items = getCommerceSnapshot().cartItems.map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description ?? "Товар",
+    color: item.color ?? "Не указан",
+    price: item.price,
+    oldPrice: item.oldPrice,
+    total: item.price,
+    image: item.image,
+    quantity: item.quantity,
+    bonusReturn: 0,
+    isFavorite: Boolean(item.isFavorite),
+  }));
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -78,12 +90,43 @@ export default function CheckoutPage() {
       ? formData.boutiqueId !== ""
       : formData.deliveryAddress.trim() !== "");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
     setIsSubmitting(true);
-    setTimeout(() => {
-      router.push("/checkout/success");
-    }, 1500);
+    const localOrder = createOrder({
+      customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      phone: formData.phone,
+      deliveryAddress:
+        formData.deliveryMethod === "pickup"
+          ? `Самовывоз из бутика ${formData.boutiqueId}`
+          : formData.deliveryAddress,
+      paymentMethod: formData.paymentMethod,
+      deliveryMethod: formData.deliveryMethod,
+    });
+    try {
+      const response = await fetch("/api/commerce/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone,
+          deliveryAddress:
+            formData.deliveryMethod === "pickup"
+              ? `Самовывоз из бутика ${formData.boutiqueId}`
+              : formData.deliveryAddress,
+          paymentMethod: formData.paymentMethod,
+          deliveryMethod: formData.deliveryMethod,
+          total: localOrder.total,
+          items: localOrder.items,
+        }),
+      });
+      const data = (await response.json()) as { id?: string };
+      router.push(`/checkout/success?orderId=${data.id ?? localOrder.id}`);
+    } catch {
+      router.push(`/checkout/success?orderId=${localOrder.id}`);
+    }
   };
 
   return (
@@ -91,15 +134,15 @@ export default function CheckoutPage() {
       <Header variant="solid" />
 
       <main className="pt-[111px] md:pt-[143px]">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 pb-28 md:pb-20">
+        <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 pb-28 md:px-[39px] md:pb-20">
           {/* Заголовок */}
-          <h1 className="text-center text-[28px] md:text-[36px] font-medium leading-[1.2] mb-6 md:mb-8">
+          <h1 className="mb-6 text-center text-[28px] leading-[1.2] font-medium md:mb-8 md:text-[36px]">
             Оформление заказа
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+          <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
             {/* Левая колонка — форма */}
-            <div className="flex-1 min-w-0 space-y-4">
+            <div className="min-w-0 flex-1 space-y-4">
               <Link
                 href="/cart"
                 className="inline-flex items-center gap-2 text-[14px] text-[var(--color-dark)] hover:text-[var(--color-black)]"
@@ -122,9 +165,7 @@ export default function CheckoutPage() {
 
               <PaymentSection
                 selected={formData.paymentMethod}
-                onChange={(method: PaymentMethodType) =>
-                  updateField("paymentMethod", method)
-                }
+                onChange={(method: PaymentMethodType) => updateField("paymentMethod", method)}
               />
 
               <DeliverySection
@@ -164,16 +205,14 @@ export default function CheckoutPage() {
               discount="4 000 ₽"
               promoDiscount={promoStatus === "success" ? "6 000 ₽" : undefined}
               bonusDiscount={
-                formData.bonusesToSpend > 0
-                  ? `${formData.bonusesToSpend} ₽`
-                  : undefined
+                formData.bonusesToSpend > 0 ? `${formData.bonusesToSpend} ₽` : undefined
               }
               deliveryPrice={
                 formData.deliveryMethod === "pickup"
                   ? "Бесплатно"
                   : formData.deliveryMethod === "courier"
-                  ? "590 ₽"
-                  : "390 ₽"
+                    ? "590 ₽"
+                    : "390 ₽"
               }
               total="60 400 ₽"
               bonusEarned={3000}

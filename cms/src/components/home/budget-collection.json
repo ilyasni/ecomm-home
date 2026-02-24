@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_home_budget_collections",
+  "info": {
+    "displayName": "Budget Collection",
+    "icon": "shopping-bag",
+    "description": "Коллекция для бюджета (карточка)"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "price": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

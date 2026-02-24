@@ -1,14 +1,24 @@
 "use client";
 
 import { Button } from "@/design-system/components";
-import { aboutIntro } from "@/data/about";
+import { aboutIntro as defaultAboutIntro } from "@/data/about";
 
-export function AboutIntro() {
+interface AboutIntroProps {
+  text?: string;
+  buttonLabel?: string;
+}
+
+export function AboutIntro(props: AboutIntroProps) {
+  const aboutIntro = {
+    text: props.text ?? defaultAboutIntro.text,
+    buttonLabel: props.buttonLabel ?? defaultAboutIntro.buttonLabel,
+  };
+
   return (
-    <section className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 py-10 desktop:py-[80px]">
+    <section className="desktop:px-0 desktop:py-[80px] mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
       <div className="flex justify-end">
-        <div className="w-full desktop:max-w-[606px]">
-          <p className="text-sm leading-[1.5] text-[var(--color-dark)] desktop:text-base whitespace-pre-line">
+        <div className="desktop:max-w-[606px] w-full">
+          <p className="desktop:text-base text-sm leading-[1.5] whitespace-pre-line text-[var(--color-dark)]">
             {aboutIntro.text}
           </p>
           <div className="mt-8">

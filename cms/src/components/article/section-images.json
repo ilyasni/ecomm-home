@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_article_section_images",
+  "info": {
+    "displayName": "Section Images",
+    "icon": "images",
+    "description": "Галерея изображений в статье"
+  },
+  "attributes": {
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}

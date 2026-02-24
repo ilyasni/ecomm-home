@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_footer_columns",
+  "info": {
+    "displayName": "Footer Column",
+    "icon": "layout",
+    "description": "Колонка ссылок в футере"
+  },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "navigation.menu-item"
+    }
+  }
+}

@@ -2,15 +2,21 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import {
-  Input,
-  PhoneInput,
-  Checkbox,
-  Button,
-} from "@/design-system/components";
-import { partnershipForm } from "@/data/cooperation";
+import { Input, PhoneInput, Checkbox, Button } from "@/design-system/components";
+import { partnershipForm as defaultPartnershipForm } from "@/data/cooperation";
 
-export function PartnershipForm() {
+interface PartnershipFormProps {
+  title?: string;
+  subtitle?: string;
+  image?: string;
+}
+
+export function PartnershipForm(props: PartnershipFormProps) {
+  const partnershipForm = {
+    title: props.title ?? defaultPartnershipForm.title,
+    subtitle: props.subtitle ?? defaultPartnershipForm.subtitle,
+    image: props.image ?? defaultPartnershipForm.image,
+  };
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -18,8 +24,8 @@ export function PartnershipForm() {
   const [privacyChecked, setPrivacyChecked] = useState(false);
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0 py-10 desktop:py-[80px]">
-      <div className="flex flex-col md:flex-row gap-0 overflow-hidden">
+    <section className="desktop:px-0 desktop:py-[80px] mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
+      <div className="flex flex-col gap-0 overflow-hidden md:flex-row">
         <div className="relative h-[300px] md:h-auto md:w-1/2">
           <Image
             src={partnershipForm.image}
@@ -29,14 +35,14 @@ export function PartnershipForm() {
             unoptimized
           />
         </div>
-        <div className="bg-[var(--color-selection)] p-6 md:p-8 desktop:p-12 md:w-1/2">
-          <h2 className="text-[22px] md:text-[26px] desktop:text-[32px] font-medium leading-[1.1]">
+        <div className="desktop:p-12 bg-[var(--color-selection)] p-6 md:w-1/2 md:p-8">
+          <h2 className="desktop:text-[32px] text-[22px] leading-[1.1] font-medium md:text-[26px]">
             {partnershipForm.title}
           </h2>
-          <p className="mt-4 text-sm text-[var(--color-dark)] leading-[1.5] desktop:text-base">
+          <p className="desktop:text-base mt-4 text-sm leading-[1.5] text-[var(--color-dark)]">
             {partnershipForm.subtitle}
           </p>
-          <form className="mt-6 desktop:mt-8 flex flex-col gap-4">
+          <form className="desktop:mt-8 mt-6 flex flex-col gap-4">
             <Input
               placeholder="Имя*"
               type="text"

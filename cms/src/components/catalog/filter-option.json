@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_catalog_filter_options",
+  "info": {
+    "displayName": "Filter Option",
+    "icon": "filter",
+    "description": "Вариант фильтра каталога"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

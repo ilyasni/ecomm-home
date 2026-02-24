@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "@/design-system/icons";
 import type { IconName } from "@/design-system/icons/icon-map";
 import {
@@ -16,22 +18,13 @@ type CatalogMenuProps = {
 };
 
 export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
-  const [activeCategory, setActiveCategory] = useState<string>(
-    catalogCategories[0]?.id || ""
-  );
-  const [mobileLevel, setMobileLevel] = useState<
-    "main" | "category" | "filter"
-  >("main");
+  const [activeCategory, setActiveCategory] = useState<string>(catalogCategories[0]?.id || "");
+  const [mobileLevel, setMobileLevel] = useState<"main" | "category" | "filter">("main");
   const [mobileCategoryId, setMobileCategoryId] = useState<string>("");
   const [expandedFilter, setExpandedFilter] = useState<string>("");
 
   useEffect(() => {
-    if (!isOpen) {
-      setMobileLevel("main");
-      setMobileCategoryId("");
-      setExpandedFilter("");
-      return;
-    }
+    if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -70,71 +63,59 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
   return (
     <>
       {/* ===== DESKTOP (≥1400px) ===== */}
-      <div className="hidden desktop:block fixed inset-0 z-40 top-[111px]">
-        <div
-          className="absolute inset-0 bg-black/20"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-        <div className="relative bg-[var(--background)] border-t border-[var(--color-gray-light)]">
-          <div className="mx-auto max-w-[1400px] flex gap-12 py-8 px-2">
+      <div className="desktop:block fixed inset-0 top-[111px] z-40 hidden">
+        <div className="absolute inset-0 bg-black/20" onClick={onClose} aria-hidden="true" />
+        <div className="relative border-t border-[var(--color-gray-light)] bg-[var(--background)]">
+          <div className="mx-auto flex max-w-[1400px] gap-12 px-2 py-8">
             {/* Левая колонка: категории */}
-            <div className="flex flex-col gap-6 w-[220px] shrink-0">
+            <div className="flex w-[220px] shrink-0 flex-col gap-6">
               {catalogCategories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
                   onMouseEnter={() => setActiveCategory(cat.id)}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center gap-2 text-left group ${
+                  className={`group flex items-center gap-2 text-left ${
                     activeCategory === cat.id
                       ? "text-[var(--color-brand)]"
                       : "text-[var(--color-black)]"
                   }`}
                 >
-                  <Icon
-                    name={cat.icon as IconName}
-                    size={24}
-                    className="shrink-0"
-                  />
-                  <span className="flex-1 text-[16px] font-medium leading-[1.3]">
-                    {cat.label}
-                  </span>
+                  <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+                  <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
                   <Icon name="chevronRight" size={20} className="shrink-0" />
                 </button>
               ))}
 
-              <div className="border-t border-[var(--color-gray-light)] pt-4 flex flex-col gap-4">
+              <div className="flex flex-col gap-4 border-t border-[var(--color-gray-light)] pt-4">
                 {catalogExtraLinks.map((link) => (
                   <a
                     key={link.label}
                     href={link.href}
-                    className="flex items-center justify-between text-[16px] font-medium leading-[1.3] text-[var(--color-black)] hover:text-[var(--color-brand)] transition-colors"
+                    className="flex items-center justify-between text-[16px] leading-[1.3] font-medium text-[var(--color-black)] transition-colors hover:text-[var(--color-brand)]"
                   >
                     {link.label}
-                    {link.hasSubmenu && (
-                      <Icon name="chevronRight" size={20} />
-                    )}
+                    {link.hasSubmenu && <Icon name="chevronRight" size={20} />}
                   </a>
                 ))}
               </div>
             </div>
 
             {/* Правая часть: фильтры и промо */}
-            <div className="flex-1 flex gap-8">
+            <div className="flex flex-1 gap-8">
               {activeCat && (
                 <>
                   {/* Категории */}
                   {activeCat.subcategories && (
                     <div className="flex flex-col gap-3">
-                      <h3 className="text-[14px] font-medium leading-[1.3] text-[var(--color-black)]">
+                      <h3 className="text-[14px] leading-[1.3] font-medium text-[var(--color-black)]">
                         Категории
                       </h3>
                       {activeCat.subcategories.map((sub) => (
                         <a
                           key={sub.label}
                           href={sub.href}
-                          className="text-[14px] leading-[1.3] text-[var(--color-dark)] hover:text-[var(--color-brand)] transition-colors"
+                          className="text-[14px] leading-[1.3] text-[var(--color-dark)] transition-colors hover:text-[var(--color-brand)]"
                         >
                           {sub.label}
                         </a>
@@ -145,14 +126,14 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                   {/* Фильтры */}
                   {activeCat.filters?.map((filter) => (
                     <div key={filter.title} className="flex flex-col gap-3">
-                      <h3 className="text-[14px] font-medium leading-[1.3] text-[var(--color-black)]">
+                      <h3 className="text-[14px] leading-[1.3] font-medium text-[var(--color-black)]">
                         {filter.title}
                       </h3>
                       {filter.options.map((opt) => (
                         <a
                           key={opt.label + opt.href}
                           href={opt.href}
-                          className="text-[14px] leading-[1.3] text-[var(--color-dark)] hover:text-[var(--color-brand)] transition-colors"
+                          className="text-[14px] leading-[1.3] text-[var(--color-dark)] transition-colors hover:text-[var(--color-brand)]"
                         >
                           {opt.label}
                         </a>
@@ -161,31 +142,35 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                   ))}
 
                   {/* Промо изображения */}
-                  <div className="flex gap-4 ml-auto">
+                  <div className="ml-auto flex gap-4">
                     <a
                       href={activeCat.href}
-                      className="relative w-[200px] h-[160px] rounded overflow-hidden group"
+                      className="group relative h-[160px] w-[200px] overflow-hidden rounded"
                     >
-                      <img
-                        src="/assets/figma/collections/featured.jpg"
+                      <Image
+                        src="/assets/figma/placeholder.svg"
                         alt=""
-                        className="w-full h-full object-cover"
+                        fill
+                        unoptimized
+                        className="h-full w-full object-cover"
                       />
-                      <span className="absolute bottom-3 left-3 text-[12px] text-white flex items-center gap-1">
+                      <span className="absolute bottom-3 left-3 flex items-center gap-1 text-[12px] text-white">
                         смотреть коллекцию
                         <Icon name="arrowRight" size={16} />
                       </span>
                     </a>
                     <a
                       href={activeCat.href}
-                      className="relative w-[200px] h-[160px] rounded overflow-hidden group"
+                      className="group relative h-[160px] w-[200px] overflow-hidden rounded"
                     >
-                      <img
-                        src="/assets/figma/collections/featured.jpg"
+                      <Image
+                        src="/assets/figma/placeholder.svg"
                         alt=""
-                        className="w-full h-full object-cover"
+                        fill
+                        unoptimized
+                        className="h-full w-full object-cover"
                       />
-                      <span className="absolute bottom-3 left-3 text-[12px] text-white flex items-center gap-1">
+                      <span className="absolute bottom-3 left-3 flex items-center gap-1 text-[12px] text-white">
                         смотреть простыни
                         <Icon name="arrowRight" size={16} />
                       </span>
@@ -199,16 +184,12 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
       </div>
 
       {/* ===== TABLET (768px–1399px) ===== */}
-      <div className="hidden md:block desktop:hidden fixed inset-0 z-40 top-[81px]">
-        <div
-          className="absolute inset-0 bg-black/20"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-        <div className="relative bg-[var(--background)] border-t border-[var(--color-gray-light)] max-h-[calc(100vh-81px)] overflow-y-auto">
-          <div className="flex px-[39px] py-6 gap-12">
+      <div className="desktop:hidden fixed inset-0 top-[81px] z-40 hidden md:block">
+        <div className="absolute inset-0 bg-black/20" onClick={onClose} aria-hidden="true" />
+        <div className="relative max-h-[calc(100vh-81px)] overflow-y-auto border-t border-[var(--color-gray-light)] bg-[var(--background)]">
+          <div className="flex gap-12 px-[39px] py-6">
             {/* Левая колонка: категории */}
-            <div className="flex flex-col gap-5 w-[220px] shrink-0">
+            <div className="flex w-[220px] shrink-0 flex-col gap-5">
               {catalogCategories.map((cat) => (
                 <button
                   key={cat.id}
@@ -220,29 +201,21 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                       : "text-[var(--color-black)]"
                   }`}
                 >
-                  <Icon
-                    name={cat.icon as IconName}
-                    size={24}
-                    className="shrink-0"
-                  />
-                  <span className="flex-1 text-[16px] font-medium leading-[1.3]">
-                    {cat.label}
-                  </span>
+                  <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+                  <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
                   <Icon name="chevronRight" size={20} className="shrink-0" />
                 </button>
               ))}
 
-              <div className="border-t border-[var(--color-gray-light)] pt-4 flex flex-col gap-4">
+              <div className="flex flex-col gap-4 border-t border-[var(--color-gray-light)] pt-4">
                 {catalogExtraLinks.map((link) => (
                   <a
                     key={link.label}
                     href={link.href}
-                    className="flex items-center justify-between text-[16px] font-medium leading-[1.3] text-[var(--color-black)] hover:text-[var(--color-brand)] transition-colors"
+                    className="flex items-center justify-between text-[16px] leading-[1.3] font-medium text-[var(--color-black)] transition-colors hover:text-[var(--color-brand)]"
                   >
                     {link.label}
-                    {link.hasSubmenu && (
-                      <Icon name="chevronRight" size={20} />
-                    )}
+                    {link.hasSubmenu && <Icon name="chevronRight" size={20} />}
                   </a>
                 ))}
               </div>
@@ -250,17 +223,17 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
 
             {/* Правая часть: фильтры */}
             {activeCat && (
-              <div className="flex-1 flex gap-8">
+              <div className="flex flex-1 gap-8">
                 {activeCat.subcategories && (
                   <div className="flex flex-col gap-3">
-                    <h3 className="text-[14px] font-medium leading-[1.3] text-[var(--color-black)]">
+                    <h3 className="text-[14px] leading-[1.3] font-medium text-[var(--color-black)]">
                       Категории
                     </h3>
                     {activeCat.subcategories.map((sub) => (
                       <a
                         key={sub.label}
                         href={sub.href}
-                        className="text-[14px] leading-[1.3] text-[var(--color-dark)] hover:text-[var(--color-brand)] transition-colors"
+                        className="text-[14px] leading-[1.3] text-[var(--color-dark)] transition-colors hover:text-[var(--color-brand)]"
                       >
                         {sub.label}
                       </a>
@@ -270,14 +243,14 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
 
                 {activeCat.filters?.map((filter) => (
                   <div key={filter.title} className="flex flex-col gap-3">
-                    <h3 className="text-[14px] font-medium leading-[1.3] text-[var(--color-black)]">
+                    <h3 className="text-[14px] leading-[1.3] font-medium text-[var(--color-black)]">
                       {filter.title}
                     </h3>
                     {filter.options.map((opt) => (
                       <a
                         key={opt.label + opt.href}
                         href={opt.href}
-                        className="text-[14px] leading-[1.3] text-[var(--color-dark)] hover:text-[var(--color-brand)] transition-colors"
+                        className="text-[14px] leading-[1.3] text-[var(--color-dark)] transition-colors hover:text-[var(--color-brand)]"
                       >
                         {opt.label}
                       </a>
@@ -289,12 +262,12 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
           </div>
 
           {/* Нижний блок информационных ссылок */}
-          <div className="bg-[var(--color-gray-light)] p-[16px] mx-[39px] mb-6 flex flex-col gap-4">
+          <div className="mx-[39px] mb-6 flex flex-col gap-4 bg-[var(--color-gray-light)] p-[16px]">
             {catalogInfoLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="flex items-center justify-between text-[16px] font-medium leading-[1.3] text-[var(--color-black)]"
+                className="flex items-center justify-between text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
               >
                 {link.label}
                 {link.hasSubmenu && <Icon name="chevronRight" size={20} />}
@@ -305,20 +278,14 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
       </div>
 
       {/* ===== MOBILE (<768px) ===== */}
-      <div className="md:hidden fixed inset-0 z-40 bg-[var(--background)]">
-        {mobileLevel === "main" && (
-          <MobileMainLevel
-            onCategoryClick={handleMobileCategoryClick}
-            onClose={onClose}
-          />
-        )}
+      <div className="fixed inset-0 z-40 bg-[var(--background)] md:hidden">
+        {mobileLevel === "main" && <MobileMainLevel onCategoryClick={handleMobileCategoryClick} />}
         {mobileLevel === "category" && mobileCat && (
           <MobileCategoryLevel
             category={mobileCat}
             expandedFilter={expandedFilter}
             onToggleFilter={toggleMobileFilter}
             onBack={handleMobileBack}
-            onClose={onClose}
           />
         )}
       </div>
@@ -326,29 +293,23 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
   );
 }
 
-function MobileMainLevel({
-  onCategoryClick,
-  onClose,
-}: {
-  onCategoryClick: (catId: string) => void;
-  onClose: () => void;
-}) {
+function MobileMainLevel({ onCategoryClick }: { onCategoryClick: (catId: string) => void }) {
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto">
       {/* Header mobile: оставляем существующий хедер, этот блок не нужен */}
 
       {/* Войти / Бутики */}
-      <div className="bg-[var(--color-selection)] p-4 flex flex-col gap-4">
+      <div className="flex flex-col gap-4 bg-[var(--color-selection)] p-4">
         <a
           href="/login"
-          className="flex items-center gap-2 text-[16px] font-medium leading-[1.3] text-[var(--color-black)]"
+          className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
         >
           <Icon name="user" variant="scroll" size={24} />
           Войти / Зарегистрироваться
         </a>
         <a
           href="/boutiques"
-          className="flex items-center gap-2 text-[16px] font-medium leading-[1.3] text-[var(--color-black)]"
+          className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
         >
           <Icon name="location" size={24} />
           Бутики
@@ -356,7 +317,7 @@ function MobileMainLevel({
       </div>
 
       {/* Категории */}
-      <div className="px-4 pt-6 flex flex-col gap-6">
+      <div className="flex flex-col gap-6 px-4 pt-6">
         {catalogCategories.map((cat) => (
           <button
             key={cat.id}
@@ -364,42 +325,34 @@ function MobileMainLevel({
             onClick={() => onCategoryClick(cat.id)}
             className="flex items-center gap-2 text-left text-[var(--color-black)]"
           >
-            <Icon
-              name={cat.icon as IconName}
-              size={24}
-              className="shrink-0"
-            />
-            <span className="flex-1 text-[16px] font-medium leading-[1.3]">
-              {cat.label}
-            </span>
+            <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+            <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
             <Icon name="chevronRight" size={20} className="shrink-0" />
           </button>
         ))}
       </div>
 
       {/* Допссылки */}
-      <div className="px-4 pt-8 flex flex-col gap-4 border-t border-[var(--color-gray-light)] mt-8 mx-4">
+      <div className="mx-4 mt-8 flex flex-col gap-4 border-t border-[var(--color-gray-light)] px-4 pt-8">
         {catalogExtraLinks.map((link) => (
           <a
             key={link.label}
             href={link.href}
-            className="flex items-center justify-between text-[16px] font-medium leading-[1.3] text-[var(--color-black)]"
+            className="flex items-center justify-between text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
           >
             {link.label}
-            {link.hasSubmenu && (
-              <Icon name="chevronDown" variant="scroll" size={20} />
-            )}
+            {link.hasSubmenu && <Icon name="chevronDown" variant="scroll" size={20} />}
           </a>
         ))}
       </div>
 
       {/* Информационный блок */}
-      <div className="bg-[var(--color-gray-light)] p-4 mt-8 mx-4 mb-4 flex flex-col gap-4">
+      <div className="mx-4 mt-8 mb-4 flex flex-col gap-4 bg-[var(--color-gray-light)] p-4">
         {catalogInfoLinks.map((link) => (
           <a
             key={link.label}
             href={link.href}
-            className="flex items-center justify-between text-[16px] font-medium leading-[1.3] text-[var(--color-black)]"
+            className="flex items-center justify-between text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
           >
             {link.label}
             {link.hasSubmenu && <Icon name="chevronRight" size={20} />}
@@ -415,36 +368,25 @@ function MobileCategoryLevel({
   expandedFilter,
   onToggleFilter,
   onBack,
-  onClose,
 }: {
   category: CatalogCategory;
   expandedFilter: string;
   onToggleFilter: (title: string) => void;
   onBack: () => void;
-  onClose: () => void;
 }) {
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto">
       {/* Заголовок с кнопкой назад */}
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-[var(--color-gray-light)]">
-        <button
-          type="button"
-          onClick={onBack}
-          className="shrink-0"
-          aria-label="Назад"
-        >
-          <Icon
-            name="chevronRight"
-            size={20}
-            className="rotate-180"
-          />
+      <div className="flex items-center gap-3 border-b border-[var(--color-gray-light)] px-4 py-4">
+        <button type="button" onClick={onBack} className="shrink-0" aria-label="Назад">
+          <Icon name="chevronRight" size={20} className="rotate-180" />
         </button>
-        <span className="text-[16px] font-medium leading-[1.3] text-[var(--color-black)]">
+        <span className="text-[16px] leading-[1.3] font-medium text-[var(--color-black)]">
           {category.label}
         </span>
       </div>
 
-      <div className="px-4 pt-4 flex flex-col gap-0">
+      <div className="flex flex-col gap-0 px-4 pt-4">
         {/* Все товары */}
         <a
           href={category.href}
@@ -459,9 +401,9 @@ function MobileCategoryLevel({
             <button
               type="button"
               onClick={() => onToggleFilter("Категории")}
-              className="flex items-center justify-between w-full py-3"
+              className="flex w-full items-center justify-between py-3"
             >
-              <span className="text-[16px] font-medium leading-[1.3] text-[var(--color-black)]">
+              <span className="text-[16px] leading-[1.3] font-medium text-[var(--color-black)]">
                 Категории
               </span>
               <Icon
@@ -491,14 +433,11 @@ function MobileCategoryLevel({
 
         {/* Фильтры (каждый — аккордеон) */}
         {category.filters?.map((filter) => (
-          <div
-            key={filter.title}
-            className="border-t border-[var(--color-gray-light)]"
-          >
+          <div key={filter.title} className="border-t border-[var(--color-gray-light)]">
             <button
               type="button"
               onClick={() => onToggleFilter(filter.title)}
-              className="flex items-center justify-between w-full py-3"
+              className="flex w-full items-center justify-between py-3"
             >
               <span className="text-[16px] leading-[1.3] text-[var(--color-black)]">
                 {filter.title}
@@ -540,20 +479,22 @@ function MobileCategoryLevel({
 
         {/* Ссылка на коллекции */}
         <div className="pt-2 pb-4">
-          <a
+          <Link
             href="/collections"
             className="text-[14px] leading-[1.3] text-[var(--color-brand)] underline"
           >
             Смотреть коллекции
-          </a>
+          </Link>
         </div>
 
         {/* Промо картинка */}
-        <div className="pb-6">
-          <img
-            src="/assets/figma/collections/featured.jpg"
+        <div className="relative aspect-[343/200] pb-6">
+          <Image
+            src="/assets/figma/placeholder.svg"
             alt=""
-            className="w-full aspect-[343/200] object-cover rounded"
+            fill
+            unoptimized
+            className="rounded object-cover"
           />
         </div>
       </div>

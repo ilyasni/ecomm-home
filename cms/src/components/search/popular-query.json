@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_search_popular_queries",
+  "info": {
+    "displayName": "Popular Query",
+    "icon": "search",
+    "description": "Популярный поисковый запрос"
+  },
+  "attributes": {
+    "label": { "type": "string", "required": true },
+    "href": { "type": "string", "required": true }
+  }
+}

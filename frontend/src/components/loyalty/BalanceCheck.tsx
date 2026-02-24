@@ -2,20 +2,32 @@
 
 import Image from "next/image";
 import { Button } from "@/design-system/components";
-import { balanceCheck } from "@/data/loyalty";
+import { balanceCheck as defaultBalanceCheck } from "@/data/loyalty";
 
-export function BalanceCheck() {
+type BalanceCheckData = {
+  title: string;
+  description: string;
+  buttonLabel: string;
+  image: string;
+};
+
+type BalanceCheckProps = {
+  data?: BalanceCheckData;
+};
+
+export function BalanceCheck({ data }: BalanceCheckProps) {
+  const balanceCheck = data ?? defaultBalanceCheck;
   return (
-    <section className="w-full mx-auto max-w-[1400px] px-4 md:px-[39px] desktop:px-0">
-      <div className="flex flex-col md:flex-row gap-2">
-        <div className="flex flex-col items-center justify-center text-center bg-[var(--color-gray-light)] p-8 md:p-10 desktop:px-14 desktop:py-0 md:w-1/2 min-h-[400px] desktop:min-h-[660px]">
-          <h2 className="text-[22px] md:text-[26px] desktop:text-[40px] font-medium leading-[1.1] text-[var(--color-foreground)]">
+    <section className="desktop:px-0 mx-auto w-full max-w-[1400px] px-4 md:px-[39px]">
+      <div className="flex flex-col gap-2 md:flex-row">
+        <div className="desktop:px-14 desktop:py-0 desktop:min-h-[660px] flex min-h-[400px] flex-col items-center justify-center bg-[var(--color-gray-light)] p-8 text-center md:w-1/2 md:p-10">
+          <h2 className="desktop:text-[40px] text-[22px] leading-[1.1] font-medium text-[var(--color-foreground)] md:text-[26px]">
             {balanceCheck.title}
           </h2>
-          <p className="mt-4 desktop:mt-6 text-sm desktop:text-base text-[var(--color-dark)] leading-[1.3] max-w-[408px]">
+          <p className="desktop:mt-6 desktop:text-base mt-4 max-w-[408px] text-sm leading-[1.3] text-[var(--color-dark)]">
             {balanceCheck.description}
           </p>
-          <div className="mt-6 desktop:mt-8 w-full max-w-[423px]">
+          <div className="desktop:mt-8 mt-6 w-full max-w-[423px]">
             <Button variant="primary" type="button" fullWidth className="!justify-between !px-8">
               <span>{balanceCheck.buttonLabel}</span>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -24,9 +36,9 @@ export function BalanceCheck() {
             </Button>
           </div>
         </div>
-        <div className="relative md:w-1/2 min-h-[400px] desktop:min-h-[660px] bg-[var(--color-gold)]">
+        <div className="desktop:min-h-[660px] relative min-h-[400px] bg-[var(--color-gold)] md:w-1/2">
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-[300px] h-[160px] desktop:w-[394px] desktop:h-[200px] rounded-[5px] overflow-hidden">
+            <div className="desktop:w-[394px] desktop:h-[200px] relative h-[160px] w-[300px] overflow-hidden rounded-[5px]">
               <Image
                 src={balanceCheck.image}
                 alt="Бонусная карта"
@@ -35,10 +47,10 @@ export function BalanceCheck() {
                 unoptimized
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-[48px] desktop:text-[64px] font-medium leading-[1.1] text-[var(--color-brand)]">
+                <span className="desktop:text-[64px] text-[48px] leading-[1.1] font-medium text-[var(--color-brand)]">
                   +300
                 </span>
-                <span className="text-sm desktop:text-lg font-medium leading-[1.1] text-[var(--color-brand)]">
+                <span className="desktop:text-lg text-sm leading-[1.1] font-medium text-[var(--color-brand)]">
                   бонусных баллов
                 </span>
               </div>

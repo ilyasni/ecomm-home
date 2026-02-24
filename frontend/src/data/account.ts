@@ -70,7 +70,12 @@ export const accountUser: AccountUser = {
 };
 
 export const bonusOperations: BonusOperation[] = [
-  { id: "bo-1", date: "11 июня 2025", description: "Списание бонусов за заказ №22098", amount: -50 },
+  {
+    id: "bo-1",
+    date: "11 июня 2025",
+    description: "Списание бонусов за заказ №22098",
+    amount: -50,
+  },
   { id: "bo-2", date: "10 июня 2025", description: "Начисление за заказ №34567", amount: 100 },
   { id: "bo-3", date: "5 июня 2025", description: "Начисление за заказ №34567", amount: 100 },
   { id: "bo-4", date: "5 июня 2025", description: "Подписка на рассылку", amount: 100 },
@@ -83,9 +88,12 @@ const orderProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
-    colors: [{ name: "бежевый", hex: "#D4C5B0" }, { name: "белый", hex: "#F5F0EB" }],
+    colors: [
+      { name: "бежевый", hex: "#D4C5B0" },
+      { name: "белый", hex: "#F5F0EB" },
+    ],
   },
   {
     id: "op-2",
@@ -93,7 +101,7 @@ const orderProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -102,7 +110,7 @@ const orderProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -111,7 +119,7 @@ const orderProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
 ];
@@ -192,7 +200,7 @@ export const promotionProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -201,14 +209,14 @@ export const promotionProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "promo-3",
     title: "Комплект постельного белья Петербург",
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -217,14 +225,14 @@ export const promotionProducts: OrderProduct[] = [
     description: "Сатин, хлопок-батист",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
   {
     id: "promo-5",
     title: "Комплект постельного белья Петербург",
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -233,7 +241,7 @@ export const promotionProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
   },
 ];
 
@@ -261,7 +269,7 @@ export const cartItems: CartItem[] = [
     price: "15 000 ₽",
     oldPrice: "16 000 ₽",
     total: "15 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     quantity: 1,
     bonusReturn: 0,
     isFavorite: false,
@@ -274,7 +282,7 @@ export const cartItems: CartItem[] = [
     price: "15 000 ₽",
     oldPrice: "16 000 ₽",
     total: "30 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     quantity: 2,
     bonusReturn: 60,
     isFavorite: true,
@@ -287,7 +295,7 @@ export const cartItems: CartItem[] = [
     price: "15 000 ₽",
     oldPrice: "16 000 ₽",
     total: "15 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     quantity: 1,
     bonusReturn: 30,
     isFavorite: true,
@@ -300,7 +308,7 @@ export const recentlyViewed = [
     title: "Комплект постельного белья Сатин PETROL",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -308,7 +316,7 @@ export const recentlyViewed = [
     title: "Микро гель подушка",
     description: "Поверхность Super Soft",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -316,7 +324,7 @@ export const recentlyViewed = [
     title: "Пуховая подушка",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -324,7 +332,7 @@ export const recentlyViewed = [
     title: "Микро гель подушка",
     description: "Поверхность Super Soft",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
 ];
@@ -336,18 +344,25 @@ export const favoriteProducts = [
     description: "полотняно серый с чёрным, хлопок-сатин 400 ТС",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
-    colors: [{ name: "бежевый", hex: "#D4C5B0" }, { name: "белый", hex: "#F5F0EB" }],
+    colors: [
+      { name: "бежевый", hex: "#D4C5B0" },
+      { name: "белый", hex: "#F5F0EB" },
+    ],
   },
   {
     id: "fav-2",
     title: "Комплект постельного белья Петербург",
     description: "оттенок жёлтого золота, египетский хлопок 400 ТС",
     price: "от 25 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
-    colors: [{ name: "золотой", hex: "#BDA06A" }, { name: "белый", hex: "#F5F0EB" }, { name: "голубой", hex: "#B0C4DE" }],
+    colors: [
+      { name: "золотой", hex: "#BDA06A" },
+      { name: "белый", hex: "#F5F0EB" },
+      { name: "голубой", hex: "#B0C4DE" },
+    ],
   },
   {
     id: "fav-3",
@@ -355,15 +370,16 @@ export const favoriteProducts = [
     description: "бежевый с белым и серо-голубым, Ринг сатин 220 ТС",
     price: "24 000 ₽",
     oldPrice: "61 050 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
     id: "fav-4",
     title: "Комплект постельного белья Фелинита",
-    description: "Белый с золотистым и оттенком светлого серебра, аквамарин волнами SENSOTEX® 400 ТС",
+    description:
+      "Белый с золотистым и оттенком светлого серебра, аквамарин волнами SENSOTEX® 400 ТС",
     price: "15 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Новинка",
   },
   {
@@ -372,7 +388,7 @@ export const favoriteProducts = [
     description: "Белый с золотистым и серебристо-серым, хлопок-сатин 400 ТС",
     price: "45 000 ₽",
     oldPrice: "67 350 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
 ];
@@ -495,15 +511,31 @@ export const successOrderMock: SuccessOrderData = {
   total: "60 400 ₽",
   paymentLabel: "Наличными или картой при получении",
   status: "Заказ №3456 поступил в обработку",
-  statusDescription: "Ваш заказ принят и отправлен на сборку, дождитесь уведомления о готовности заказа.",
+  statusDescription:
+    "Ваш заказ принят и отправлен на сборку, дождитесь уведомления о готовности заказа.",
   deliveryAddress: "Россия, Московская область, г. Москва, ул. Ленина, д. 121, кв. 15",
   deliveryDate: "25 августа в 12:00–18:00",
   recipient: "Анна Пакулева",
   recipientPhone: "+7 999 999 99 99",
   products: [
-    { id: "sp-1", title: "Комплект постельного белья Петербург", image: "/assets/figma/collections/featured.jpg", quantity: 1 },
-    { id: "sp-2", title: "Комплект: Пеньюар + сорочка", image: "/assets/figma/collections/featured.jpg", quantity: 2 },
-    { id: "sp-3", title: "Комплект постельного белья Арии Минк", image: "/assets/figma/collections/featured.jpg", quantity: 1 },
+    {
+      id: "sp-1",
+      title: "Комплект постельного белья Петербург",
+      image: "/assets/figma/placeholder.svg",
+      quantity: 1,
+    },
+    {
+      id: "sp-2",
+      title: "Комплект: Пеньюар + сорочка",
+      image: "/assets/figma/placeholder.svg",
+      quantity: 2,
+    },
+    {
+      id: "sp-3",
+      title: "Комплект постельного белья Арии Минк",
+      image: "/assets/figma/placeholder.svg",
+      quantity: 1,
+    },
   ],
 };
 
@@ -514,7 +546,7 @@ export const recommendedProducts: OrderProduct[] = [
     description: "Белый утиный пух в хлопке-батисте",
     price: "23 800 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
   {
@@ -522,7 +554,7 @@ export const recommendedProducts: OrderProduct[] = [
     title: "Микро гель подушка",
     description: "Поверхность Super Soft",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Эксклюзив",
   },
   {
@@ -530,7 +562,7 @@ export const recommendedProducts: OrderProduct[] = [
     title: "Пуховая подушка",
     description: "Белый утиный пух в хлопке-батисте",
     price: "5 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "Новинка",
   },
   {
@@ -539,7 +571,7 @@ export const recommendedProducts: OrderProduct[] = [
     description: "Сатин, хлопок-батист",
     price: "24 000 ₽",
     oldPrice: "28 000 ₽",
-    image: "/assets/figma/collections/featured.jpg",
+    image: "/assets/figma/placeholder.svg",
     badge: "-15%",
   },
 ];
@@ -569,8 +601,6 @@ export const sidebarNavigation = {
   },
   promotions: {
     title: "Актуальные акции",
-    items: [
-      { label: "Акция «Баллы за отзывы»", href: "/account/promotions" },
-    ],
+    items: [{ label: "Акция «Баллы за отзывы»", href: "/account/promotions" }],
   },
 };

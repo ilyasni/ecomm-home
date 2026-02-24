@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { promotionProducts } from "@/data/account";
 
 export function PromotionSection() {
@@ -5,7 +6,7 @@ export function PromotionSection() {
     <div className="flex flex-col gap-6">
       {/* Banner */}
       <div className="flex items-center gap-6 rounded-[5px] border border-[var(--color-gray-light)] p-6">
-        <div className="hidden md:flex h-[170px] w-[170px] shrink-0 items-center justify-center rounded-full bg-[var(--color-selection)]">
+        <div className="hidden h-[170px] w-[170px] shrink-0 items-center justify-center rounded-full bg-[var(--color-selection)] md:flex">
           <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
             <rect width="76" height="76" rx="8" fill="var(--color-gold)" fillOpacity="0.2" />
             <path
@@ -31,9 +32,7 @@ export function PromotionSection() {
 
       {/* Empty state */}
       <div>
-        <p className="text-base font-medium text-[var(--color-black)]">
-          Нет подходящих товаров
-        </p>
+        <p className="text-base font-medium text-[var(--color-black)]">Нет подходящих товаров</p>
         <p className="mt-2 text-sm text-[var(--color-dark-gray)]">
           У вас нет покупок, участвующих в акции. Сообщим, когда они появятся
         </p>
@@ -41,16 +40,18 @@ export function PromotionSection() {
 
       {/* Other promotion products */}
       <div>
-        <h3 className="text-lg font-medium text-[var(--color-black)] mb-4">
+        <h3 className="mb-4 text-lg font-medium text-[var(--color-black)]">
           Другие товары в акции
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
           {promotionProducts.map((product) => (
             <div key={product.id} className="flex flex-col gap-2">
-              <div className="relative aspect-[294/300] rounded-[5px] overflow-hidden bg-[var(--color-selection)]">
-                <img
+              <div className="relative aspect-[294/300] overflow-hidden rounded-[5px] bg-[var(--color-selection)]">
+                <Image
                   src={product.image}
                   alt={product.title}
+                  fill
+                  unoptimized
                   className="h-full w-full object-cover"
                 />
                 {product.badge && (
@@ -60,13 +61,13 @@ export function PromotionSection() {
                 )}
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium text-[var(--color-black)] line-clamp-2">
+                <span className="line-clamp-2 text-sm font-medium text-[var(--color-black)]">
                   {product.title}
                 </span>
-                <span className="text-xs text-[var(--color-gray)] line-clamp-2">
+                <span className="line-clamp-2 text-xs text-[var(--color-gray)]">
                   {product.description}
                 </span>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-[var(--color-black)]">
                     {product.price}
                   </span>

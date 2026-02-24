@@ -5,60 +5,64 @@ import Image from "next/image";
 import { ArrowLink, Button, Input, Checkbox } from "@/design-system/components";
 import { Icon } from "@/design-system/icons";
 
-export function Boutique() {
+type BoutiqueProps = {
+  title?: string;
+  photos?: string[];
+  videoUrl?: string | null;
+};
+
+const defaultPhotos = ["/assets/figma/placeholder.svg", "/assets/figma/placeholder.svg"];
+
+export function Boutique({
+  title = "Посетите бутик\nVITA BRAVA HOME",
+  photos = defaultPhotos,
+  videoUrl,
+}: BoutiqueProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [privacyChecked, setPrivacyChecked] = useState(false);
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-10 md:px-[39px] desktop:px-0 desktop:py-0">
-      <div className="flex flex-col gap-8 md:gap-10 desktop:flex-row desktop:items-center desktop:gap-[48px] desktop:h-[591px]">
-        <div className="flex gap-2 md:h-[343px] desktop:w-[700px] desktop:shrink-0 desktop:h-[591px]">
-          <div className="relative h-[289px] w-1/2 desktop:h-[591px] desktop:w-[346px]">
-            <Image
-              src="/assets/figma/boutique/boutique-1.jpg"
-              alt="Бутик VITA BRAVA HOME"
-              fill
-              className="object-cover"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-[rgba(33,33,31,0.3)]" />
-          </div>
-          <div className="relative h-[289px] w-1/2 desktop:h-[591px] desktop:w-[346px]">
-            <Image
-              src="/assets/figma/boutique/boutique-1.jpg"
-              alt="Бутик VITA BRAVA HOME"
-              fill
-              className="object-cover"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-[rgba(33,33,31,0.3)]" />
-            <div className="absolute left-1/2 top-1/2 flex h-[58px] w-[58px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white">
-              <Icon name="play" size={20} className="rotate-90" />
+    <section className="desktop:px-0 desktop:py-0 mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
+      <div className="desktop:flex-row desktop:items-center desktop:gap-[48px] desktop:h-[591px] flex flex-col gap-8 md:gap-10">
+        <div className="desktop:w-[700px] desktop:shrink-0 desktop:h-[591px] flex gap-2 md:h-[343px]">
+          {photos.slice(0, 2).map((photo, idx) => (
+            <div key={idx} className="desktop:h-[591px] desktop:w-[346px] relative h-[289px] w-1/2">
+              <Image
+                src={photo}
+                alt={`Бутик VITA BRAVA HOME ${idx + 1}`}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-[rgba(33,33,31,0.3)]" />
+              {idx === 1 && (videoUrl || !videoUrl) && (
+                <div className="absolute top-1/2 left-1/2 flex h-[58px] w-[58px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white">
+                  <Icon name="play" size={20} className="rotate-90" />
+                </div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
-        <div className="flex flex-col desktop:w-[620px]">
-          <div className="flex flex-col gap-6 text-center desktop:text-center">
-            <h2 className="text-[26px] font-medium leading-[1.1] desktop:text-[40px]">
-              Посетите бутик
-              <br />
-              VITA BRAVA HOME
+        <div className="desktop:w-[620px] flex flex-col">
+          <div className="desktop:text-center flex flex-col gap-6 text-center">
+            <h2 className="desktop:text-[40px] text-[26px] leading-[1.1] font-medium whitespace-pre-line">
+              {title}
             </h2>
             <div className="flex justify-center">
               <ArrowLink label="Как нас найти" tone="dark" />
             </div>
           </div>
-          <div className="mt-12 flex flex-col gap-8 text-center desktop:text-center">
+          <div className="desktop:text-center mt-12 flex flex-col gap-8 text-center">
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl font-medium leading-[1.1] desktop:text-[24px]">
+              <h3 className="desktop:text-[24px] text-xl leading-[1.1] font-medium">
                 Записаться на консультацию
               </h3>
-              <p className="text-sm text-[var(--color-dark)] leading-[1.3] desktop:text-base">
+              <p className="desktop:text-base text-sm leading-[1.3] text-[var(--color-dark)]">
                 Оцените качество наших тканей в фирменном магазине в Москве
               </p>
             </div>
-            <form className="flex flex-col gap-4 mx-auto desktop:w-[478px]">
+            <form className="desktop:w-[478px] mx-auto flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <Input
                   placeholder="Имя"

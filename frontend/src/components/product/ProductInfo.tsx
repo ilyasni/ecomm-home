@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/design-system/icons";
 import { Button, Select, Quantity } from "@/design-system/components";
 import { SizeChartModal } from "@/components/product/SizeChartModal";
@@ -71,18 +72,13 @@ const descriptions: AccordionItem[] = [
   },
 ];
 
-export function ProductInfo({
-  product,
-  onAddToCart,
-  className,
-}: ProductInfoProps) {
+export function ProductInfo({ product, onAddToCart, className }: ProductInfoProps) {
+  const router = useRouter();
   const [selectedSize, setSelectedSize] = useState("");
   const [sizeChartOpen, setSizeChartOpen] = useState(false);
   const [orderPanelOpen, setOrderPanelOpen] = useState(false);
   const [consultationPanelOpen, setConsultationPanelOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(
-    new Set(["description"])
-  );
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(["description"]));
   const [addedToCart, setAddedToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -103,17 +99,17 @@ export function ProductInfo({
   return (
     <div className={`${className || ""}`}>
       {/* Заголовок */}
-      <h1 className="text-2xl font-medium leading-[1.1] md:text-[32px] desktop:text-[40px]">
+      <h1 className="desktop:text-[40px] text-2xl leading-[1.1] font-medium md:text-[32px]">
         {product.title}
       </h1>
 
       {/* Цена */}
       <div className="mt-6 flex items-center gap-4">
-        <span className="text-xl font-medium leading-[1.1] desktop:text-[24px]">
+        <span className="desktop:text-[24px] text-xl leading-[1.1] font-medium">
           {product.price}
         </span>
         {product.oldPrice && (
-          <span className="text-base font-medium leading-normal text-[var(--color-brown)] line-through desktop:text-[20px]">
+          <span className="desktop:text-[20px] text-base leading-normal font-medium text-[var(--color-brown)] line-through">
             {product.oldPrice}
           </span>
         )}
@@ -213,17 +209,12 @@ export function ProductInfo({
                 variant="primary"
                 fullWidth
                 onClick={() => {
-                  /* Навигация в корзину */
+                  router.push("/cart");
                 }}
               >
                 Перейти в корзину
               </Button>
-              <Quantity
-                value={quantity}
-                onChange={setQuantity}
-                min={1}
-                size="medium"
-              />
+              <Quantity value={quantity} onChange={setQuantity} min={1} size="medium" />
             </div>
           ) : (
             <Button
@@ -243,11 +234,7 @@ export function ProductInfo({
         </div>
       ) : (
         <div className="mt-6">
-          <Button
-            variant="primary"
-            fullWidth
-            onClick={() => setOrderPanelOpen(true)}
-          >
+          <Button variant="primary" fullWidth onClick={() => setOrderPanelOpen(true)}>
             Сделать заказ
           </Button>
         </div>
@@ -267,38 +254,29 @@ export function ProductInfo({
       >
         <Icon name="chatBubbles" size={28} className="shrink-0" />
         <p className="text-[14px] leading-[1.3] text-[var(--color-dark)]">
-          <span className="font-semibold underline">
-            Консультация эксперта.
-          </span>{" "}
-          Остались вопросы? Воспользуйтесь нашим бесплатным сервисом
+          <span className="font-semibold underline">Консультация эксперта.</span> Остались вопросы?
+          Воспользуйтесь нашим бесплатным сервисом
         </p>
       </button>
 
       {/* Accordion */}
       <div className="mt-8">
         {descriptions.map((item) => (
-          <div
-            key={item.id}
-            className="border-b border-[var(--color-gray-light)]"
-          >
+          <div key={item.id} className="border-b border-[var(--color-gray-light)]">
             <button
               type="button"
               onClick={() => toggleAccordion(item.id)}
               className="flex w-full items-center justify-between py-4"
             >
-              <span className="text-[16px] font-medium leading-[1.3]">
-                {item.title}
-              </span>
+              <span className="text-[16px] leading-[1.3] font-medium">{item.title}</span>
               <Icon
                 name="chevronDown"
                 size={20}
-                className={`transition-transform ${
-                  expandedItems.has(item.id) ? "rotate-180" : ""
-                }`}
+                className={`transition-transform ${expandedItems.has(item.id) ? "rotate-180" : ""}`}
               />
             </button>
             {expandedItems.has(item.id) && (
-              <p className="pb-4 text-[16px] font-normal leading-[1.3] text-[var(--color-dark)]">
+              <p className="pb-4 text-[16px] leading-[1.3] font-normal text-[var(--color-dark)]">
                 {item.content}
               </p>
             )}
@@ -306,10 +284,7 @@ export function ProductInfo({
         ))}
       </div>
 
-      <SizeChartModal
-        isOpen={sizeChartOpen}
-        onClose={() => setSizeChartOpen(false)}
-      />
+      <SizeChartModal isOpen={sizeChartOpen} onClose={() => setSizeChartOpen(false)} />
 
       <OrderFormPanel
         isOpen={orderPanelOpen}

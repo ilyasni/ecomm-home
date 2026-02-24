@@ -1,105 +1,126 @@
-"use client";
-
-import { use } from "react";
-import { Header } from "@/components/home/Header";
-import { Footer } from "@/components/home/Footer";
-import { Breadcrumbs } from "@/components/catalog/Breadcrumbs";
-import { ProductGallery } from "@/components/product/ProductGallery";
-import { ProductInfo } from "@/components/product/ProductInfo";
-import { GiftCertificateInfo } from "@/components/product/GiftCertificateInfo";
-import { RecommendationsSlider } from "@/components/product/RecommendationsSlider";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import {
+  getProductBySlug,
+  getProducts,
+  getCategoryBySlug,
+  getProductsByCategory,
+} from "@/lib/queries/catalog";
+import { withFallback } from "@/lib/with-fallback";
+import { mapMediaOrPlaceholder, formatPrice } from "@/lib/mappers";
 import { catalogProducts } from "@/data/catalog";
+import type { Product } from "@/components/catalog/ProductCard";
+import { ProductPageClient } from "./ProductPageClient";
+import { CategoryPageClient } from "./CategoryPageClient";
 
-type PageProps = {
+interface PageProps {
   params: Promise<{ slug: string }>;
-};
+}
 
-export default function ProductPage({ params }: PageProps) {
-  const { slug } = use(params);
-
-  const product = catalogProducts.find((p) => p.id === slug) || catalogProducts[0];
-
-  const images = Array(9).fill(product.image);
-
-  const isGiftCert = product.type === "giftCertificate";
-
-  const breadcrumbs = isGiftCert
-    ? [
-        { label: "Главная", href: "/" },
-        { label: "Подарочный сертификат" },
-      ]
-    : [
-        { label: "Главная", href: "/" },
-        { label: "Постельное бельё", href: "/catalog" },
-        { label: product.title },
-      ];
-
-  const handleAddToCart = (id: string) => {
-    console.log("Add to cart:", id);
+function mapStrapiProduct(raw: Record<string, unknown>): Product {
+  const colors = (raw.colors as Array<{ name: string; hex: string }>) ?? [];
+  return {
+    id: (raw.documentId as string) ?? (raw.slug as string) ?? String(raw.id),
+    slug: (raw.slug as string) ?? undefined,
+    title: raw.title as string,
+    description: (raw.description as string) ?? "",
+    price: raw.price ? formatPrice(raw.price as number) : "",
+    oldPrice: raw.oldPrice ? formatPrice(raw.oldPrice as number) : undefined,
+    image: mapMediaOrPlaceholder(raw.image as never),
+    sku: (raw.sku as string) ?? undefined,
+    inStock: (raw.inStock as boolean) ?? true,
+    type: ((raw.type as string) ?? (raw.productType as string) ?? "product") as Product["type"],
+    colors,
   };
+}
 
-  const handleFavorite = (id: string) => {
-    console.log("Add to favorites:", id);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const category = await withFallback(async () => {
+    const res = await getCategoryBySlug(slug);
+    return res.data as Record<string, unknown>;
+  }, null);
+
+  if (category) {
+    const title = (category.title as string) ?? slug;
+    return {
+      title,
+      description: (category.seoDescription as string) || `${title} — каталог Vita Brava Home`,
+    };
+  }
+
+  const data = await withFallback(async () => {
+    const res = await getProductBySlug(slug);
+    return res.data;
+  }, null);
+
+  const title =
+    (data?.title as string) ?? catalogProducts.find((p) => p.id === slug)?.title ?? "Товар";
+  const description = (data?.description as string) ?? "";
+
+  return {
+    title,
+    description: description || `${title} — купить в интернет-магазине Vita Brava Home`,
   };
+}
 
-  const recommended = catalogProducts.filter((p) => p.id !== product.id).slice(0, 4);
+export default async function CatalogSlugPage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const strapiCategory = await withFallback(async () => {
+    const res = await getCategoryBySlug(slug);
+    return res.data as Record<string, unknown>;
+  }, null);
+
+  if (strapiCategory) {
+    const categoryProducts = await withFallback(async () => {
+      const res = await getProductsByCategory(slug, { pageSize: 24 });
+      return (res.data as Record<string, unknown>[]).map(mapStrapiProduct);
+    }, [] as Product[]);
+
+    return (
+      <CategoryPageClient
+        title={(strapiCategory.title as string) ?? slug}
+        slug={slug}
+        products={categoryProducts}
+      />
+    );
+  }
+
+  const strapiProduct = await withFallback(async () => {
+    const res = await getProductBySlug(slug);
+    return res.data as Record<string, unknown>;
+  }, null);
+
+  let product: Product;
+  if (strapiProduct) {
+    product = mapStrapiProduct(strapiProduct);
+  } else {
+    const mockProduct = catalogProducts.find((p) => p.id === slug) || catalogProducts[0];
+    if (!mockProduct) notFound();
+    product = mockProduct;
+  }
+
+  const recommendedData = await withFallback(async () => {
+    const res = await getProducts({ pageSize: 4 });
+    return res.data as Record<string, unknown>[];
+  }, null);
+
+  const recommended = recommendedData
+    ? recommendedData
+        .filter((p) => (p.slug as string) !== slug)
+        .slice(0, 4)
+        .map(mapStrapiProduct)
+    : catalogProducts.filter((p) => p.id !== product.id).slice(0, 4);
+
   const recentlyViewed = catalogProducts.slice(0, 4);
 
   return (
-    <div className="bg-[var(--background)] text-[var(--foreground)]">
-      <Header variant="solid" />
-      <main className="pt-[78px] md:pt-[81px] desktop:pt-[111px]">
-        <div className="px-4 md:px-[39px] desktop:px-0">
-          <div className="mx-auto max-w-[1400px] pt-4 md:pt-6 desktop:pt-8">
-            <div className="flex items-center justify-between mb-6">
-              <Breadcrumbs items={breadcrumbs} />
-            </div>
-
-            <div className="flex flex-col gap-8 desktop:flex-row desktop:gap-[30px]">
-              <ProductGallery
-                images={images}
-                title={product.title}
-                onFavorite={() => handleFavorite(product.id)}
-                className="desktop:w-[804px] desktop:shrink-0"
-              />
-              {product.type === "giftCertificate" ? (
-                <GiftCertificateInfo
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                  className="desktop:flex-1"
-                />
-              ) : (
-                <ProductInfo
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                  className="desktop:flex-1"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="px-4 md:px-[39px] desktop:px-0">
-          <div className="mx-auto max-w-[1400px]">
-            <RecommendationsSlider
-              title="С этим товаром покупают"
-              products={recommended}
-              onFavorite={handleFavorite}
-              onAddToCart={handleAddToCart}
-              className="mt-12 desktop:mt-[80px]"
-            />
-
-            <RecommendationsSlider
-              title="Ранее вы смотрели"
-              products={recentlyViewed}
-              onFavorite={handleFavorite}
-              onAddToCart={handleAddToCart}
-              className="mt-12 desktop:mt-[80px] mb-12 desktop:mb-[80px]"
-            />
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <ProductPageClient
+      product={product}
+      recommended={recommended}
+      recentlyViewed={recentlyViewed}
+    />
   );
 }

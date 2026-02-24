@@ -1,0 +1,12 @@
+node_modules
+.next
+dist
+build
+coverage
+*.min.js
+*.min.css
+package-lock.json
+cms/.cache
+cms/.tmp
+cms/dist
+strapi_uploads

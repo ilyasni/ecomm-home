@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_catalog_subcategories",
+  "info": {
+    "displayName": "Subcategory",
+    "icon": "folder",
+    "description": "Подкатегория каталога"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

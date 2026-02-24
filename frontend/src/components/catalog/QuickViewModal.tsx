@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { Icon } from "@/design-system/icons";
 import { Button, Select } from "@/design-system/components";
@@ -36,21 +37,18 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/30"
-        onClick={onClose}
-      />
-      <div className="relative z-10 mx-4 flex w-full max-w-[1305px] flex-col overflow-hidden rounded-lg bg-white shadow-xl desktop:flex-row">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="desktop:flex-row relative z-10 mx-4 flex w-full max-w-[1305px] flex-col overflow-hidden rounded-lg bg-white shadow-xl">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex items-center justify-center hover:opacity-70 transition-opacity"
+          className="absolute top-4 right-4 z-20 flex items-center justify-center transition-opacity hover:opacity-70"
           aria-label="Закрыть"
         >
           <Icon name="close" size={24} />
         </button>
 
-        <div className="relative aspect-square w-full desktop:w-[480px] desktop:shrink-0">
+        <div className="desktop:w-[480px] desktop:shrink-0 relative aspect-square w-full">
           <Image
             src={product.image}
             alt={product.title}
@@ -58,17 +56,17 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
             className="object-cover"
             unoptimized
           />
-          <div className="absolute right-3 top-3 flex gap-2">
+          <div className="absolute top-3 right-3 flex gap-2">
             <button
               type="button"
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] hover:opacity-80 transition-opacity"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
               aria-label="Добавить в избранное"
             >
               <Icon name="favorite" size={18} />
             </button>
             <button
               type="button"
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] hover:opacity-80 transition-opacity"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
               aria-label="Сертификат качества"
             >
               <Icon name="diamond" size={18} />
@@ -76,16 +74,16 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
           </div>
         </div>
 
-        <div className="flex flex-col p-6 desktop:flex-1 desktop:p-10">
+        <div className="desktop:flex-1 desktop:p-10 flex flex-col p-6">
           {product.sku && (
             <p className="text-sm text-[var(--color-gray)]">Артикул: {product.sku}</p>
           )}
-          <h2 className="mt-2 text-2xl font-medium leading-tight desktop:text-[32px]">
+          <h2 className="desktop:text-[32px] mt-2 text-2xl leading-tight font-medium">
             {product.title}
           </h2>
 
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-xl font-medium desktop:text-2xl">{product.price}</span>
+            <span className="desktop:text-2xl text-xl font-medium">{product.price}</span>
             {product.oldPrice && (
               <span className="text-base text-[var(--color-gray)] line-through">
                 {product.oldPrice}
@@ -112,7 +110,7 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
               </div>
               <p className="mt-1 text-xs text-[var(--color-gray)]">
                 Оттенок на сайте может отличаться.{" "}
-                <span className="underline cursor-pointer">Подробнее</span>
+                <span className="cursor-pointer underline">Подробнее</span>
               </p>
             </div>
           )}
@@ -134,11 +132,7 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
           </div>
 
           <div className="mt-4 space-y-3">
-            <Button
-              variant="primary"
-              fullWidth
-              onClick={() => onAddToCart?.(product.id)}
-            >
+            <Button variant="primary" fullWidth onClick={() => onAddToCart?.(product.id)}>
               В корзину
             </Button>
             <Button variant="secondary" fullWidth>
@@ -146,12 +140,12 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
             </Button>
           </div>
 
-          <a
-            href={`/catalog/${product.id}`}
-            className="mt-4 block text-center text-sm text-[var(--color-dark-gray)] underline hover:opacity-70 transition-opacity"
+          <Link
+            href={`/catalog/${product.slug ?? product.id}`}
+            className="mt-4 block text-center text-sm text-[var(--color-dark-gray)] underline transition-opacity hover:opacity-70"
           >
             Больше информации о товаре
-          </a>
+          </Link>
         </div>
       </div>
     </div>

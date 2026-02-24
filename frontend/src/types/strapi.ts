@@ -1,16 +1,20 @@
 export interface StrapiResponse<T> {
-  data: StrapiEntity<T>;
+  data: T & StrapiBaseFields;
   meta: StrapiMeta;
 }
 
 export interface StrapiListResponse<T> {
-  data: StrapiEntity<T>[];
+  data: (T & StrapiBaseFields)[];
   meta: StrapiMeta;
 }
 
-export interface StrapiEntity<T> {
+export interface StrapiBaseFields {
   id: number;
-  attributes: T;
+  documentId: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string | null;
+  locale?: string;
 }
 
 export interface StrapiMeta {
@@ -26,18 +30,18 @@ export interface StrapiPagination {
 
 export interface StrapiMedia {
   id: number;
-  attributes: {
-    url: string;
-    alternativeText: string | null;
-    width: number;
-    height: number;
-    formats: {
-      thumbnail?: StrapiImageFormat;
-      small?: StrapiImageFormat;
-      medium?: StrapiImageFormat;
-      large?: StrapiImageFormat;
-    } | null;
-  };
+  documentId: string;
+  url: string;
+  alternativeText: string | null;
+  name: string;
+  width: number;
+  height: number;
+  formats: {
+    thumbnail?: StrapiImageFormat;
+    small?: StrapiImageFormat;
+    medium?: StrapiImageFormat;
+    large?: StrapiImageFormat;
+  } | null;
 }
 
 export interface StrapiImageFormat {
@@ -46,10 +50,6 @@ export interface StrapiImageFormat {
   height: number;
 }
 
-export type StrapiRelation<T> = {
-  data: StrapiEntity<T> | null;
-};
+export type StrapiComponent<T> = T & { id: number };
 
-export type StrapiRelationMany<T> = {
-  data: StrapiEntity<T>[];
-};
+export type StrapiDynamicZone<T> = T & { id: number; __component: string };

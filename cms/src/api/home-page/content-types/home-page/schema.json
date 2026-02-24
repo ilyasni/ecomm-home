@@ -1,0 +1,108 @@
+{
+  "kind": "singleType",
+  "collectionName": "home_pages",
+  "info": {
+    "singularName": "home-page",
+    "pluralName": "home-pages",
+    "displayName": "Home Page",
+    "description": "Главная страница"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroSlides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.hero-slide"
+    },
+    "hitProducts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    },
+    "budgetCollections": {
+      "type": "component",
+      "repeatable": true,
+      "component": "home.budget-collection"
+    },
+    "advantages": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.advantage"
+    },
+    "advantageImages": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "feedbacks": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feedback"
+    },
+    "featuredProduct": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product.product"
+    },
+    "featuredCategoryLabel": {
+      "type": "string"
+    },
+    "certificateTitle": {
+      "type": "string"
+    },
+    "certificateText": {
+      "type": "text"
+    },
+    "certificateImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "certificateButtonLabel": {
+      "type": "string"
+    },
+    "partnershipTitle": {
+      "type": "string"
+    },
+    "partnershipText": {
+      "type": "text"
+    },
+    "partnershipImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "partnershipButtonLabel": {
+      "type": "string"
+    },
+    "boutiqueTitle": {
+      "type": "string"
+    },
+    "boutiquePhotos": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "boutiqueVideo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["videos"]
+    },
+    "promoBannerTitle": {
+      "type": "string"
+    },
+    "promoBannerItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "home.promo-item"
+    },
+    "hitTabs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "home.product-tab"
+    }
+  }
+}

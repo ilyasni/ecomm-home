@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_article_section_headings",
+  "info": {
+    "displayName": "Section Heading",
+    "icon": "heading",
+    "description": "Заголовок секции статьи"
+  },
+  "attributes": {
+    "anchorId": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

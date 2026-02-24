@@ -1,15 +1,22 @@
 import { CategoryCard } from "@/components/catalog/CategoryCard";
-import { catalogCategoryCards } from "@/data/catalog-categories";
+import {
+  catalogCategoryCards as defaultCatalogCategoryCards,
+  type CategoryCardData,
+} from "@/data/catalog-categories";
 
-export function CategoriesGrid() {
-  const [bedLinen, homeTextile, blankets, pillows, plaids, towels, boudoir] =
-    catalogCategoryCards;
+interface CategoriesGridProps {
+  categories?: CategoryCardData[];
+}
+
+export function CategoriesGrid({ categories }: CategoriesGridProps) {
+  const cards = categories ?? defaultCatalogCategoryCards;
+  const [bedLinen, homeTextile, blankets, pillows, plaids, towels, boudoir] = cards;
 
   return (
-    <div className="px-4 md:px-[39px] desktop:px-0">
-      <div className="mx-auto max-w-[1400px] mt-6 desktop:mt-8">
+    <div className="desktop:px-0 px-4 md:px-[39px]">
+      <div className="desktop:mt-8 mx-auto mt-6 max-w-[1400px]">
         {/* Desktop layout */}
-        <div className="hidden desktop:flex desktop:flex-col desktop:gap-2">
+        <div className="desktop:flex desktop:flex-col desktop:gap-2 hidden">
           <div className="flex gap-2">
             <CategoryCard {...bedLinen} className="aspect-square w-1/2" />
             <CategoryCard {...homeTextile} className="aspect-square w-1/2" />
@@ -26,7 +33,7 @@ export function CategoriesGrid() {
         </div>
 
         {/* Tablet layout */}
-        <div className="hidden md:flex md:flex-col md:gap-2 desktop:hidden">
+        <div className="desktop:hidden hidden md:flex md:flex-col md:gap-2">
           <div className="flex gap-2">
             <CategoryCard {...bedLinen} className="h-[350px] w-1/2" />
             <CategoryCard {...homeTextile} className="h-[350px] w-1/2" />

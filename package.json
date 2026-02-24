@@ -1,0 +1,22 @@
+{
+  "name": "ecomm-home",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{ts,tsx}": [
+      "prettier --write --config .prettierrc",
+      "eslint --fix"
+    ],
+    "frontend/src/**/*.{css,json}": [
+      "prettier --write --config .prettierrc"
+    ]
+  }
+}

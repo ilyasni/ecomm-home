@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "special_offers_pages",
+  "info": {
+    "singularName": "special-offers-page",
+    "pluralName": "special-offers-pages",
+    "displayName": "Special Offers Page",
+    "description": "Страница Специальные предложения"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "offers": {
+      "type": "component",
+      "repeatable": true,
+      "component": "special-offers.offer"
+    },
+    "bonusSection": {
+      "type": "component",
+      "repeatable": false,
+      "component": "special-offers.bonus-section"
+    }
+  }
+}

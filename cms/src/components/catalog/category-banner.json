@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_catalog_category_banners",
+  "info": {
+    "displayName": "Category Banner",
+    "icon": "picture",
+    "description": "Баннер в категории каталога с планированием показа"
+  },
+  "attributes": {
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "link": { "type": "string" },
+    "startDate": { "type": "datetime" },
+    "endDate": { "type": "datetime" },
+    "isFullWidth": { "type": "boolean", "default": false }
+  }
+}

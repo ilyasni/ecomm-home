@@ -1,0 +1,132 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product",
+    "description": "Товар каталога"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "price": {
+      "type": "decimal",
+      "required": true
+    },
+    "oldPrice": {
+      "type": "decimal"
+    },
+    "sku": {
+      "type": "string",
+      "unique": true
+    },
+    "inStock": {
+      "type": "boolean",
+      "default": true
+    },
+    "badge": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "decimal",
+      "min": 0,
+      "max": 5
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "colors": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.color"
+    },
+    "sizes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.size-option"
+    },
+    "setItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.set-item"
+    },
+    "productType": {
+      "type": "enumeration",
+      "enum": ["product", "set", "giftCertificate"],
+      "default": "product"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "giftCertDescription": {
+      "type": "text"
+    },
+    "video": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["videos"]
+    },
+    "seoTitle": {
+      "type": "string"
+    },
+    "seoDescription": {
+      "type": "text"
+    },
+    "specifications": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.specification"
+    },
+    "sizeChart": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.size-chart-row"
+    },
+    "labels": {
+      "type": "json"
+    },
+    "weight": {
+      "type": "decimal"
+    },
+    "composition": {
+      "type": "string"
+    },
+    "careInstructions": {
+      "type": "text"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "products"
+    },
+    "collections": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::collection.collection",
+      "inversedBy": "products"
+    }
+  }
+}

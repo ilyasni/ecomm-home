@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_catalog_filters",
+  "info": {
+    "displayName": "Filter",
+    "icon": "filter",
+    "description": "Фильтр каталога с вариантами"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "options": {
+      "type": "component",
+      "repeatable": true,
+      "component": "catalog.filter-option"
+    }
+  }
+}

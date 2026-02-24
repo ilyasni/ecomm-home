@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_article_section_tables",
+  "info": {
+    "displayName": "Section Table",
+    "icon": "table",
+    "description": "Таблица в статье"
+  },
+  "attributes": {
+    "headers": {
+      "type": "json"
+    },
+    "rows": {
+      "type": "json"
+    }
+  }
+}

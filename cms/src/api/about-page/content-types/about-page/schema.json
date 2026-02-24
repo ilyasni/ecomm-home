@@ -1,0 +1,87 @@
+{
+  "kind": "singleType",
+  "collectionName": "about_pages",
+  "info": {
+    "singularName": "about-page",
+    "pluralName": "about-pages",
+    "displayName": "About Page",
+    "description": "Страница О бренде"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroTitle": {
+      "type": "text",
+      "required": true
+    },
+    "heroDesktopImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroMobileImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "introText": {
+      "type": "text"
+    },
+    "introButtonLabel": {
+      "type": "string"
+    },
+    "advantages": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.advantage"
+    },
+    "advantageImages": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "historyTitle": {
+      "type": "string"
+    },
+    "historyParagraphs": {
+      "type": "json"
+    },
+    "differenceTitle": {
+      "type": "string"
+    },
+    "differenceItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "about.difference-item"
+    },
+    "collectionsTitle": {
+      "type": "string"
+    },
+    "collectionsSubtitle": {
+      "type": "string"
+    },
+    "collectionPreviews": {
+      "type": "component",
+      "repeatable": true,
+      "component": "about.collection-preview"
+    },
+    "productionTitle": {
+      "type": "string"
+    },
+    "productionSteps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "about.production-step"
+    },
+    "creatingTitle": {
+      "type": "string"
+    },
+    "creatingBlocks": {
+      "type": "component",
+      "repeatable": true,
+      "component": "about.creating-block"
+    }
+  }
+}

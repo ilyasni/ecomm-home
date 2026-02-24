@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_product_colors",
+  "info": {
+    "displayName": "Color",
+    "icon": "paint-brush",
+    "description": "Цвет товара"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "hex": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
