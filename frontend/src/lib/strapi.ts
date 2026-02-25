@@ -4,15 +4,42 @@ const STRAPI_URL =
   process.env.STRAPI_INTERNAL_URL ?? process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337";
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 
+export class StrapiHttpError extends Error {
+  readonly status: number;
+  readonly statusText: string;
+  readonly path: string;
+
+  constructor(status: number, statusText: string, path: string) {
+    super(`Strapi API error: ${status} ${statusText} [${path}]`);
+    this.name = "StrapiHttpError";
+    this.status = status;
+    this.statusText = statusText;
+    this.path = path;
+  }
+}
+
 interface FetchOptions {
   revalidate?: number | false;
   cache?: RequestCache;
   tags?: string[];
 }
 
+export function isPlaceholderToken(token: string | undefined): boolean {
+  if (!token) return false;
+  return token.includes("placeholder") || token.includes("replace-after");
+}
+
+export function getStrapiBaseUrl(): string {
+  return STRAPI_URL;
+}
+
+export function hasUsableStrapiToken(): boolean {
+  return Boolean(STRAPI_TOKEN && !isPlaceholderToken(STRAPI_TOKEN));
+}
+
 function buildHeaders(): HeadersInit {
   const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (STRAPI_TOKEN) {
+  if (STRAPI_TOKEN && !isPlaceholderToken(STRAPI_TOKEN)) {
     headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
   }
   return headers;
@@ -46,10 +73,17 @@ export async function strapiGet<T>(
     fetchOptions.next = { ...fetchOptions.next, tags: options.tags };
   }
 
-  const res = await fetch(url.toString(), fetchOptions);
+  const hasAuthHeader = Boolean((fetchOptions.headers as Record<string, string>).Authorization);
+  let res = await fetch(url.toString(), fetchOptions);
+
+  if (res.status === 401 && hasAuthHeader) {
+    const retryHeaders = { ...(fetchOptions.headers as Record<string, string>) };
+    delete retryHeaders.Authorization;
+    res = await fetch(url.toString(), { ...fetchOptions, headers: retryHeaders });
+  }
 
   if (!res.ok) {
-    throw new Error(`Strapi API error: ${res.status} ${res.statusText} [${path}]`);
+    throw new StrapiHttpError(res.status, res.statusText, path);
   }
 
   return res.json();

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   getProductBySlug,
   getProducts,
   getCategoryBySlug,
   getProductsByCategory,
+  getCategories,
 } from "@/lib/queries/catalog";
 import { withFallback } from "@/lib/with-fallback";
 import { mapMediaOrPlaceholder, formatPrice } from "@/lib/mappers";
@@ -15,6 +16,47 @@ import { CategoryPageClient } from "./CategoryPageClient";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+type StrapiEntity = Record<string, unknown>;
+
+function normalizeText(value: string): string {
+  return value.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+async function resolveCategoryByLegacySlug(slug: string): Promise<StrapiEntity | null> {
+  const legacyKeywordMap: Record<string, string[]> = {
+    boudoir: ["будуар", "наряд"],
+    "gift-certificates": ["сертификат", "подароч"],
+  };
+
+  const keywords = legacyKeywordMap[slug];
+  if (!keywords) return null;
+
+  const categories = await withFallback(async () => {
+    const res = await getCategories();
+    return res.data as StrapiEntity[];
+  }, [] as StrapiEntity[]);
+
+  const byKeyword = categories.find((category) => {
+    const title = normalizeText(String(category.title ?? ""));
+    return keywords.some((keyword) => title.includes(keyword));
+  });
+
+  return byKeyword ?? null;
+}
+
+async function resolveGiftCertificateProductSlug(): Promise<string | null> {
+  const giftProducts = await withFallback(async () => {
+    const res = await getProducts({
+      pageSize: 1,
+      filters: { "filters[productType][$eq]": "giftCertificate" },
+    });
+    return res.data as StrapiEntity[];
+  }, [] as StrapiEntity[]);
+
+  const slug = giftProducts[0]?.slug;
+  return typeof slug === "string" && slug.length > 0 ? slug : null;
 }
 
 function mapStrapiProduct(raw: Record<string, unknown>): Product {
@@ -55,8 +97,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return res.data;
   }, null);
 
-  const title =
-    (data?.title as string) ?? catalogProducts.find((p) => p.id === slug)?.title ?? "Товар";
+  const title = (data?.title as string) ?? "Товар";
   const description = (data?.description as string) ?? "";
 
   return {
@@ -68,10 +109,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CatalogSlugPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const strapiCategory = await withFallback(async () => {
+  let strapiCategory = await withFallback(async () => {
     const res = await getCategoryBySlug(slug);
     return res.data as Record<string, unknown>;
   }, null);
+
+  if (!strapiCategory) {
+    const legacyCategory = await resolveCategoryByLegacySlug(slug);
+    if (legacyCategory?.slug) {
+      permanentRedirect(`/catalog/${legacyCategory.slug as string}`);
+    }
+  }
+
+  if (!strapiCategory && slug === "gift-certificates") {
+    const giftCertificateSlug = await resolveGiftCertificateProductSlug();
+    if (giftCertificateSlug) {
+      permanentRedirect(`/catalog/${giftCertificateSlug}`);
+    }
+  }
 
   if (strapiCategory) {
     const categoryProducts = await withFallback(async () => {
@@ -97,9 +152,12 @@ export default async function CatalogSlugPage({ params }: PageProps) {
   if (strapiProduct) {
     product = mapStrapiProduct(strapiProduct);
   } else {
-    const mockProduct = catalogProducts.find((p) => p.id === slug) || catalogProducts[0];
-    if (!mockProduct) notFound();
-    product = mockProduct;
+    const mockProduct = catalogProducts.find((p) => p.id === slug);
+    if (process.env.NODE_ENV !== "production" && mockProduct) {
+      product = mockProduct;
+    } else {
+      notFound();
+    }
   }
 
   const recommendedData = await withFallback(async () => {
