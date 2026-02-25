@@ -1,3 +1,4 @@
 import { factories } from "@strapi/strapi";
 
-export default factories.createCoreService("api::wishlist.wishlist");
+const WISHLIST_UID = "api::wishlist.wishlist" as any;
+export default factories.createCoreService(WISHLIST_UID);

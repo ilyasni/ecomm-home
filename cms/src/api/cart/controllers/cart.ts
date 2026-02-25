@@ -1,3 +1,4 @@
 import { factories } from "@strapi/strapi";
 
-export default factories.createCoreController("api::cart.cart");
+const CART_UID = "api::cart.cart" as any;
+export default factories.createCoreController(CART_UID);

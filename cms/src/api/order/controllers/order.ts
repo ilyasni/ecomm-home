@@ -1,3 +1,4 @@
 import { factories } from "@strapi/strapi";
 
-export default factories.createCoreController("api::order.order");
+const ORDER_UID = "api::order.order" as any;
+export default factories.createCoreController(ORDER_UID);

@@ -1,3 +1,4 @@
 import { factories } from "@strapi/strapi";
 
-export default factories.createCoreRouter("api::order.order");
+const ORDER_UID = "api::order.order" as any;
+export default factories.createCoreRouter(ORDER_UID);
