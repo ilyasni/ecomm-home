@@ -9,10 +9,10 @@ COPY package.json package-lock.json* ./
 RUN npm config set fetch-retries 5 -g \
   && npm config set fetch-retry-mintimeout 20000 -g \
   && npm config set fetch-retry-maxtimeout 1200000 -g \
-  && npm install node-addon-api \
-  && npm install @swc/core-linux-x64-gnu \
-  && npm install @rollup/rollup-linux-x64-gnu \
-  && npm ci --include=optional
+  && npm install node-addon-api --verbose \
+  && npm install @swc/core-linux-x64-gnu --verbose \
+  && npm install @rollup/rollup-linux-x64-gnu --verbose \
+  && npm ci --include=optional --verbose
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
@@ -20,7 +20,7 @@ COPY . ./
 
 RUN chown -R node:node /opt/app
 USER node
-RUN npm run build
+RUN bash -lc 'set -e; npm run build & pid=$!; while kill -0 \"$pid\" 2>/dev/null; do echo \"[cms-build] still running\"; sleep 20; done; wait \"$pid\"'
 
 EXPOSE 1337
 CMD ["npm", "run", "start"]
