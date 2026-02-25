@@ -11,10 +11,12 @@ export async function withFallback<T>(fetcher: () => Promise<T>, fallback: T): P
     return result;
   } catch (error) {
     const isProductionBuild = process.env.NEXT_PHASE === "phase-production-build";
+    const strictCmsAuth = process.env.STRICT_CMS_AUTH === "true";
 
     if (
       process.env.NODE_ENV === "production" &&
       !isProductionBuild &&
+      strictCmsAuth &&
       error instanceof StrapiHttpError &&
       (error.status === 401 || error.status === 403)
     ) {
