@@ -10,8 +10,11 @@ export async function withFallback<T>(fetcher: () => Promise<T>, fallback: T): P
     const result = await fetcher();
     return result;
   } catch (error) {
+    const isProductionBuild = process.env.NEXT_PHASE === "phase-production-build";
+
     if (
       process.env.NODE_ENV === "production" &&
+      !isProductionBuild &&
       error instanceof StrapiHttpError &&
       (error.status === 401 || error.status === 403)
     ) {
