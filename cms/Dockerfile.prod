@@ -13,7 +13,8 @@ RUN npm config set fetch-retries 5 -g \
   && npm config set fetch-timeout 300000 -g \
   && npm config set fund false -g \
   && npm config set audit false -g
-RUN --mount=type=cache,target=/root/.npm npm ci --include=dev --include=optional --prefer-offline
+RUN --mount=type=cache,target=/root/.npm npm ci --include=dev --include=optional --prefer-offline \
+  && npm install --no-save @swc/core-linux-x64-gnu @rollup/rollup-linux-x64-gnu node-addon-api
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
