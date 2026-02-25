@@ -1,5 +1,6 @@
+# syntax=docker/dockerfile:1.7
 FROM node:20-bookworm-slim
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential python3 pkg-config libvips-dev git ca-certificates wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python3 pkg-config ca-certificates && rm -rf /var/lib/apt/lists/*
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -9,10 +10,10 @@ COPY package.json package-lock.json* ./
 RUN npm config set fetch-retries 5 -g \
   && npm config set fetch-retry-mintimeout 20000 -g \
   && npm config set fetch-retry-maxtimeout 1200000 -g \
-  && npm install node-addon-api --verbose \
-  && npm install @swc/core-linux-x64-gnu --verbose \
-  && npm install @rollup/rollup-linux-x64-gnu --verbose \
-  && npm ci --include=optional --verbose
+  && npm config set fetch-timeout 300000 -g \
+  && npm config set fund false -g \
+  && npm config set audit false -g
+RUN --mount=type=cache,target=/root/.npm npm ci --include=dev --include=optional --prefer-offline
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
