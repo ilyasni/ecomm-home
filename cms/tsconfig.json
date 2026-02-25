@@ -7,5 +7,12 @@
     "typeRoots": ["./node_modules/@types"]
   },
   "include": ["./", "src/**/*.json"],
-  "exclude": ["node_modules", "dist", ".cache", ".tmp", "build"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".cache",
+    ".tmp",
+    "build",
+    "types/generated/**"
+  ]
 }
