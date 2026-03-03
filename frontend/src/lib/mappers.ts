@@ -1,20 +1,31 @@
 import type { StrapiMedia } from "@/types/strapi";
 import { getStrapiMediaUrl } from "./strapi";
+import { getImgproxyUrl, type ImgproxyOptions } from "./imgproxy";
 
 export const PLACEHOLDER_IMAGE = "/assets/figma/placeholder.svg";
 
-export function mapMedia(media: StrapiMedia | null | undefined): string | undefined {
+export function mapMedia(
+  media: StrapiMedia | null | undefined,
+  imgproxyOptions?: ImgproxyOptions
+): string | undefined {
   if (!media?.url) return undefined;
-  return getStrapiMediaUrl(media.url);
+  const rawUrl = getStrapiMediaUrl(media.url);
+  return getImgproxyUrl(rawUrl, imgproxyOptions);
 }
 
-export function mapMediaOrPlaceholder(media: StrapiMedia | null | undefined): string {
-  return mapMedia(media) ?? PLACEHOLDER_IMAGE;
+export function mapMediaOrPlaceholder(
+  media: StrapiMedia | null | undefined,
+  imgproxyOptions?: ImgproxyOptions
+): string {
+  return mapMedia(media, imgproxyOptions) ?? PLACEHOLDER_IMAGE;
 }
 
-export function mapMediaArray(media: StrapiMedia[] | null | undefined): string[] {
+export function mapMediaArray(
+  media: StrapiMedia[] | null | undefined,
+  imgproxyOptions?: ImgproxyOptions
+): string[] {
   if (!media || !Array.isArray(media)) return [];
-  return media.map((m) => getStrapiMediaUrl(m.url));
+  return media.map((m) => getImgproxyUrl(getStrapiMediaUrl(m.url), imgproxyOptions));
 }
 
 export function formatPrice(value: number | null | undefined): string {

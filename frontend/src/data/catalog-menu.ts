@@ -36,11 +36,11 @@ export const catalogCategories: CatalogCategory[] = [
     icon: "catalogBedLinen",
     href: "/catalog/bed-linen",
     subcategories: [
-      { label: "Комплекты", href: "/catalog/bed-linen/sets" },
-      { label: "Конструктор", href: "/catalog/bed-linen/constructor" },
-      { label: "Наволочки", href: "/catalog/bed-linen/pillowcases" },
-      { label: "Простыни", href: "/catalog/bed-linen/sheets" },
-      { label: "Пододеяльники", href: "/catalog/bed-linen/duvet-covers" },
+      { label: "Комплекты", href: "/catalog/bed-linen" },
+      { label: "Конструктор", href: "/catalog/bed-linen" },
+      { label: "Наволочки", href: "/catalog/bed-linen" },
+      { label: "Простыни", href: "/catalog/bed-linen" },
+      { label: "Пододеяльники", href: "/catalog/bed-linen" },
     ],
     filters: [
       {
@@ -81,9 +81,9 @@ export const catalogCategories: CatalogCategory[] = [
     icon: "catalogHomeTextile",
     href: "/catalog/home-textile",
     subcategories: [
-      { label: "Скатерти", href: "/catalog/home-textile/tablecloths" },
-      { label: "Салфетки", href: "/catalog/home-textile/napkins" },
-      { label: "Дорожки", href: "/catalog/home-textile/runners" },
+      { label: "Скатерти", href: "/catalog/home-textile" },
+      { label: "Салфетки", href: "/catalog/home-textile" },
+      { label: "Дорожки", href: "/catalog/home-textile" },
     ],
   },
   {
@@ -120,7 +120,7 @@ export const catalogCategories: CatalogCategory[] = [
 
 export const catalogExtraLinks: CatalogExtraLink[] = [
   { label: "Подарочные сертификаты", href: "/gift-certificates", hasSubmenu: true },
-  { label: "Новинки", href: "/new" },
+  { label: "Новинки", href: "/search?sort=new" },
   { label: "Коллекции", href: "/collections", hasSubmenu: true },
 ];
 

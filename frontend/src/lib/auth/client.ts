@@ -1,13 +1,18 @@
 export interface AuthUser {
-  id: number;
-  username: string;
+  id: string;
   email: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  company_name: string | null;
 }
 
 async function parseJson<T>(res: Response): Promise<T> {
   const data = (await res.json()) as T & { error?: { message?: string } };
   if (!res.ok) {
-    throw new Error(data.error?.message ?? "Auth request failed");
+    throw new Error(
+      (data as { error?: { message?: string } }).error?.message ?? "Auth request failed"
+    );
   }
   return data;
 }
@@ -21,7 +26,12 @@ export async function login(payload: { identifier: string; password: string }) {
   return parseJson<{ user: AuthUser }>(res);
 }
 
-export async function register(payload: { username: string; email: string; password: string }) {
+export async function register(payload: {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}) {
   const res = await fetch("/api/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

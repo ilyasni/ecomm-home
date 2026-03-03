@@ -1,10 +1,36 @@
 import { strapiFind, strapiFindBySlug } from "@/lib/strapi";
 
+export interface StrapiSubcategoryItem {
+  label: string;
+  href: string;
+}
+
+export interface StrapiFilterOption {
+  label: string;
+  href: string;
+}
+
+export interface StrapiFilterItem {
+  title: string;
+  options: StrapiFilterOption[];
+}
+
+export interface StrapiCategoryRaw {
+  documentId: string;
+  slug: string;
+  title: string;
+  icon?: string;
+  sortOrder?: number;
+  subcategories?: StrapiSubcategoryItem[];
+  filters?: StrapiFilterItem[];
+}
+
 export async function getCategories() {
   return strapiFind(
     "categories",
     {
-      populate: "*",
+      "populate[subcategories]": "*",
+      "populate[filters][populate][options]": "*",
       "sort[0]": "sortOrder:asc",
     },
     { revalidate: 120, tags: ["categories"] }

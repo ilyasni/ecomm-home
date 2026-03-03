@@ -410,7 +410,7 @@ export interface Boutique {
   workingHours: string;
 }
 
-export type PaymentMethodType = "card" | "certificate" | "on-delivery";
+export type PaymentMethodType = "card" | "sbp" | "yandex-pay" | "certificate" | "on-delivery";
 export type DeliveryMethodType = "courier" | "pickup" | "cdek";
 
 export interface PaymentMethod {
@@ -496,6 +496,8 @@ export const boutiques: Boutique[] = [
 
 export const paymentMethods: PaymentMethod[] = [
   { id: "card", label: "Оплата картой онлайн", description: "Visa, MasterCard, МИР" },
+  { id: "sbp", label: "СБП", description: "Система быстрых платежей" },
+  { id: "yandex-pay", label: "Yandex Pay / SberPay" },
   { id: "certificate", label: "Подарочный сертификат" },
   { id: "on-delivery", label: "Оплата при получении", description: "Наличными или картой" },
 ];
