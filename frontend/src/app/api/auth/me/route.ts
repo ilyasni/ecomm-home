@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthTokenFromCookie, getMeFromStrapi } from "@/lib/auth/server";
+import { getAuthTokenFromCookie, getMedusaCustomer } from "@/lib/auth/server";
 
 export async function GET() {
   try {
@@ -7,8 +7,8 @@ export async function GET() {
     if (!token) {
       return NextResponse.json({ error: { message: "Unauthorized" } }, { status: 401 });
     }
-    const user = await getMeFromStrapi(token);
-    return NextResponse.json({ user });
+    const customer = await getMedusaCustomer(token);
+    return NextResponse.json({ user: customer });
   } catch {
     return NextResponse.json({ error: { message: "Unauthorized" } }, { status: 401 });
   }
