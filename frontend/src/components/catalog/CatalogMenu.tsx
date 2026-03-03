@@ -52,7 +52,6 @@ type CatalogMenuProps = {
 };
 
 export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) {
-  const { openLogin } = useAuthModal();
   const catalogCategories = catalogData?.length
     ? catalogData.map(mapStrapiToMenuCategory)
     : hardcodedCategories;
