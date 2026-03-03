@@ -159,6 +159,21 @@ export default function CheckoutPage() {
 
     // ── Попытка #1: Medusa Cart Complete flow ────────────────────────────
     try {
+      // Сначала синхронизируем localStorage items → Medusa cart
+      const cartItems = getCommerceSnapshot().cartItems;
+      await fetch("/api/cart/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cartItems.map((item) => ({
+            id: item.id,
+            title: item.title,
+            quantity: item.quantity,
+            size: item.size,
+          })),
+        }),
+      }).catch((err) => console.warn("[checkout] sync failed (non-blocking):", err));
+
       await fetch("/api/cart/address", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
