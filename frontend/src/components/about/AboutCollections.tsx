@@ -7,7 +7,7 @@ interface AboutCollectionsProps {
   data?: {
     title: string;
     subtitle: string;
-    items: { id: string; title: string; image: string }[];
+    items: { id: string; title: string; image: string; href?: string }[];
   };
 }
 
@@ -29,7 +29,7 @@ export function AboutCollections({ data }: AboutCollectionsProps) {
           {aboutCollections.items.map((item) => (
             <a
               key={item.id}
-              href="#"
+              href={item.href ?? "/collections"}
               className="group desktop:h-[700px] relative h-[460px] overflow-hidden md:h-[500px]"
             >
               <Image

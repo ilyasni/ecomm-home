@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/design-system/icons";
 import { Button, Input, Checkbox } from "@/design-system/components";
 import { Textarea } from "@/design-system/components/Textarea";
@@ -28,11 +29,7 @@ type AccordionItem = {
   content: string;
 };
 
-export function GiftCertificateInfo({
-  product,
-  onAddToCart,
-  className,
-}: GiftCertificateInfoProps) {
+export function GiftCertificateInfo({ product, onAddToCart, className }: GiftCertificateInfoProps) {
   const [variant, setVariant] = useState<CertificateVariant>("electronic");
   const [price, setPrice] = useState(PRICE_MIN);
 
@@ -50,9 +47,7 @@ export function GiftCertificateInfo({
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   // Accordion state
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(
-    new Set(["description"])
-  );
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(["description"]));
 
   const toggleAccordion = (id: string) => {
     setExpandedItems((prev) => {
@@ -82,26 +77,25 @@ export function GiftCertificateInfo({
     },
   ];
 
-  const sliderPercent =
-    ((price - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+  const sliderPercent = ((price - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
 
   return (
     <div className={`${className || ""}`}>
       {/* Заголовок */}
-      <h1 className="text-2xl font-medium leading-[1.1] md:text-[32px] desktop:text-[40px]">
+      <h1 className="desktop:text-[40px] text-2xl leading-[1.1] font-medium md:text-[32px]">
         {product.title}
       </h1>
 
       {/* Подзаголовок */}
       {product.subtitle && (
-        <p className="mt-6 text-[14px] leading-[1.3] text-[var(--color-dark)] desktop:text-[16px]">
+        <p className="desktop:text-[16px] mt-6 text-[14px] leading-[1.3] text-[var(--color-dark)]">
           {product.subtitle}
         </p>
       )}
 
       {/* Переключатель варианта */}
-      <div className="mt-6 flex items-center gap-6 desktop:gap-[80px]">
-        <label className="flex items-center gap-3 cursor-pointer">
+      <div className="desktop:gap-[80px] mt-6 flex items-center gap-6">
+        <label className="flex cursor-pointer items-center gap-3">
           <input
             type="radio"
             name="certVariant"
@@ -110,11 +104,9 @@ export function GiftCertificateInfo({
             onChange={() => setVariant("electronic")}
             className="h-[18px] w-[18px] accent-[var(--color-brand)]"
           />
-          <span className="text-[16px] leading-[1.3] text-[var(--color-black)]">
-            электронный
-          </span>
+          <span className="text-[16px] leading-[1.3] text-[var(--color-black)]">электронный</span>
         </label>
-        <label className="flex items-center gap-3 cursor-pointer">
+        <label className="flex cursor-pointer items-center gap-3">
           <input
             type="radio"
             name="certVariant"
@@ -131,7 +123,7 @@ export function GiftCertificateInfo({
 
       {/* Цена */}
       <div className="mt-8">
-        <span className="text-xl font-medium leading-[1.1] desktop:text-[24px]">
+        <span className="desktop:text-[24px] text-xl leading-[1.1] font-medium">
           {formatPrice(price)}
         </span>
       </div>
@@ -176,11 +168,9 @@ export function GiftCertificateInfo({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Icon name="checkCircle" size={24} />
-            <span className="text-[14px] leading-[1.3] text-[var(--color-dark)]">
-              В наличии
-            </span>
+            <span className="text-[14px] leading-[1.3] text-[var(--color-dark)]">В наличии</span>
           </div>
-          <span className="text-[12px] leading-[1.1] text-[var(--color-gray)] underline text-right">
+          <span className="text-right text-[12px] leading-[1.1] text-[var(--color-gray)] underline">
             Правила использования
             <br />
             подарочных сертификатов VA
@@ -204,8 +194,8 @@ export function GiftCertificateInfo({
       {variant === "electronic" && (
         <>
           {/* Текст поздравления */}
-          <div className="mt-6 rounded-none bg-[#f4f3ef] p-4 desktop:p-6">
-            <p className="text-[16px] font-medium leading-[1.1] text-[var(--color-black)]">
+          <div className="desktop:p-6 mt-6 rounded-none bg-[#f4f3ef] p-4">
+            <p className="text-[16px] leading-[1.1] font-medium text-[var(--color-black)]">
               Текст для вашего поздравления
             </p>
             <div className="mt-4">
@@ -223,20 +213,16 @@ export function GiftCertificateInfo({
 
           {/* Куда отправить? */}
           <div className="mt-6">
-            <p className="text-[16px] font-medium leading-[1.3] text-[var(--color-black)]">
+            <p className="text-[16px] leading-[1.3] font-medium text-[var(--color-black)]">
               Куда отправить?
             </p>
 
             <div className="mt-4">
-              <Checkbox
-                checked={sendToSelf}
-                onChange={setSendToSelf}
-                label="Отправить себе"
-              />
+              <Checkbox checked={sendToSelf} onChange={setSendToSelf} label="Отправить себе" />
             </div>
 
             <div className="mt-4 flex flex-col gap-3">
-              <div className="grid grid-cols-1 gap-3 desktop:grid-cols-2">
+              <div className="desktop:grid-cols-2 grid grid-cols-1 gap-3">
                 <Input
                   placeholder="Имя отправителя*"
                   value={senderName}
@@ -250,7 +236,7 @@ export function GiftCertificateInfo({
                   fullWidth
                 />
               </div>
-              <div className="grid grid-cols-1 gap-3 desktop:grid-cols-2">
+              <div className="desktop:grid-cols-2 grid grid-cols-1 gap-3">
                 <Input
                   placeholder="E-mail отправителя*"
                   type="email"
@@ -277,7 +263,7 @@ export function GiftCertificateInfo({
 
           {/* Когда отправить? */}
           <div className="mt-6">
-            <p className="text-[16px] font-medium leading-[1.3] text-[var(--color-black)]">
+            <p className="text-[16px] leading-[1.3] font-medium text-[var(--color-black)]">
               Когда отправить?
             </p>
 
@@ -308,31 +294,27 @@ export function GiftCertificateInfo({
 
           {/* Согласие + Кнопка */}
           <div className="mt-6">
-            <label className="flex items-start gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-start gap-2">
               <input
                 type="checkbox"
-                className="mt-1 h-[18px] w-[18px] shrink-0 appearance-none rounded-[2px] border border-[var(--color-gray)] checked:bg-[var(--color-brand)] checked:border-[var(--color-brand)]"
+                className="mt-1 h-[18px] w-[18px] shrink-0 appearance-none rounded-[2px] border border-[var(--color-gray)] checked:border-[var(--color-brand)] checked:bg-[var(--color-brand)]"
                 checked={privacyAccepted}
                 onChange={(e) => setPrivacyAccepted(e.target.checked)}
               />
               <span className="text-[14px] leading-[1.3] text-[var(--color-black)]">
                 Я ознакомлен с{" "}
-                <a href="#" className="underline">
+                <Link href="/info/terms" className="underline">
                   Правилами использования
-                </a>{" "}
+                </Link>{" "}
                 и согласен с{" "}
-                <a href="#" className="underline">
+                <Link href="/info/terms" className="underline">
                   условиями предоставления подарочных сертификатов
-                </a>
+                </Link>
               </span>
             </label>
 
             <div className="mt-4">
-              <Button
-                variant="primary"
-                fullWidth
-                onClick={() => onAddToCart?.(product.id)}
-              >
+              <Button variant="primary" fullWidth onClick={() => onAddToCart?.(product.id)}>
                 В корзину
               </Button>
             </div>
@@ -343,11 +325,7 @@ export function GiftCertificateInfo({
       {/* Физический вариант: кнопка */}
       {variant === "physical" && (
         <div className="mt-6">
-          <Button
-            variant="primary"
-            fullWidth
-            onClick={() => onAddToCart?.(product.id)}
-          >
+          <Button variant="primary" fullWidth onClick={() => onAddToCart?.(product.id)}>
             В корзину
           </Button>
         </div>
@@ -356,28 +334,21 @@ export function GiftCertificateInfo({
       {/* Аккордеон описания */}
       <div className="mt-6">
         {descriptions.map((item) => (
-          <div
-            key={item.id}
-            className="border-b border-[var(--color-gray-light)]"
-          >
+          <div key={item.id} className="border-b border-[var(--color-gray-light)]">
             <button
               type="button"
               onClick={() => toggleAccordion(item.id)}
               className="flex w-full items-center justify-between py-4"
             >
-              <span className="text-[16px] font-medium leading-[1.3]">
-                {item.title}
-              </span>
+              <span className="text-[16px] leading-[1.3] font-medium">{item.title}</span>
               <Icon
                 name="chevronDown"
                 size={20}
-                className={`transition-transform ${
-                  expandedItems.has(item.id) ? "rotate-180" : ""
-                }`}
+                className={`transition-transform ${expandedItems.has(item.id) ? "rotate-180" : ""}`}
               />
             </button>
             {expandedItems.has(item.id) && (
-              <div className="pb-4 text-[16px] font-normal leading-[1.3] text-[var(--color-dark)] whitespace-pre-line">
+              <div className="pb-4 text-[16px] leading-[1.3] font-normal whitespace-pre-line text-[var(--color-dark)]">
                 {item.content}
               </div>
             )}

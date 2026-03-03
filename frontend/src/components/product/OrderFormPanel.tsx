@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { Icon } from "@/design-system/icons";
 import { Input, Textarea, Button } from "@/design-system/components";
@@ -141,13 +142,13 @@ export function OrderFormPanel({ isOpen, onClose, variant = "order" }: OrderForm
               />
               <span className="text-[14px] leading-[1.3] text-[var(--color-black)]">
                 Я ознакомлен с{" "}
-                <a href="#" className="underline">
+                <Link href="/info/privacy" className="underline">
                   Политикой конфиденциальности
-                </a>{" "}
+                </Link>{" "}
                 и согласен на{" "}
-                <a href="#" className="underline">
+                <Link href="/info/consent" className="underline">
                   обработку моих персональных данных
-                </a>
+                </Link>
               </span>
             </label>
 

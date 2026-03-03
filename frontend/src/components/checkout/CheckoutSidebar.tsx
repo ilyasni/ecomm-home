@@ -127,11 +127,11 @@ export function CheckoutSidebar({
 
         <p className="mt-3 text-center text-[11px] leading-[1.4] text-[var(--color-dark)]">
           Нажимая на кнопку, вы соглашаетесь с{" "}
-          <Link href="#" className="underline">
+          <Link href="/info/terms" className="underline">
             условиями оферты
           </Link>{" "}
           и{" "}
-          <Link href="#" className="underline">
+          <Link href="/info/privacy" className="underline">
             политикой конфиденциальности
           </Link>
         </p>

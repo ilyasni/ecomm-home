@@ -63,16 +63,19 @@ export const aboutCollections = {
       id: "coll-light",
       title: "Коллекция Light",
       image: "/assets/figma/placeholder.svg",
+      href: "/collections",
     },
     {
       id: "coll-medium",
       title: "Коллекция Medium",
       image: "/assets/figma/placeholder.svg",
+      href: "/collections",
     },
     {
       id: "coll-premium",
       title: "Коллекция Premium",
       image: "/assets/figma/placeholder.svg",
+      href: "/collections",
     },
   ],
 };

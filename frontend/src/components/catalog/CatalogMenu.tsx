@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/design-system/icons";
 import type { IconName } from "@/design-system/icons/icon-map";
 import {
@@ -12,6 +13,7 @@ import {
   type CatalogCategory,
 } from "@/data/catalog-menu";
 import type { StrapiCategoryRaw } from "@/lib/queries/catalog";
+import { useAuthModal, useAuthSession } from "@/components/auth";
 
 const activeCategoryIconMap: Partial<Record<IconName, IconName>> = {
   catalogBedLinen: "catalogBedLinenActive",
@@ -58,6 +60,9 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
   const [mobileLevel, setMobileLevel] = useState<"main" | "category" | "filter">("main");
   const [mobileCategoryId, setMobileCategoryId] = useState<string>("");
   const [expandedFilter, setExpandedFilter] = useState<string>("");
+  const router = useRouter();
+  const { openLogin } = useAuthModal();
+  const { user } = useAuthSession();
 
   // Сброс активной категории при смене данных (Strapi ↔ fallback)
   useEffect(() => {
@@ -341,6 +346,14 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
           <MobileMainLevel
             categories={catalogCategories}
             onCategoryClick={handleMobileCategoryClick}
+            onLoginClick={() => {
+              if (user) {
+                router.push("/account");
+              } else {
+                openLogin();
+              }
+            }}
+            isLoggedIn={!!user}
           />
         )}
         {mobileLevel === "category" && mobileCat && (
@@ -359,9 +372,13 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
 function MobileMainLevel({
   categories,
   onCategoryClick,
+  onLoginClick,
+  isLoggedIn,
 }: {
   categories: CatalogCategory[];
   onCategoryClick: (catId: string) => void;
+  onLoginClick: () => void;
+  isLoggedIn: boolean;
 }) {
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -369,13 +386,14 @@ function MobileMainLevel({
 
       {/* Войти / Бутики */}
       <div className="flex flex-col gap-4 bg-[var(--color-selection)] p-4">
-        <a
-          href="/login"
+        <button
+          type="button"
+          onClick={onLoginClick}
           className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
         >
           <Icon name="user" variant="scroll" size={24} />
-          Войти / Зарегистрироваться
-        </a>
+          {isLoggedIn ? "Личный кабинет" : "Войти / Зарегистрироваться"}
+        </button>
         <a
           href="/boutiques"
           className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
