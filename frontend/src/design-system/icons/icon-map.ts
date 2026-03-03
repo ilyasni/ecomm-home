@@ -1,11 +1,15 @@
 export type IconName =
   | "logo"
   | "burger"
+  | "burgerActive"
   | "chevronDown"
   | "search"
   | "user"
   | "favorite"
+  | "favoriteFilled"
   | "bag"
+  | "bagCard"
+  | "bagCardHover"
   | "telegram"
   | "whatsapp"
   | "arrowRight"
@@ -34,7 +38,15 @@ export type IconName =
   | "catalogPlaids"
   | "catalogTowels"
   | "catalogBoudoir"
-  | "chevronRight";
+  | "catalogBedLinenActive"
+  | "catalogHomeTextileActive"
+  | "catalogBlanketsActive"
+  | "catalogPillowsActive"
+  | "catalogPlaidsActive"
+  | "catalogTowelsActive"
+  | "catalogBoudoirActive"
+  | "chevronRight"
+  | "chevronRightPrimary";
 
 export type IconVariant = "default" | "scroll";
 
@@ -43,11 +55,15 @@ type IconMap = Record<IconName, { default: string; scroll?: string }>;
 export const iconMap: IconMap = {
   logo: {
     default: "/assets/figma/footer/logo.svg",
-    scroll: "/assets/figma/header/logo.svg",
+    scroll: "/assets/figma/header-scroll/logo.svg",
   },
   burger: {
     default: "/assets/figma/header/burger.svg",
     scroll: "/assets/figma/header-scroll/burger.svg",
+  },
+  burgerActive: {
+    default: "/assets/figma/icons/burger-active.svg",
+    scroll: "/assets/figma/icons/burger-active.svg",
   },
   chevronDown: {
     default: "/assets/figma/header/chevron-down.svg",
@@ -65,15 +81,26 @@ export const iconMap: IconMap = {
     default: "/assets/figma/header/favorite.svg",
     scroll: "/assets/figma/header-scroll/favorite.svg",
   },
+  favoriteFilled: {
+    default: "/assets/figma/icons/favorite-filled.svg",
+  },
   bag: {
     default: "/assets/figma/header/bag.svg",
     scroll: "/assets/figma/header-scroll/bag.svg",
   },
+  bagCard: {
+    default: "/assets/figma/collections/bag.svg",
+  },
+  bagCardHover: {
+    default: "/assets/figma/icons/bag-primary.svg",
+  },
   telegram: {
     default: "/assets/figma/header/telegram.svg",
+    scroll: "/assets/figma/header-scroll/telegram.svg",
   },
   whatsapp: {
     default: "/assets/figma/header/whatsapp.svg",
+    scroll: "/assets/figma/header-scroll/whatsapp.svg",
   },
   arrowRight: {
     default: "/assets/figma/collections/arrow-right.svg",
@@ -153,7 +180,31 @@ export const iconMap: IconMap = {
   catalogBoudoir: {
     default: "/assets/figma/icons/catalog/boudoir.svg",
   },
+  catalogBedLinenActive: {
+    default: "/assets/figma/icons/catalog/bed-linen-active.svg",
+  },
+  catalogHomeTextileActive: {
+    default: "/assets/figma/icons/catalog/home-textile-active.svg",
+  },
+  catalogBlanketsActive: {
+    default: "/assets/figma/icons/catalog/blankets-active.svg",
+  },
+  catalogPillowsActive: {
+    default: "/assets/figma/icons/catalog/pillows-active.svg",
+  },
+  catalogPlaidsActive: {
+    default: "/assets/figma/icons/catalog/plaids-active.svg",
+  },
+  catalogTowelsActive: {
+    default: "/assets/figma/icons/catalog/towels-active.svg",
+  },
+  catalogBoudoirActive: {
+    default: "/assets/figma/icons/catalog/boudoir-active.svg",
+  },
   chevronRight: {
     default: "/assets/figma/icons/arrow-right.svg",
+  },
+  chevronRightPrimary: {
+    default: "/assets/figma/icons/arrow-right-primary.svg",
   },
 };
