@@ -48,3 +48,9 @@ frontend/test-results/
 
 # Old site dump (large SQL)
 old_site_va_home/
+
+# Claude Code session memory
+.claude/
+
+# Temporary migration scripts / SQL dumps
+tmp_migration/

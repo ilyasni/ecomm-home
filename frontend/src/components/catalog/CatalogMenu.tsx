@@ -3,25 +3,72 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/design-system/icons";
 import type { IconName } from "@/design-system/icons/icon-map";
 import {
-  catalogCategories,
+  catalogCategories as hardcodedCategories,
   catalogExtraLinks,
   catalogInfoLinks,
   type CatalogCategory,
 } from "@/data/catalog-menu";
+import type { StrapiCategoryRaw } from "@/lib/queries/catalog";
+import { useAuthModal, useAuthSession } from "@/components/auth";
+
+const activeCategoryIconMap: Partial<Record<IconName, IconName>> = {
+  catalogBedLinen: "catalogBedLinenActive",
+  catalogHomeTextile: "catalogHomeTextileActive",
+  catalogBlankets: "catalogBlanketsActive",
+  catalogPillows: "catalogPillowsActive",
+  catalogPlaids: "catalogPlaidsActive",
+  catalogTowels: "catalogTowelsActive",
+  catalogBoudoir: "catalogBoudoirActive",
+};
+
+function resolveCategoryIconName(icon: string, isActive: boolean): IconName {
+  const normalizedIcon = icon as IconName;
+  if (!isActive) return normalizedIcon;
+  return activeCategoryIconMap[normalizedIcon] ?? normalizedIcon;
+}
+
+function mapStrapiToMenuCategory(raw: StrapiCategoryRaw): CatalogCategory {
+  return {
+    id: raw.slug,
+    label: raw.title,
+    icon: raw.icon || "catalogBedLinen",
+    href: `/catalog/${raw.slug}`,
+    subcategories: raw.subcategories?.map((s) => ({ label: s.label, href: s.href })),
+    filters: raw.filters?.map((f) => ({
+      title: f.title,
+      options: (f.options ?? []).map((o) => ({ label: o.label, href: o.href })),
+    })),
+  };
+}
 
 type CatalogMenuProps = {
   isOpen: boolean;
   onClose: () => void;
+  catalogData?: StrapiCategoryRaw[] | null;
 };
 
-export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
+export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) {
+  const catalogCategories = catalogData?.length
+    ? catalogData.map(mapStrapiToMenuCategory)
+    : hardcodedCategories;
+
   const [activeCategory, setActiveCategory] = useState<string>(catalogCategories[0]?.id || "");
   const [mobileLevel, setMobileLevel] = useState<"main" | "category" | "filter">("main");
   const [mobileCategoryId, setMobileCategoryId] = useState<string>("");
   const [expandedFilter, setExpandedFilter] = useState<string>("");
+  const router = useRouter();
+  const { openLogin } = useAuthModal();
+  const { user } = useAuthSession();
+
+  // Сброс активной категории при смене данных (Strapi ↔ fallback)
+  useEffect(() => {
+    setActiveCategory(catalogCategories[0]?.id || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalogData]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -81,9 +128,17 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                       : "text-[var(--color-black)]"
                   }`}
                 >
-                  <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+                  <Icon
+                    name={resolveCategoryIconName(cat.icon, activeCategory === cat.id)}
+                    size={24}
+                    className="shrink-0"
+                  />
                   <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
-                  <Icon name="chevronRight" size={20} className="shrink-0" />
+                  <Icon
+                    name={activeCategory === cat.id ? "chevronRightPrimary" : "chevronRight"}
+                    size={20}
+                    className="shrink-0"
+                  />
                 </button>
               ))}
 
@@ -201,9 +256,17 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                       : "text-[var(--color-black)]"
                   }`}
                 >
-                  <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+                  <Icon
+                    name={resolveCategoryIconName(cat.icon, activeCategory === cat.id)}
+                    size={24}
+                    className="shrink-0"
+                  />
                   <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
-                  <Icon name="chevronRight" size={20} className="shrink-0" />
+                  <Icon
+                    name={activeCategory === cat.id ? "chevronRightPrimary" : "chevronRight"}
+                    size={20}
+                    className="shrink-0"
+                  />
                 </button>
               ))}
 
@@ -279,7 +342,20 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
 
       {/* ===== MOBILE (<768px) ===== */}
       <div className="fixed inset-0 z-40 bg-[var(--background)] md:hidden">
-        {mobileLevel === "main" && <MobileMainLevel onCategoryClick={handleMobileCategoryClick} />}
+        {mobileLevel === "main" && (
+          <MobileMainLevel
+            categories={catalogCategories}
+            onCategoryClick={handleMobileCategoryClick}
+            onLoginClick={() => {
+              if (user) {
+                router.push("/account");
+              } else {
+                openLogin();
+              }
+            }}
+            isLoggedIn={!!user}
+          />
+        )}
         {mobileLevel === "category" && mobileCat && (
           <MobileCategoryLevel
             category={mobileCat}
@@ -293,20 +369,31 @@ export function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
   );
 }
 
-function MobileMainLevel({ onCategoryClick }: { onCategoryClick: (catId: string) => void }) {
+function MobileMainLevel({
+  categories,
+  onCategoryClick,
+  onLoginClick,
+  isLoggedIn,
+}: {
+  categories: CatalogCategory[];
+  onCategoryClick: (catId: string) => void;
+  onLoginClick: () => void;
+  isLoggedIn: boolean;
+}) {
   return (
     <div className="flex h-full flex-col overflow-y-auto">
       {/* Header mobile: оставляем существующий хедер, этот блок не нужен */}
 
       {/* Войти / Бутики */}
       <div className="flex flex-col gap-4 bg-[var(--color-selection)] p-4">
-        <a
-          href="/login"
+        <button
+          type="button"
+          onClick={onLoginClick}
           className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
         >
           <Icon name="user" variant="scroll" size={24} />
-          Войти / Зарегистрироваться
-        </a>
+          {isLoggedIn ? "Личный кабинет" : "Войти / Зарегистрироваться"}
+        </button>
         <a
           href="/boutiques"
           className="flex items-center gap-2 text-[16px] leading-[1.3] font-medium text-[var(--color-black)]"
@@ -318,14 +405,14 @@ function MobileMainLevel({ onCategoryClick }: { onCategoryClick: (catId: string)
 
       {/* Категории */}
       <div className="flex flex-col gap-6 px-4 pt-6">
-        {catalogCategories.map((cat) => (
+        {categories.map((cat) => (
           <button
             key={cat.id}
             type="button"
             onClick={() => onCategoryClick(cat.id)}
             className="flex items-center gap-2 text-left text-[var(--color-black)]"
           >
-            <Icon name={cat.icon as IconName} size={24} className="shrink-0" />
+            <Icon name={resolveCategoryIconName(cat.icon, false)} size={24} className="shrink-0" />
             <span className="flex-1 text-[16px] leading-[1.3] font-medium">{cat.label}</span>
             <Icon name="chevronRight" size={20} className="shrink-0" />
           </button>

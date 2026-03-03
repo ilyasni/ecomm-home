@@ -3,6 +3,7 @@ export type SpecialOffer = {
   title: string;
   subtitle: string;
   image: string;
+  href?: string;
 };
 
 export const specialOffers: SpecialOffer[] = [

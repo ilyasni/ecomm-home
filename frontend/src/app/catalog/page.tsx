@@ -9,6 +9,8 @@ import { mapMediaOrPlaceholder } from "@/lib/mappers";
 import type { CategoryCardData } from "@/data/catalog-categories";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Каталог",
   description:

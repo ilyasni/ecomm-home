@@ -3,16 +3,17 @@
 ## Содержание
 
 1. [Обзор архитектуры](#1-обзор-архитектуры)
-2. [Env-переменные](#2-env-переменные)
-3. [API-клиент](#3-api-клиент)
-4. [Strapi Content Types](#4-strapi-content-types)
-5. [Маппинг страниц на API-эндпоинты](#5-маппинг-страниц-на-api-эндпоинты)
-6. [Миграция компонентов на Server Components](#6-миграция-компонентов-на-server-components)
-7. [Кеширование и ревалидация](#7-кеширование-и-ревалидация)
-8. [Работа с медиа](#8-работа-с-медиа)
-9. [Аутентификация](#9-аутентификация)
-10. [Пошаговый план внедрения](#10-пошаговый-план-внедрения)
-11. [Rollback-стратегия](#11-rollback-стратегия)
+2. [Нормативная модель владения данными (Medusa vs Strapi)](#2-нормативная-модель-владения-данными-medusa-vs-strapi)
+3. [Env-переменные](#3-env-переменные)
+4. [API-клиент](#4-api-клиент)
+5. [Strapi Content Types](#5-strapi-content-types)
+6. [Маппинг страниц на API-эндпоинты](#6-маппинг-страниц-на-api-эндпоинты)
+7. [Миграция компонентов на Server Components](#7-миграция-компонентов-на-server-components)
+8. [Кеширование и ревалидация](#8-кеширование-и-ревалидация)
+9. [Работа с медиа](#9-работа-с-медиа)
+10. [Аутентификация](#10-аутентификация)
+11. [Пошаговый план внедрения](#11-пошаговый-план-внедрения)
+12. [Rollback-стратегия](#12-rollback-стратегия)
 
 ---
 
@@ -54,7 +55,38 @@ Frontend (Next.js 16)               Strapi v5
 
 ---
 
-## 2. Env-переменные
+## 2. Нормативная модель владения данными (Medusa vs Strapi)
+
+Этот раздел является нормативным и имеет приоритет над остальными частями документа.
+
+### Source of truth
+
+- `Medusa` — источник истины для commerce-сущностей:
+  - товары, варианты, цены, остатки;
+  - корзины, checkout, заказы, платежи, доставки, возвраты;
+  - покупатели магазина и адреса для заказа.
+- `Strapi` — источник истины для editorial/content-сущностей:
+  - контентные страницы, баннеры, статьи, SEO;
+  - контентные медиа и дополнительные текстовые блоки карточек.
+
+### Что нельзя делать в Strapi
+
+- Нельзя хранить `Order` как master-реестр заказов магазина.
+- Нельзя хранить customer identity магазина как master в Strapi.
+- Нельзя использовать Strapi как источник цены/остатка/SKU.
+
+### Разрешённая интеграция
+
+- В Strapi допустимы только проекции и связи с Medusa по полям `medusa_*_id`.
+- Синхронизация Medusa -> Strapi должна быть идемпотентной (upsert), событийной и с retry/DLQ.
+
+### Ссылка на архитектурное решение
+
+- `frontend/docs/project-knowledge/decisions/ADR-0001-strapi-medusa-data-ownership.md`
+
+---
+
+## 3. Env-переменные
 
 Скопировать `.env.local.example` в `.env.local`:
 
@@ -73,7 +105,7 @@ cp .env.local.example .env.local
 
 ---
 
-## 3. API-клиент
+## 4. API-клиент
 
 Файл: `src/lib/strapi.ts`
 
@@ -106,7 +138,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 
 ---
 
-## 4. Strapi Content Types
+## 5. Strapi Content Types
 
 ### 4.1 Collection Types (12)
 
@@ -213,7 +245,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 - mapImage: media (single)
 ```
 
-#### Order
+#### Order (legacy, не использовать как master)
 ```
 - number: string (required, unique)
 - status: enum [Получен, Отменён, В доставке, Обработка]
@@ -227,7 +259,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 - user: relation (belongs-to → User)
 ```
 
-#### Address
+#### Address (legacy, не использовать как master)
 ```
 - label: string
 - region: string
@@ -237,7 +269,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 - user: relation (belongs-to → User)
 ```
 
-#### BonusOperation
+#### BonusOperation (legacy, не использовать как master)
 ```
 - date: date
 - description: string
@@ -356,7 +388,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 
 ---
 
-## 5. Маппинг страниц на API-эндпоинты
+## 6. Маппинг страниц на API-эндпоинты
 
 | Маршрут | Query-функция | Strapi endpoint | Кеш |
 |---|---|---|---|
@@ -383,7 +415,7 @@ await strapiFind("info-pages", {}, { revalidate: false });
 
 ---
 
-## 6. Миграция компонентов на Server Components
+## 7. Миграция компонентов на Server Components
 
 ### Компоненты, которые останутся Client (`"use client"`)
 
@@ -448,7 +480,7 @@ export default async function CatalogPage() {
 
 ---
 
-## 7. Кеширование и ревалидация
+## 8. Кеширование и ревалидация
 
 ### Стратегия по типу контента
 
@@ -485,7 +517,7 @@ export async function POST(request: NextRequest) {
 
 ---
 
-## 8. Работа с медиа
+## 9. Работа с медиа
 
 ### Утилита `getStrapiMediaUrl`
 
@@ -515,54 +547,36 @@ import { getStrapiMediaUrl } from "@/lib/strapi";
 
 ---
 
-## 9. Аутентификация
+## 10. Аутентификация
 
-### Strapi Users & Permissions
+### Аутентификация покупателей (Medusa)
 
-Для аккаунт-секции (`/account/*`) использовать Strapi Users & Permissions plugin:
+Для аккаунт-секции (`/account/*`) использовать контур аутентификации и customer-данные Medusa.
 
-1. **Регистрация**: `POST /api/auth/local/register`
-2. **Вход**: `POST /api/auth/local`
-3. **Профиль**: `GET /api/users/me`
-4. **JWT-токен**: хранить в httpOnly cookie (через Next.js API route)
+1. Регистрация/вход/профиль покупателя — через Medusa API и customer-модуль.
+2. Токены сессии хранить в `httpOnly` cookie через BFF-слой Next.js.
+3. Защита маршрутов `/account/*` — через middleware/серверные проверки сессии.
 
-### Интеграция с AuthProviderWrapper
+### Аутентификация контент-редакторов (Strapi)
 
-Текущий `AuthProviderWrapper` — заглушка. Для подключения к Strapi:
+`Strapi Users & Permissions` использовать только для CMS-админов и редакторов контента.
 
-1. Создать `src/lib/auth.ts` с функциями login/register/logout
-2. Хранить JWT в httpOnly cookie через Next.js Server Action
-3. Обновить `AuthProviderWrapper` для проверки cookie при mount
-4. Добавить middleware для защиты `/account/*` маршрутов
+### Важно
 
-### Расширение User
-
-Добавить через Strapi Admin → Content-Type Builder → User:
-
-```
-- firstName: string
-- lastName: string
-- phone: string
-- birthDate: date
-- bonuses: integer (default: 0)
-- city: string
-- region: string
-- addresses: relation (has-many → Address)
-- bonusOperations: relation (has-many → BonusOperation)
-- notificationSettings: component (repeatable) → account.notification-setting
-```
+- Не использовать Strapi User как мастер-профиль покупателя магазина.
+- Не смешивать роли CMS-редактора и customer identity e-commerce.
 
 ---
 
-## 10. Пошаговый план внедрения
+## 11. Пошаговый план внедрения
 
 ### Фаза 1: Backend (Strapi)
 
 1. Развернуть Strapi v5 (`npx create-strapi-app@latest backend`)
-2. Создать Collection Types: Product, Category, Collection, Article, Boutique, InfoPage
+2. Создать Collection Types: Product/Category/Collection (как editorial-проекции с `medusa_*_id`), Article, Boutique, InfoPage
 3. Создать Single Types: HomePage, AboutPage, ContactsPage, и т.д.
 4. Создать все Reusable Components (27 штук)
-5. Настроить Users & Permissions (публичный доступ к каталогу, приватный к заказам)
+5. Настроить Users & Permissions для CMS-админов и редакторов (не для customer-кабинета)
 6. Импортировать данные из `src/data/*.ts` в Strapi
 7. Загрузить медиа из `/public/assets/figma/` в Media Library
 8. Создать API Token (read-only) для frontend
@@ -578,9 +592,9 @@ import { getStrapiMediaUrl } from "@/lib/strapi";
 ### Фаза 3: Frontend — интерактивные страницы
 
 1. Добавить state management: `npm install zustand`
-2. Реализовать Cart Store (локальное состояние + sync с Strapi)
+2. Реализовать Cart Store (локальное состояние + sync с Medusa)
 3. Реализовать Favorites Store
-4. Подключить аутентификацию
+4. Подключить аутентификацию покупателей через Medusa
 5. Перевести Checkout на реальный API
 
 ### Фаза 4: Оптимизация
@@ -593,7 +607,7 @@ import { getStrapiMediaUrl } from "@/lib/strapi";
 
 ---
 
-## 11. Rollback-стратегия
+## 12. Rollback-стратегия
 
 ### При ошибках в Strapi
 

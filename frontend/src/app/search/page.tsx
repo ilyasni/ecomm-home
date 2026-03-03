@@ -1,20 +1,33 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { HeaderServer } from "@/components/home/HeaderServer";
 import { FooterServer } from "@/components/home/FooterServer";
-import { CatalogGrid } from "@/components/catalog/CatalogGrid";
 import type { Product } from "@/components/catalog/ProductCard";
-import { searchProducts } from "@/lib/queries/search";
+import { searchProducts, type SearchResult } from "@/lib/queries/search";
 import { withFallback } from "@/lib/with-fallback";
 import { formatPrice, mapMediaOrPlaceholder } from "@/lib/mappers";
+import { SearchPageClient } from "./SearchPageClient";
 
 export const metadata: Metadata = {
   title: "Поиск",
   description: "Поиск товаров Vita Brava Home",
 };
 
+/** Filterable Meilisearch attributes, отражённые в FiltersPanel */
+const FILTER_KEYS = ["fabric", "density", "size", "color"] as const;
+
+/** Нормализует searchParam в массив строк */
+function toArray(v: string | string[] | undefined): string[] {
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v];
+}
+
+const EMPTY_RESULT: SearchResult = {
+  data: [],
+  meta: { pagination: { page: 1, pageSize: 24, total: 0 } },
+};
+
 interface SearchPageProps {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 function mapResult(raw: Record<string, unknown>): Product {
@@ -31,17 +44,33 @@ function mapResult(raw: Record<string, unknown>): Product {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const { q = "" } = await searchParams;
-  const query = q.trim();
+  const params = await searchParams;
+  const query = (typeof params.q === "string" ? params.q : "").trim();
 
-  const data = query
-    ? await withFallback(async () => {
-        const response = await searchProducts(query, 1, 24);
-        return response.data as Record<string, unknown>[];
-      }, [])
-    : [];
+  // Собираем активные фильтры из URL
+  const activeFilters: Record<string, string[]> = {};
+  for (const key of FILTER_KEYS) {
+    const vals = toArray(params[key]);
+    if (vals.length > 0) activeFilters[key] = vals;
+  }
 
-  const products = data.map(mapResult);
+  // Формат facetFilters для Meilisearch: AND между полями, OR внутри поля
+  const facetFilters: string[][] = Object.entries(activeFilters).map(([key, vals]) =>
+    vals.map((v) => `${key}:${v}`)
+  );
+
+  const hasSearch = Boolean(query) || facetFilters.length > 0;
+
+  const result = hasSearch
+    ? await withFallback(
+        () => searchProducts(query, 1, 24, facetFilters.length ? facetFilters : undefined),
+        EMPTY_RESULT
+      )
+    : EMPTY_RESULT;
+
+  const products = result.data.map(mapResult);
+  const totalCount = result.meta.pagination.total;
+  const facetDistribution = result.meta.facetDistribution;
 
   return (
     <div className="bg-[var(--background)] text-[var(--foreground)]">
@@ -51,7 +80,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <h1 className="mb-6 text-center text-[28px] leading-[1.2] font-medium md:mb-8 md:text-[36px]">
             Поиск товаров
           </h1>
+
           <form className="mb-8" action="/search">
+            {/* Сохраняем активные фильтры при новом поиске */}
+            {Object.entries(activeFilters).flatMap(([key, vals]) =>
+              vals.map((v) => <input key={`${key}:${v}`} type="hidden" name={key} value={v} />)
+            )}
             <input
               type="search"
               name="q"
@@ -61,25 +95,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             />
           </form>
 
-          {query.length === 0 ? (
+          {!hasSearch ? (
             <p className="text-center text-[var(--color-dark)]">
               Введи запрос, чтобы найти товары.
             </p>
-          ) : products.length === 0 ? (
-            <p className="text-center text-[var(--color-dark)]">
-              По запросу <strong>{query}</strong> ничего не найдено.{" "}
-              <Link href="/catalog" className="underline">
-                Перейти в каталог
-              </Link>
-              .
-            </p>
           ) : (
-            <>
-              <p className="mb-6 text-[var(--color-dark)]">
-                Найдено: <strong>{products.length}</strong>
-              </p>
-              <CatalogGrid products={products} columns={3} />
-            </>
+            <SearchPageClient
+              query={query}
+              products={products}
+              activeFilters={activeFilters}
+              totalCount={totalCount}
+              facetDistribution={facetDistribution}
+            />
           )}
         </div>
       </main>

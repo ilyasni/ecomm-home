@@ -15,6 +15,11 @@
   --color-error: #d7111a;
   --color-black: #22201d;
   --color-dark-gray: #494846;
+  /* Overlay токены для image-оверлеев */
+  --overlay-dark-light: rgba(17, 10, 0, 0.25);
+  --overlay-dark-warm: rgba(17, 10, 0, 0.35);
+  --overlay-dark: rgba(0, 0, 0, 0.3);
+  --overlay-dark-medium: rgba(33, 33, 31, 0.3);
 }
 
 @theme inline {

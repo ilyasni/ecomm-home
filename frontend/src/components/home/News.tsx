@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/design-system/components";
 import { Carousel } from "@/components/ui/Carousel";
 import { news as defaultNews } from "@/data/home";
@@ -40,9 +41,9 @@ export function News({ items }: NewsProps = {}) {
     <section className="desktop:px-0 desktop:py-[80px] mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
       <div className="flex items-center justify-between">
         <h2 className="desktop:text-[32px] text-2xl leading-[1.1] font-medium">Новости</h2>
-        <a className="text-sm leading-[1.3] text-[var(--color-brand)] underline" href="#">
+        <Link className="text-sm leading-[1.3] text-[var(--color-brand)] underline" href="/news">
           Все статьи
-        </a>
+        </Link>
       </div>
       <div className="mt-8">
         <Carousel
@@ -52,6 +53,7 @@ export function News({ items }: NewsProps = {}) {
           showPagination
           paginationClassName="news-pagination"
           breakpoints={{
+            640: { slidesPerView: 1.5, spaceBetween: 12 },
             768: { slidesPerView: 2.2, spaceBetween: 8 },
             1400: { slidesPerView: 4, spaceBetween: 8 },
           }}

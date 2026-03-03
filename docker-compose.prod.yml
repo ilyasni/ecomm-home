@@ -1,0 +1,101 @@
+services:
+  cms:
+    build:
+      context: ./cms
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: ${DATABASE_HOST:?}
+      DATABASE_PORT: ${DATABASE_PORT:?}
+      DATABASE_NAME: ${DATABASE_NAME:?}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:?}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?}
+      REDIS_HOST: ${REDIS_HOST:-}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      APP_KEYS: ${STRAPI_APP_KEYS:?}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT:?}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET:?}
+      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT:?}
+      JWT_SECRET: ${STRAPI_JWT_SECRET:?}
+      ADMIN_ENCRYPTION_KEY: ${STRAPI_ADMIN_ENCRYPTION_KEY:?}
+      ADMIN_SESSION_MAX_LIFESPAN: ${STRAPI_ADMIN_SESSION_MAX_LIFESPAN:-86400}
+      ADMIN_REFRESH_TOKEN_MAX_LIFESPAN: ${STRAPI_ADMIN_REFRESH_TOKEN_MAX_LIFESPAN:-2592000}
+      # MinIO (S3) — если пусто, Strapi fallback на локальный диск
+      MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL:-}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
+      MINIO_BUCKET: ${MINIO_BUCKET:-strapi-uploads}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      # Search reindex webhook (lifecycle → frontend)
+      FRONTEND_INTERNAL_URL: http://frontend:3000
+      REINDEX_SECRET: ${REINDEX_SECRET:-}
+    volumes:
+      - strapi_uploads:/opt/app/public/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:1337/_health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    depends_on:
+      cms:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:?}
+      NEXT_PUBLIC_STRAPI_MEDIA_URL: ${NEXT_PUBLIC_STRAPI_MEDIA_URL:?}
+      STRAPI_INTERNAL_URL: http://cms:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:?}
+      STRAPI_MEDIA_HOSTNAME: ${STRAPI_MEDIA_HOSTNAME:?}
+      STRICT_CMS_AUTH: ${STRICT_CMS_AUTH:-false}
+      # Medusa Commerce (Phase 2 — graceful если не настроено)
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-}
+      MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:-}
+      # Meilisearch
+      MEILISEARCH_URL: ${MEILISEARCH_URL:-}
+      MEILISEARCH_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-}
+      REINDEX_SECRET: ${REINDEX_SECRET:-}
+      # Imgproxy
+      IMGPROXY_URL: ${IMGPROXY_URL:-}
+      NEXT_PUBLIC_IMGPROXY_URL: ${NEXT_PUBLIC_IMGPROXY_URL:-}
+      IMGPROXY_KEY: ${IMGPROXY_KEY:-}
+      IMGPROXY_SALT: ${IMGPROXY_SALT:-}
+      IMGPROXY_HOSTNAME: ${IMGPROXY_HOSTNAME:-}
+      IMGPROXY_SOURCE_REWRITE_FROM: ${IMGPROXY_SOURCE_REWRITE_FROM:-}
+      IMGPROXY_SOURCE_REWRITE_TO: ${IMGPROXY_SOURCE_REWRITE_TO:-}
+      # Payment
+      YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID:-}
+      YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY:-}
+      # Delivery
+      CDEK_CLIENT_ID: ${CDEK_CLIENT_ID:-}
+      CDEK_CLIENT_SECRET: ${CDEK_CLIENT_SECRET:-}
+      CDEK_FROM_CITY_CODE: ${CDEK_FROM_CITY_CODE:-44}
+      # Email / SMTP
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: "${SMTP_FROM:-Vita Brava Home <noreply@vitabrava.ru>}"
+      EMAIL_ADMIN: ${EMAIL_ADMIN:-}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  strapi_uploads:

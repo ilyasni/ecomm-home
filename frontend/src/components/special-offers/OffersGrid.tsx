@@ -15,7 +15,7 @@ export function OffersGrid({ data }: OffersGridProps) {
       {specialOffers.map((offer) => (
         <a
           key={offer.id}
-          href="#"
+          href={offer.href ?? "/special-offers"}
           className="group desktop:h-[450px] relative h-[220px] overflow-hidden md:h-[340px]"
         >
           <Image

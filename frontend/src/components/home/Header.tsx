@@ -7,6 +7,7 @@ import { Icon } from "@/design-system/icons";
 import { CatalogMenu } from "@/components/catalog/CatalogMenu";
 import { useAuthModal, useAuthSession } from "@/components/auth";
 import type { NavigationData } from "@/lib/queries/navigation";
+import type { StrapiCategoryRaw } from "@/lib/queries/catalog";
 import { getCartCount, getFavoritesCount, subscribeCommerce } from "@/lib/commerce";
 
 const defaultTopMenuItems = [
@@ -16,7 +17,7 @@ const defaultTopMenuItems = [
   { label: "Покупателям", href: "/customer-info" },
   { label: "Сотрудничество", href: "/cooperation" },
   { label: "Контакты", href: "/contacts" },
-  { label: "Бутики", href: "/contacts" },
+  { label: "Бутики", href: "/boutiques" },
 ];
 
 const defaultCatalogLinks = [
@@ -33,9 +34,10 @@ const defaultCatalogLinks = [
 type HeaderProps = {
   variant?: "transparent" | "solid";
   navigation?: NavigationData | null;
+  catalogData?: StrapiCategoryRaw[] | null;
 };
 
-export function Header({ variant = "transparent", navigation }: HeaderProps) {
+export function Header({ variant = "transparent", navigation, catalogData }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
@@ -82,7 +84,9 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
       <div className="desktop:block hidden bg-[var(--color-brown)] text-[var(--color-light)]">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between py-2">
           <div className="flex items-center gap-12 whitespace-nowrap">
-            <Icon name="logo" variant="scroll" size={173} height={31} alt="Vita Brava Home" />
+            <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
+              <Icon name="logo" variant="scroll" size={173} height={31} alt="Vita Brava Home" />
+            </Link>
             <nav className="flex items-center gap-6 text-sm leading-[1.3]">
               {topMenuItems.map((item, idx) => (
                 <a
@@ -133,7 +137,7 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
               className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <Icon
-                name={catalogOpen ? "close" : "burger"}
+                name={catalogOpen ? "burgerActive" : "burger"}
                 variant={bottomBarIconVariant}
                 size={24}
               />
@@ -208,7 +212,9 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
       <div className="desktop:hidden bg-[var(--color-brown)] text-[var(--color-light)] max-md:hidden">
         <div className="flex items-center justify-between px-[39px] py-2">
           <div className="flex items-center gap-12">
-            <Icon name="logo" variant="scroll" size={145} height={25} alt="Vita Brava Home" />
+            <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
+              <Icon name="logo" variant="scroll" size={145} height={25} alt="Vita Brava Home" />
+            </Link>
             <nav className="flex items-center gap-8 text-sm leading-[1.3]">
               <a
                 href="/customer-info"
@@ -220,7 +226,7 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
               <a href="/contacts" className="transition-opacity hover:opacity-80">
                 Контакты
               </a>
-              <a href="/contacts" className="transition-opacity hover:opacity-80">
+              <a href="/boutiques" className="transition-opacity hover:opacity-80">
                 Бутики
               </a>
             </nav>
@@ -240,7 +246,7 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
             className="flex items-center gap-2 text-sm leading-[1.3] transition-opacity hover:opacity-80"
           >
             <Icon
-              name={catalogOpen ? "close" : "burger"}
+              name={catalogOpen ? "burgerActive" : "burger"}
               variant={bottomBarIconVariant}
               size={24}
             />
@@ -305,7 +311,7 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
               className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Меню"
             >
-              <Icon name={catalogOpen ? "close" : "burger"} variant="scroll" size={24} />
+              <Icon name={catalogOpen ? "burgerActive" : "burger"} variant="scroll" size={24} />
             </button>
             <Link
               href="/search"
@@ -315,7 +321,9 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
               <Icon name="search" variant="scroll" size={24} />
             </Link>
           </div>
-          <Icon name="logo" variant="scroll" size={170} height={27} alt="Vita Brava Home" />
+          <Link href="/" className="flex items-center transition-opacity hover:opacity-80">
+            <Icon name="logo" variant="scroll" size={145} height={23} alt="Vita Brava Home" />
+          </Link>
           <div className="flex items-center gap-2">
             <Link
               href="/favorites"
@@ -335,7 +343,11 @@ export function Header({ variant = "transparent", navigation }: HeaderProps) {
         </div>
       </div>
 
-      <CatalogMenu isOpen={catalogOpen} onClose={() => setCatalogOpen(false)} />
+      <CatalogMenu
+        isOpen={catalogOpen}
+        onClose={() => setCatalogOpen(false)}
+        catalogData={catalogData}
+      />
     </header>
   );
 }

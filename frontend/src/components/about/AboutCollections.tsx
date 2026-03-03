@@ -7,7 +7,7 @@ interface AboutCollectionsProps {
   data?: {
     title: string;
     subtitle: string;
-    items: { id: string; title: string; image: string }[];
+    items: { id: string; title: string; image: string; href?: string }[];
   };
 }
 
@@ -29,7 +29,7 @@ export function AboutCollections({ data }: AboutCollectionsProps) {
           {aboutCollections.items.map((item) => (
             <a
               key={item.id}
-              href="#"
+              href={item.href ?? "/collections"}
               className="group desktop:h-[700px] relative h-[460px] overflow-hidden md:h-[500px]"
             >
               <Image
@@ -39,7 +39,7 @@ export function AboutCollections({ data }: AboutCollectionsProps) {
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 unoptimized
               />
-              <div className="absolute inset-0 bg-[rgba(0,0,0,0.3)]" />
+              <div className="absolute inset-0 bg-[var(--overlay-dark)]" />
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-[var(--color-light)]">
                 <p className="desktop:text-[28px] text-xl leading-[1.1] font-medium whitespace-nowrap md:text-2xl">
                   {item.title}

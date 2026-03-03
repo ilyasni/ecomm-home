@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "partnership_inquiries",
+  "info": {
+    "singularName": "partnership-inquiry",
+    "pluralName": "partnership-inquiries",
+    "displayName": "Partnership Inquiry",
+    "description": "Заявки на партнёрство и сотрудничество"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    }
+  }
+}

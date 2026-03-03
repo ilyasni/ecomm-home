@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/home/Header";
@@ -14,13 +14,8 @@ import { CommentSection } from "@/components/checkout/CommentSection";
 import { CheckoutSidebar } from "@/components/checkout/CheckoutSidebar";
 import { BoutiquePickupModal } from "@/components/checkout/modals/BoutiquePickupModal";
 import { CitySelectionModal } from "@/components/checkout/modals/CitySelectionModal";
-import {
-  accountUser,
-  type PaymentMethodType,
-  type DeliveryMethodType,
-  type CheckoutFormData,
-} from "@/data/account";
-import { createOrder, getCommerceSnapshot } from "@/lib/commerce";
+import type { PaymentMethodType, DeliveryMethodType, CheckoutFormData } from "@/data/account";
+import { getCommerceSnapshot } from "@/lib/commerce";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -29,10 +24,10 @@ export default function CheckoutPage() {
   const [cityModalOpen, setCityModalOpen] = useState(false);
 
   const [formData, setFormData] = useState<CheckoutFormData>({
-    firstName: accountUser.firstName,
-    lastName: accountUser.lastName,
-    phone: accountUser.phone,
-    email: accountUser.email,
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
     isLegalEntity: false,
     companyName: "",
     inn: "",
@@ -47,8 +42,50 @@ export default function CheckoutPage() {
     comment: "",
   });
 
+  // Предзаполнить форму из профиля Medusa (если пользователь залогинен)
+  useEffect(() => {
+    fetch("/api/account/profile")
+      .then((res) => res.json())
+      .then(
+        (data: {
+          user?: {
+            first_name: string | null;
+            last_name: string | null;
+            email: string;
+            phone: string | null;
+          };
+        }) => {
+          if (data.user) {
+            setFormData((prev) => ({
+              ...prev,
+              firstName: data.user!.first_name ?? prev.firstName,
+              lastName: data.user!.last_name ?? prev.lastName,
+              email: data.user!.email || prev.email,
+              phone: data.user!.phone ?? prev.phone,
+            }));
+          }
+        }
+      )
+      .catch(() => {});
+  }, []);
+
+  // 3.4.2 — баланс бонусов из Medusa customer.metadata
+  const [availableBonuses, setAvailableBonuses] = useState(0);
+  useEffect(() => {
+    fetch("/api/account/bonuses")
+      .then((r) => r.json())
+      .then((d: { balance?: number }) => setAvailableBonuses(d.balance ?? 0))
+      .catch(() => {});
+  }, []);
+
+  const [cdekPrice, setCdekPrice] = useState(390);
   const [promoStatus, setPromoStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [promoMessage, setPromoMessage] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    type: "percentage" | "fixed";
+    value: number;
+  } | null>(null);
 
   const items = getCommerceSnapshot().cartItems.map((item) => ({
     id: item.id,
@@ -68,17 +105,35 @@ export default function CheckoutPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePromoApply = () => {
+  const handlePromoApply = async () => {
+    if (!formData.promoCode.trim()) return;
     setPromoStatus("loading");
-    setTimeout(() => {
-      if (formData.promoCode.toLowerCase() === "vita10") {
+    try {
+      const res = await fetch("/api/cart/promo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: formData.promoCode }),
+      });
+      const data = await res.json();
+      if (data.valid && data.discount) {
+        setAppliedPromo({ code: data.code, type: data.discount.type, value: data.discount.value });
         setPromoStatus("success");
-        setPromoMessage("Промокод применён: скидка 10%");
+        setPromoMessage(
+          `Промокод применён: скидка ${
+            data.discount.type === "percentage"
+              ? `${data.discount.value}%`
+              : `${data.discount.value.toLocaleString("ru-RU")} ₽`
+          }`
+        );
       } else {
+        setAppliedPromo(null);
         setPromoStatus("error");
-        setPromoMessage("Промокод не найден");
+        setPromoMessage(data.message ?? "Промокод не найден");
       }
-    }, 1000);
+    } catch {
+      setPromoStatus("error");
+      setPromoMessage("Ошибка проверки промокода");
+    }
   };
 
   const canSubmit =
@@ -93,48 +148,174 @@ export default function CheckoutPage() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setIsSubmitting(true);
-    const localOrder = createOrder({
-      customerName: `${formData.firstName} ${formData.lastName}`.trim(),
-      email: formData.email,
-      phone: formData.phone,
-      deliveryAddress:
-        formData.deliveryMethod === "pickup"
-          ? `Самовывоз из бутика ${formData.boutiqueId}`
-          : formData.deliveryAddress,
-      paymentMethod: formData.paymentMethod,
-      deliveryMethod: formData.deliveryMethod,
-    });
+
+    const customerName = `${formData.firstName} ${formData.lastName}`.trim();
+    const deliveryAddress =
+      formData.deliveryMethod === "pickup"
+        ? `Самовывоз из бутика ${formData.boutiqueId}`
+        : formData.deliveryAddress;
+
+    let orderId: string | null = null;
+
+    // ── Попытка #1: Medusa Cart Complete flow ────────────────────────────
     try {
-      const response = await fetch("/api/commerce/orders", {
+      await fetch("/api/cart/address", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          address_1: deliveryAddress,
+          city: "Москва",
+          phone: formData.phone,
+          country_code: "ru",
+        }),
+      });
+
+      const completeRes = await fetch("/api/cart/complete", { method: "POST" });
+      const completeData = (await completeRes.json()) as {
+        type: "order" | "cart";
+        order?: { id: string; display_id?: number };
+        error?: string;
+      };
+
+      if (completeData.type === "order" && completeData.order?.id) {
+        orderId = completeData.order.id;
+      } else {
+        // Нет shipping/payment provider в Medusa — используем legacy fallback
+        console.warn(
+          "[checkout] Cart complete failed, fallback to Draft Orders:",
+          completeData.error
+        );
+      }
+    } catch (err) {
+      console.warn("[checkout] Cart complete error, fallback to Draft Orders:", err);
+    }
+
+    // Если Cart Complete не вернул orderId — генерируем локальный
+    if (!orderId) {
+      orderId = `local-${crypto.randomUUID()}`;
+    }
+
+    // ── Fire-and-forget: email-подтверждение заказа клиенту ─────────────
+    if (formData.email) {
+      void fetch("/api/email/order-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: `${formData.firstName} ${formData.lastName}`.trim(),
-          email: formData.email,
-          phone: formData.phone,
-          deliveryAddress:
-            formData.deliveryMethod === "pickup"
-              ? `Самовывоз из бутика ${formData.boutiqueId}`
-              : formData.deliveryAddress,
-          paymentMethod: formData.paymentMethod,
-          deliveryMethod: formData.deliveryMethod,
-          total: localOrder.total,
-          items: localOrder.items,
+          customerEmail: formData.email,
+          orderId,
+          customerName,
+          deliveryAddress,
+          items: items.map((item) => ({
+            title: item.title,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          subtotal: formatRub(subtotal),
+          total: formatRub(totalAmount),
+          promoDiscount: promoDiscount > 0 ? formatRub(promoDiscount) : undefined,
+          bonusDiscount: bonusDiscount > 0 ? formatRub(bonusDiscount) : undefined,
+          deliveryPrice: deliveryCost === 0 ? "Бесплатно" : formatRub(deliveryCost),
         }),
-      });
-      const data = (await response.json()) as { id?: string };
-      router.push(`/checkout/success?orderId=${data.id ?? localOrder.id}`);
-    } catch {
-      router.push(`/checkout/success?orderId=${localOrder.id}`);
+      }).catch(() => {});
     }
+
+    // ── 3.4.2 Fire-and-forget: начислить бонусы (5% от итого) ───────────
+    if (orderId) {
+      void fetch("/api/account/bonuses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ earnedAmount: bonusEarned }),
+      }).catch(() => {});
+    }
+
+    // ── Fire-and-forget: CDEK заявка ────────────────────────────────────
+    if (formData.deliveryMethod === "cdek" && formData.deliveryAddress) {
+      void fetch("/api/delivery/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          toAddress: formData.deliveryAddress,
+          toCityId: formData.deliveryCity,
+          customerName,
+          phone: formData.phone,
+          items: items.map((item) => ({ title: item.title, quantity: item.quantity })),
+        }),
+      }).catch(() => {});
+    }
+
+    // ── Онлайн-оплата ────────────────────────────────────────────────────
+    const needsOnlinePayment =
+      formData.paymentMethod !== "on-delivery" && formData.paymentMethod !== "certificate";
+
+    if (needsOnlinePayment) {
+      try {
+        const payRes = await fetch("/api/payment/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId,
+            amount: Math.round(totalAmount * 100),
+            method: formData.paymentMethod,
+            customerEmail: formData.email,
+          }),
+        });
+        const payData = (await payRes.json()) as {
+          paymentId?: string;
+          confirmationUrl?: string;
+        };
+        const encodedUrl = encodeURIComponent(payData.confirmationUrl ?? "stub");
+        router.push(
+          `/checkout/payment?orderId=${encodeURIComponent(orderId)}&paymentId=${encodeURIComponent(payData.paymentId ?? "")}&url=${encodedUrl}&method=${formData.paymentMethod}`
+        );
+      } catch {
+        router.push(`/checkout/success?orderId=${encodeURIComponent(orderId)}`);
+      }
+    } else {
+      router.push(`/checkout/success?orderId=${encodeURIComponent(orderId)}`);
+    }
+
+    setIsSubmitting(false);
   };
+
+  // ── Расчёт итогов ────────────────────────────────────────────────────────
+  function formatRub(value: number): string {
+    return `${Math.round(value).toLocaleString("ru-RU")} ₽`;
+  }
+
+  const subtotal = items.reduce((sum, item) => {
+    const priceNum = Number(item.price.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+    return sum + priceNum * item.quantity;
+  }, 0);
+
+  const promoDiscount = appliedPromo
+    ? appliedPromo.type === "percentage"
+      ? Math.round(subtotal * (appliedPromo.value / 100))
+      : Math.min(appliedPromo.value, subtotal)
+    : 0;
+
+  const bonusDiscount = Number(formData.bonusesToSpend) || 0;
+
+  const deliveryCost =
+    formData.deliveryMethod === "pickup"
+      ? 0
+      : formData.deliveryMethod === "courier"
+        ? 590
+        : cdekPrice;
+
+  const totalAmount = subtotal - promoDiscount - bonusDiscount + deliveryCost;
+  const bonusEarned = Math.round(totalAmount * 0.05);
+  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <>
       <Header variant="solid" />
 
       <main className="pt-[111px] md:pt-[143px]">
-        <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 pb-28 md:px-[39px] md:pb-20">
+        <div className="desktop:px-0 mx-auto max-w-[1400px] px-4 pb-[200px] md:px-[39px] md:pb-20">
           {/* Заголовок */}
           <h1 className="mb-6 text-center text-[28px] leading-[1.2] font-medium md:mb-8 md:text-[36px]">
             Оформление заказа
@@ -179,12 +360,13 @@ export default function CheckoutPage() {
                 onCityChange={(city) => updateField("deliveryCity", city)}
                 onAddressChange={(addr) => updateField("deliveryAddress", addr)}
                 onBoutiqueSelect={() => setBoutiqueModalOpen(true)}
+                onCdekPriceUpdate={setCdekPrice}
               />
 
               <ReferralSection
                 promoCode={formData.promoCode}
                 bonusesToSpend={formData.bonusesToSpend}
-                availableBonuses={accountUser.bonuses}
+                availableBonuses={availableBonuses}
                 onPromoChange={(code) => updateField("promoCode", code)}
                 onPromoApply={handlePromoApply}
                 onBonusesChange={(amount) => updateField("bonusesToSpend", amount.toString())}
@@ -201,21 +383,12 @@ export default function CheckoutPage() {
             {/* Правая колонка — итого */}
             <CheckoutSidebar
               items={items}
-              subtotal="64 000 ₽"
-              discount="4 000 ₽"
-              promoDiscount={promoStatus === "success" ? "6 000 ₽" : undefined}
-              bonusDiscount={
-                formData.bonusesToSpend > 0 ? `${formData.bonusesToSpend} ₽` : undefined
-              }
-              deliveryPrice={
-                formData.deliveryMethod === "pickup"
-                  ? "Бесплатно"
-                  : formData.deliveryMethod === "courier"
-                    ? "590 ₽"
-                    : "390 ₽"
-              }
-              total="60 400 ₽"
-              bonusEarned={3000}
+              subtotal={formatRub(subtotal)}
+              promoDiscount={promoDiscount > 0 ? formatRub(promoDiscount) : undefined}
+              bonusDiscount={bonusDiscount > 0 ? formatRub(bonusDiscount) : undefined}
+              deliveryPrice={deliveryCost === 0 ? "Бесплатно" : formatRub(deliveryCost)}
+              total={formatRub(totalAmount)}
+              bonusEarned={bonusEarned}
               isSubmitting={isSubmitting}
               canSubmit={canSubmit}
               onSubmit={handleSubmit}

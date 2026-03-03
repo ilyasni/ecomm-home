@@ -59,7 +59,8 @@ export function AuthProviderWrapper({ children }: { children: ReactNode }) {
         }}
         onRegisterSubmit={(data) => {
           void registerRequest({
-            username: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || data.email,
+            first_name: String(data.firstName ?? ""),
+            last_name: String(data.lastName ?? ""),
             email: String(data.email ?? ""),
             password: String(data.password ?? ""),
           }).then((response) => setUser(response.user));

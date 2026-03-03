@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Onest } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { AuthProviderWrapper } from "@/components/auth/AuthProviderWrapper";
 
@@ -57,6 +58,18 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${onest.variable} antialiased`}>
         <AuthProviderWrapper>{children}</AuthProviderWrapper>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-onest), Arial, sans-serif",
+              fontSize: "14px",
+              borderRadius: "5px",
+            },
+            success: { duration: 4000 },
+            error: { duration: 5000 },
+          }}
+        />
       </body>
     </html>
   );

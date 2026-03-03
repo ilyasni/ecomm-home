@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_inquiries",
+  "info": {
+    "singularName": "order-inquiry",
+    "pluralName": "order-inquiries",
+    "displayName": "Order Inquiry",
+    "description": "Заявки на заказ и консультацию"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "comment": {
+      "type": "text"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": ["order", "consultation"],
+      "default": "order"
+    }
+  }
+}
