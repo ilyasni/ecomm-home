@@ -52,6 +52,7 @@ type CatalogMenuProps = {
 };
 
 export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) {
+  const { openLogin } = useAuthModal();
   const catalogCategories = catalogData?.length
     ? catalogData.map(mapStrapiToMenuCategory)
     : hardcodedCategories;
@@ -107,6 +108,11 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
     setExpandedFilter((prev) => (prev === title ? "" : title));
   };
 
+  const handleAuthClick = () => {
+    openLogin();
+    onClose();
+  };
+
   return (
     <>
       {/* ===== DESKTOP (≥1400px) ===== */}
@@ -117,11 +123,12 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
             {/* Левая колонка: категории */}
             <div className="flex w-[220px] shrink-0 flex-col gap-6">
               {catalogCategories.map((cat) => (
-                <button
+                <Link
                   key={cat.id}
-                  type="button"
+                  href={cat.href}
                   onMouseEnter={() => setActiveCategory(cat.id)}
-                  onClick={() => setActiveCategory(cat.id)}
+                  onFocus={() => setActiveCategory(cat.id)}
+                  onClick={onClose}
                   className={`group flex items-center gap-2 text-left ${
                     activeCategory === cat.id
                       ? "text-[var(--color-brand)]"
@@ -139,7 +146,7 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
                     size={20}
                     className="shrink-0"
                   />
-                </button>
+                </Link>
               ))}
 
               <div className="flex flex-col gap-4 border-t border-[var(--color-gray-light)] pt-4">
@@ -246,10 +253,12 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
             {/* Левая колонка: категории */}
             <div className="flex w-[220px] shrink-0 flex-col gap-5">
               {catalogCategories.map((cat) => (
-                <button
+                <Link
                   key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategory(cat.id)}
+                  href={cat.href}
+                  onClick={onClose}
+                  onMouseEnter={() => setActiveCategory(cat.id)}
+                  onFocus={() => setActiveCategory(cat.id)}
                   className={`flex items-center gap-2 text-left ${
                     activeCategory === cat.id
                       ? "text-[var(--color-brand)]"
@@ -267,7 +276,7 @@ export function CatalogMenu({ isOpen, onClose, catalogData }: CatalogMenuProps) 
                     size={20}
                     className="shrink-0"
                   />
-                </button>
+                </Link>
               ))}
 
               <div className="flex flex-col gap-4 border-t border-[var(--color-gray-light)] pt-4">

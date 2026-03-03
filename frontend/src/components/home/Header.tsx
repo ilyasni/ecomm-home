@@ -31,6 +31,29 @@ const defaultCatalogLinks = [
   { label: "Подарочные сертификаты", href: "/catalog/gift-certificates" },
 ];
 
+function normalizeCatalogHref(href: string, label: string, availableSlugs: Set<string>): string {
+  const trimmed = href.trim();
+  if (!trimmed.startsWith("/catalog/")) return trimmed;
+
+  const currentSlug = trimmed.replace("/catalog/", "").split("?")[0].split("/")[0];
+  if (availableSlugs.has(currentSlug)) return trimmed;
+
+  const slugAliasBySlug: Record<string, string> = {
+    "home-textile": "home",
+    plaids: "throws",
+  };
+  const slugAliasByLabel: Record<string, string> = {
+    "домашний текстиль": "home",
+    "пледы": "throws",
+  };
+
+  const normalizedLabel = label.toLowerCase().trim();
+  const resolvedSlug = slugAliasBySlug[currentSlug] ?? slugAliasByLabel[normalizedLabel];
+  if (!resolvedSlug || !availableSlugs.has(resolvedSlug)) return trimmed;
+
+  return trimmed.replace(`/catalog/${currentSlug}`, `/catalog/${resolvedSlug}`);
+}
+
 type HeaderProps = {
   variant?: "transparent" | "solid";
   navigation?: NavigationData | null;
@@ -72,7 +95,11 @@ export function Header({ variant = "transparent", navigation, catalogData }: Hea
   const bottomBarIconVariant = useDarkStyle ? "scroll" : "default";
 
   const topMenuItems = navigation?.topMenuItems ?? defaultTopMenuItems;
-  const catalogCategories = navigation?.catalogCategories ?? defaultCatalogLinks;
+  const availableSlugs = new Set((catalogData ?? []).map((category) => category.slug));
+  const catalogCategories = (navigation?.catalogCategories ?? defaultCatalogLinks).map((category) => ({
+    ...category,
+    href: normalizeCatalogHref(category.href, category.label, availableSlugs),
+  }));
   const phone = navigation?.phone ?? "8 800 888-80-80";
   const topBarText = navigation?.topBarText ?? "Летние коллекции уже в наличии";
   const telegramUrl = navigation?.telegramUrl ?? "#";
