@@ -52,6 +52,7 @@ export function News({ items }: NewsProps = {}) {
           showPagination
           paginationClassName="news-pagination"
           breakpoints={{
+            640: { slidesPerView: 1.5, spaceBetween: 12 },
             768: { slidesPerView: 2.2, spaceBetween: 8 },
             1400: { slidesPerView: 4, spaceBetween: 8 },
           }}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { Input, PhoneInput, Checkbox, Button } from "@/design-system/components";
 import { partnershipForm as defaultPartnershipForm } from "@/data/cooperation";
 
@@ -22,6 +23,34 @@ export function PartnershipForm(props: PartnershipFormProps) {
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
   const [privacyChecked, setPrivacyChecked] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !phone.trim() || !privacyChecked) {
+      toast.error("Заполните обязательные поля и подтвердите согласие на обработку данных");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/partnership", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, city }),
+      });
+      if (!res.ok) throw new Error("Server error");
+      toast.success("Заявка на сотрудничество отправлена! Мы свяжемся с вами в ближайшее время.");
+      setName("");
+      setPhone("");
+      setEmail("");
+      setCity("");
+      setPrivacyChecked(false);
+    } catch {
+      toast.error("Не удалось отправить заявку. Попробуйте позже.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section className="desktop:px-0 desktop:py-[80px] mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
@@ -42,7 +71,7 @@ export function PartnershipForm(props: PartnershipFormProps) {
           <p className="desktop:text-base mt-4 text-sm leading-[1.5] text-[var(--color-dark)]">
             {partnershipForm.subtitle}
           </p>
-          <form className="desktop:mt-8 mt-6 flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="desktop:mt-8 mt-6 flex flex-col gap-4">
             <Input
               placeholder="Имя*"
               type="text"
@@ -70,7 +99,7 @@ export function PartnershipForm(props: PartnershipFormProps) {
               checked={privacyChecked}
               onChange={setPrivacyChecked}
             />
-            <Button variant="primary" type="submit" fullWidth>
+            <Button variant="primary" type="submit" fullWidth isLoading={isSubmitting}>
               Отправить заявку на сотрудничество
             </Button>
           </form>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/home/Header";
 import { Footer } from "@/components/home/Footer";
@@ -11,6 +11,21 @@ import { Icon } from "@/design-system/icons";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { successOrderMock, recommendedProducts } from "@/data/account";
 import { getCommerceSnapshot } from "@/lib/commerce";
+
+// ── Типы данных заказа из Medusa ──────────────────────────────────────────────
+
+interface MedusaOrderSummary {
+  id: string;
+  orderNumber: string | number;
+  total: string;
+  paymentLabel: string;
+  deliveryAddress: string;
+  recipient: string;
+  recipientPhone: string;
+  items: { id: string; title: string; image: string; quantity: number }[];
+}
+
+// ── Компоненты ────────────────────────────────────────────────────────────────
 
 function ThankYouBanner() {
   return (
@@ -30,7 +45,42 @@ function ThankYouBanner() {
 
 function OrderSummary() {
   const searchParams = useSearchParams();
+  const [medusaOrder, setMedusaOrder] = useState<MedusaOrderSummary | null>(null);
+
+  // Если orderId — Medusa-идентификатор, загружаем реальные данные заказа
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+    if (!orderId) return;
+    if (orderId.startsWith("dorder_") || orderId.startsWith("order_")) {
+      fetch(`/api/commerce/orders/${orderId}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: MedusaOrderSummary | null) => {
+          if (data && !("error" in (data as object))) {
+            setMedusaOrder(data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [searchParams]);
+
   const order = useMemo(() => {
+    // Приоритет: данные из Medusa (если получены)
+    if (medusaOrder) {
+      return {
+        orderNumber: medusaOrder.orderNumber,
+        total: medusaOrder.total,
+        paymentLabel: medusaOrder.paymentLabel,
+        status: `Заказ №${medusaOrder.orderNumber} поступил в обработку`,
+        statusDescription: "Ваш заказ принят и передан на сборку.",
+        deliveryAddress: medusaOrder.deliveryAddress,
+        deliveryDate: "Срок уточняется",
+        recipient: medusaOrder.recipient,
+        recipientPhone: medusaOrder.recipientPhone,
+        products: medusaOrder.items,
+      };
+    }
+
+    // Fallback: localStorage-заказ
     const orderId = searchParams.get("orderId");
     if (!orderId) return successOrderMock;
     const stored = getCommerceSnapshot().orders.find((item) => item.id === orderId);
@@ -52,7 +102,7 @@ function OrderSummary() {
         quantity: item.quantity,
       })),
     };
-  }, [searchParams]);
+  }, [searchParams, medusaOrder]);
 
   return (
     <div className="mb-10 flex flex-col gap-6 md:mb-16 md:flex-row md:gap-8">

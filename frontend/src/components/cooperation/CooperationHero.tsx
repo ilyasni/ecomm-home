@@ -42,7 +42,7 @@ export function CooperationHero(props: CooperationHeroProps) {
         priority
         unoptimized
       />
-      <div className="absolute inset-0 bg-[rgba(17,10,0,0.35)]" />
+      <div className="absolute inset-0 bg-[var(--overlay-dark-warm)]" />
 
       <div className="desktop:px-0 relative mx-auto flex h-full max-w-[1400px] flex-col px-4 md:px-[39px]">
         <div className="desktop:pt-[119px] pt-[86px] md:pt-[89px]">

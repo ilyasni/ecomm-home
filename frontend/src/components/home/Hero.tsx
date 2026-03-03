@@ -41,7 +41,7 @@ export function Hero({ slides: propSlides }: HeroProps = {}) {
         priority
         unoptimized
       />
-      <div className="absolute inset-0 bg-[rgba(17,10,0,0.25)]" />
+      <div className="absolute inset-0 bg-[var(--overlay-dark-light)]" />
       <div className="desktop:px-0 desktop:pb-[134px] relative mx-auto flex h-full max-w-[1400px] flex-col justify-end px-4 pb-8 md:px-[39px]">
         <div className="max-w-[558px] text-[var(--color-light)]">
           <h1 className="desktop:text-[40px] text-[26px] leading-[1.1] font-medium">

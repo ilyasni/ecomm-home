@@ -69,13 +69,15 @@ export function Footer({ footer }: FooterProps) {
         <div className="desktop:grid desktop:grid-cols-[minmax(0,500px)_1fr] mb-10 hidden gap-10">
           {/* Newsletter */}
           <div className="space-y-6">
-            <Image
-              src="/assets/figma/footer/logo.svg"
-              alt="Vita Brava Home"
-              width={315}
-              height={58}
-              unoptimized
-            />
+            <Link href="/" className="inline-flex transition-opacity hover:opacity-80">
+              <Image
+                src="/assets/figma/footer/logo.svg"
+                alt="Vita Brava Home"
+                width={315}
+                height={58}
+                unoptimized
+              />
+            </Link>
             <div className="space-y-6">
               <p className="text-lg leading-[1.1] font-medium">
                 Подпишитесь на наши новости и акции
@@ -148,7 +150,9 @@ export function Footer({ footer }: FooterProps) {
           {/* Newsletter */}
           <div className="space-y-6">
             <div className="flex justify-center">
-              <Icon name="logo" variant="default" size={301} height={56} alt="Vita Brava Home" />
+              <Link href="/" className="inline-flex transition-opacity hover:opacity-80">
+                <Icon name="logo" variant="default" size={301} height={56} alt="Vita Brava Home" />
+              </Link>
             </div>
             <div className="space-y-4">
               <p className="text-center text-base leading-[1.1] font-medium">

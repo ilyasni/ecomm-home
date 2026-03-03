@@ -10,7 +10,7 @@ interface AboutProps {
 export function About({ image }: AboutProps = {}) {
   return (
     <section className="desktop:px-0 desktop:py-[80px] mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
-      <div className="desktop:grid-cols-2 grid gap-2 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <div className="desktop:px-[78px] desktop:h-[688px] flex items-center justify-center bg-[var(--color-selection)] px-6 py-16 text-center md:h-[343px]">
           <div className="flex flex-col items-center gap-8">
             <div className="flex flex-col gap-6">

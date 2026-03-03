@@ -59,10 +59,15 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
           <div className="absolute top-3 right-3 flex gap-2">
             <button
               type="button"
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
+              className="group flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)]"
               aria-label="Добавить в избранное"
             >
-              <Icon name="favorite" size={18} />
+              <span className="group-hover:hidden">
+                <Icon name="favorite" size={18} />
+              </span>
+              <span className="hidden group-hover:block">
+                <Icon name="favoriteFilled" size={18} />
+              </span>
             </button>
             <button
               type="button"

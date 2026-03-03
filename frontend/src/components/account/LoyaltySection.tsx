@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { accountUser, bonusOperations } from "@/data/account";
+import { useState, useEffect } from "react";
 
 function FaqItem({
   question,
@@ -19,7 +18,7 @@ function FaqItem({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between py-3 text-left text-sm text-[var(--color-black)] hover:text-[var(--color-brand)] transition-colors"
+        className="flex w-full items-center justify-between py-3 text-left text-sm text-[var(--color-black)] transition-colors hover:text-[var(--color-brand)]"
       >
         <span>{question}</span>
         <svg
@@ -28,18 +27,11 @@ function FaqItem({
           viewBox="0 0 20 20"
           className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
         >
-          <path
-            d="M5 7.5L10 12.5L15 7.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            fill="none"
-          />
+          <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
         </svg>
       </button>
       {isOpen && (
-        <p className="pb-3 text-sm leading-[1.5] text-[var(--color-dark-gray)]">
-          {answer}
-        </p>
+        <p className="pb-3 text-sm leading-[1.5] text-[var(--color-dark-gray)]">{answer}</p>
       )}
     </div>
   );
@@ -48,17 +40,23 @@ function FaqItem({
 export function LoyaltySection() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
+  const [balance, setBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/account/bonuses")
+      .then((r) => r.json())
+      .then((d: { balance?: number }) => setBalance(d.balance ?? 0))
+      .catch(() => setBalance(0));
+  }, []);
 
   const faqItems = [
     {
       question: "Как накопить бонусы?",
-      answer:
-        "Покупая определённые товары или участвуя в акциях VITA BRAVA HOME",
+      answer: "Покупая определённые товары или участвуя в акциях VITA BRAVA HOME",
     },
     {
       question: "Как списать бонусы?",
-      answer:
-        "Бонусы можно списать при оформлении заказа. 1 бонус = 1 рубль.",
+      answer: "Бонусы можно списать при оформлении заказа. 1 бонус = 1 рубль.",
     },
     {
       question: "Как участвовать в программе лояльности?",
@@ -67,19 +65,13 @@ export function LoyaltySection() {
     },
   ];
 
-  const displayedOperations = showAllHistory
-    ? bonusOperations
-    : bonusOperations.slice(0, 4);
-
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-2xl font-medium text-[var(--color-black)]">
-        Программа лояльности
-      </h2>
+      <h2 className="text-2xl font-medium text-[var(--color-black)]">Программа лояльности</h2>
 
       {/* Бонусный баннер */}
       <div className="rounded-[5px] border border-[var(--color-gray-light)] p-6">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <span className="text-base font-medium text-[var(--color-black)]">
@@ -90,13 +82,11 @@ export function LoyaltySection() {
               </span>
             </div>
             <span className="text-lg font-medium text-[var(--color-brand)]">
-              {accountUser.bonuses} БОНУСОВ
+              {balance === null ? "..." : `${balance} БОНУСОВ`}
             </span>
-            <span className="text-sm text-[var(--color-gray)]">
-              можно списать на покупки
-            </span>
+            <span className="text-sm text-[var(--color-gray)]">можно списать на покупки</span>
           </div>
-          <div className="rounded-[5px] bg-[var(--color-selection)] p-4 max-w-[235px]">
+          <div className="max-w-[235px] rounded-[5px] bg-[var(--color-selection)] p-4">
             <p className="text-sm text-[var(--color-dark-gray)]">
               Получи дополнительные 50 бонусов, оставив отзыв на сайте
             </p>
@@ -111,15 +101,15 @@ export function LoyaltySection() {
       </div>
 
       {/* Условия и FAQ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <div className="rounded-[5px] border border-[var(--color-gray-light)] p-6">
           <h3 className="text-base font-medium text-[var(--color-black)]">
             Условия программы лояльности
           </h3>
           <p className="mt-4 text-sm leading-[1.5] text-[var(--color-dark-gray)]">
-            Зарегистрируйтесь на сайте и получайте бонусы за каждую покупку. Сколько
-            бонусов будет начислено за конкретный товар, вы сможете узнать, добавив
-            его в корзину, которые будет находиться под товарами
+            Зарегистрируйтесь на сайте и получайте бонусы за каждую покупку. Сколько бонусов будет
+            начислено за конкретный товар, вы сможете узнать, добавив его в корзину, которые будет
+            находиться под товарами
           </p>
         </div>
         <div className="rounded-[5px] border border-[var(--color-gray-light)] p-6">
@@ -129,52 +119,34 @@ export function LoyaltySection() {
               question={item.question}
               answer={item.answer}
               isOpen={openFaq === index}
-              onToggle={() =>
-                setOpenFaq(openFaq === index ? null : index)
-              }
+              onToggle={() => setOpenFaq(openFaq === index ? null : index)}
             />
           ))}
         </div>
       </div>
 
-      {/* История операций */}
+      {/* История операций — пока баланс без детальной истории */}
       <div className="rounded-[5px] border border-[var(--color-gray-light)] p-6">
-        <h3 className="text-base font-medium text-[var(--color-black)] mb-4">
+        <h3 className="mb-4 text-base font-medium text-[var(--color-black)]">
           История операций с бонусами
         </h3>
-        <div className="flex flex-col">
-          {displayedOperations.map((op) => (
-            <div
-              key={op.id}
-              className="flex items-start justify-between border-b border-[var(--color-gray-light)] py-4 last:border-b-0"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-[var(--color-gray)]">
-                  {op.date}
-                </span>
-                <span className="text-sm text-[var(--color-dark-gray)]">
-                  {op.description}
-                </span>
-              </div>
-              <span
-                className={`text-sm font-medium shrink-0 ${
-                  op.amount > 0
-                    ? "text-[var(--color-black)]"
-                    : "text-[var(--color-dark-gray)]"
-                }`}
-              >
-                {op.amount > 0 ? `+${op.amount}` : op.amount}
-              </span>
-            </div>
-          ))}
-        </div>
-        {!showAllHistory && bonusOperations.length > 4 && (
+        {balance !== null && balance > 0 ? (
+          <p className="text-sm text-[var(--color-dark-gray)]">
+            Текущий баланс: <strong>{balance} бонусов</strong>. Детальная история операций будет
+            доступна в следующем обновлении.
+          </p>
+        ) : (
+          <p className="text-sm text-[var(--color-gray)]">
+            {balance === null ? "Загрузка..." : "Операций с бонусами пока нет."}
+          </p>
+        )}
+        {showAllHistory && (
           <button
             type="button"
-            onClick={() => setShowAllHistory(true)}
+            onClick={() => setShowAllHistory(false)}
             className="mt-4 text-sm text-[var(--color-brand)] underline hover:no-underline"
           >
-            Показать еще
+            Скрыть
           </button>
         )}
       </div>

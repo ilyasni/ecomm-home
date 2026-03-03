@@ -113,9 +113,62 @@ function CartItemRow({
   );
 }
 
-function OrderSidebar({ itemCount }: { itemCount: number }) {
+function formatRub(value: number): string {
+  return `${Math.round(value).toLocaleString("ru-RU")} ₽`;
+}
+
+function OrderSidebar({ itemCount, subtotal }: { itemCount: number; subtotal: number }) {
   const [promoCode, setPromoCode] = useState("");
-  const [bonuses, setBonuses] = useState("50");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    type: string;
+    value: number;
+  } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const promoDiscount = appliedPromo
+    ? appliedPromo.type === "percentage"
+      ? Math.round(subtotal * (appliedPromo.value / 100))
+      : Math.min(appliedPromo.value, subtotal)
+    : 0;
+  const total = subtotal - promoDiscount;
+  const bonusesAccrued = Math.round(total * 0.05);
+
+  const handleApplyPromo = async () => {
+    const code = promoCode.trim();
+    if (!code) return;
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const res = await fetch("/api/cart/promo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = (await res.json()) as {
+        valid: boolean;
+        code?: string;
+        discount?: { type: string; value: number };
+        message?: string;
+      };
+      if (data.valid && data.discount) {
+        setAppliedPromo({
+          code: data.code ?? code,
+          type: data.discount.type,
+          value: data.discount.value,
+        });
+        setPromoError("");
+      } else {
+        setAppliedPromo(null);
+        setPromoError(data.message ?? "Промокод не найден");
+      }
+    } catch {
+      setPromoError("Не удалось проверить промокод");
+    } finally {
+      setPromoLoading(false);
+    }
+  };
 
   return (
     <aside className="desktop:w-[447px] h-fit w-full shrink-0 rounded-[5px] border border-[var(--color-gray-light)] md:sticky md:top-[160px] md:w-[340px]">
@@ -123,62 +176,62 @@ function OrderSidebar({ itemCount }: { itemCount: number }) {
         <h2 className="mb-4 text-[20px] font-medium md:text-[22px]">Ваш заказ</h2>
 
         <div className="mb-1 flex justify-between text-[14px]">
-          <span>{itemCount} товар(а) / 5 кг</span>
-          <span className="font-medium">64 000 ₽</span>
+          <span>
+            {itemCount} {itemCount === 1 ? "товар" : itemCount < 5 ? "товара" : "товаров"}
+          </span>
+          <span className="font-medium">{formatRub(subtotal)}</span>
         </div>
-        <div className="mb-4 flex justify-between text-[14px]">
-          <span>Скидки по заказу</span>
-          <span className="text-[var(--color-gold)]">- 4 000 ₽</span>
-        </div>
+        {promoDiscount > 0 && (
+          <div className="mb-4 flex justify-between text-[14px]">
+            <span>Промокод «{appliedPromo?.code}»</span>
+            <span className="text-[var(--color-gold)]">- {formatRub(promoDiscount)}</span>
+          </div>
+        )}
 
         <div className="mb-4 border-t border-[var(--color-gray-light)] pt-4">
           <p className="mb-2 text-[14px] font-medium">Промокод</p>
           <div className="relative">
             <Input
               value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
+              onChange={(e) => {
+                setPromoCode(e.target.value);
+                setPromoError("");
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
               placeholder="Введите промокод"
               className="w-full pr-10"
             />
             <button
               type="button"
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--color-dark)] hover:text-[var(--color-black)]"
+              onClick={handleApplyPromo}
+              disabled={promoLoading}
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--color-dark)] hover:text-[var(--color-black)] disabled:opacity-40"
               aria-label="Применить промокод"
             >
               <Icon name="arrowRight" size={16} />
             </button>
           </div>
-        </div>
-
-        <div className="mb-4 border-t border-[var(--color-gray-light)] pt-4">
-          <p className="mb-2 text-[14px] font-medium">Бонусы по программе лояльности</p>
-          <div className="relative">
-            <Input
-              value={bonuses}
-              onChange={(e) => setBonuses(e.target.value)}
-              className="w-full pr-10"
-            />
-            <button
-              type="button"
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--color-dark)] hover:text-[var(--color-black)]"
-              aria-label="Применить бонусы"
-            >
-              <Icon name="arrowRight" size={16} />
-            </button>
-          </div>
-          <p className="mt-1 text-[12px] text-[var(--color-dark)]">
-            Можно списать <strong>100</strong> бонусов &nbsp; 1 бонус=1 ₽
-          </p>
+          {appliedPromo && (
+            <p className="mt-1 text-[12px] text-[var(--color-gold)]">
+              Промокод применён: скидка{" "}
+              {appliedPromo.type === "percentage"
+                ? `${appliedPromo.value}%`
+                : `${appliedPromo.value.toLocaleString("ru-RU")} ₽`}
+            </p>
+          )}
+          {promoError && <p className="mt-1 text-[12px] text-red-500">{promoError}</p>}
         </div>
 
         <div className="mb-4 border-t border-[var(--color-gray-light)] pt-4">
           <div className="flex items-baseline justify-between">
             <span className="text-[18px] font-medium">Сумма заказа</span>
-            <span className="text-[22px] font-medium">60 000 ₽</span>
+            <span className="text-[22px] font-medium">{formatRub(total)}</span>
           </div>
           <div className="mt-1 flex justify-between text-[12px] text-[var(--color-dark)]">
             <span>Будет начислено бонусов</span>
-            <span className="font-medium text-[var(--color-gold)]">+ 3 000</span>
+            <span className="font-medium text-[var(--color-gold)]">
+              + {bonusesAccrued.toLocaleString("ru-RU")}
+            </span>
           </div>
           <Link
             href="/account/loyalty"
@@ -325,6 +378,11 @@ export default function CartPage() {
 
   const isEmpty = items.length === 0;
 
+  const subtotal = items.reduce((sum, item) => {
+    const priceNumber = Number(item.price.replace(/[^\d]/g, "")) || 0;
+    return sum + priceNumber * item.quantity;
+  }, 0);
+
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
@@ -453,7 +511,7 @@ export default function CartPage() {
                   ))}
                 </div>
 
-                <OrderSidebar itemCount={items.length} />
+                <OrderSidebar itemCount={items.length} subtotal={subtotal} />
               </div>
 
               {/* Рекомендации */}

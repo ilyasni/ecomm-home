@@ -73,6 +73,7 @@ export function Feedback({ items }: FeedbackProps = {}) {
           prevButtonClassName="feedback-prev"
           nextButtonClassName="feedback-next"
           breakpoints={{
+            640: { slidesPerView: 1.5, spaceBetween: 12 },
             768: { slidesPerView: 2.2, spaceBetween: 8 },
             1400: { slidesPerView: 3, spaceBetween: 8 },
           }}

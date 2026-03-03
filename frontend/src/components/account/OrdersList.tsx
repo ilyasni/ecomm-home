@@ -4,43 +4,58 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/design-system";
 import { OrderCard } from "./OrderCard";
-import { orders } from "@/data/account";
-import { getCommerceSnapshot, subscribeCommerce } from "@/lib/commerce";
+import type { Order } from "@/data/account";
+import type { MedusaOrder } from "@/types/medusa";
+
+function mapStatus(status: string): Order["status"] {
+  if (status === "completed") return "Получен";
+  if (status === "cancelled") return "Отменён";
+  if (status === "shipped" || status === "partially_shipped") return "В доставке";
+  return "Обработка";
+}
+
+function mapOrder(o: MedusaOrder): Order {
+  return {
+    id: o.id,
+    number: String(o.display_id),
+    status: mapStatus(o.status),
+    date: o.created_at,
+    deliveryType: "Доставка",
+    deliveryAddress:
+      [o.shipping_address?.address_1, o.shipping_address?.city].filter(Boolean).join(", ") || "—",
+    deliveryDate: "Уточняется",
+    paymentMethod: "Онлайн",
+    total: `${Math.round(o.total / 100).toLocaleString("ru-RU")} ₽`,
+    products: o.items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: "",
+      price: `${Math.round(item.unit_price / 100).toLocaleString("ru-RU")} ₽`,
+      image: item.thumbnail ?? "/placeholder.jpg",
+    })),
+  };
+}
 
 export function OrdersList() {
   const [activeTab, setActiveTab] = useState<"current" | "completed">("current");
   const [visibleCount, setVisibleCount] = useState(4);
-  const [storeOrders, setStoreOrders] = useState<typeof orders>([]);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const sync = () => {
-      const mapped = getCommerceSnapshot().orders.map((order) => ({
-        id: order.id,
-        number: order.id,
-        status: (order.status === "completed" ? "Получен" : "Обработка") as "Получен" | "Обработка",
-        date: order.createdAt,
-        deliveryType: order.deliveryMethod,
-        deliveryAddress: order.deliveryAddress,
-        deliveryDate: "Уточняется",
-        paymentMethod: order.paymentMethod,
-        total: order.total,
-        products: order.items.map((item) => ({
-          id: item.id,
-          title: item.title,
-          description: item.description ?? "",
-          price: item.price,
-          image: item.image,
-        })),
-      }));
-      setStoreOrders(mapped);
-    };
-    sync();
-    return subscribeCommerce(sync);
+    fetch("/api/account/orders")
+      .then((res) => res.json())
+      .then((data: { orders?: MedusaOrder[] }) => {
+        setAllOrders((data.orders ?? []).map(mapOrder));
+      })
+      .catch(() => setAllOrders([]))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const currentOrders: typeof orders = [];
-  const completedOrders = storeOrders.length > 0 ? storeOrders : orders;
-
+  const currentOrders = allOrders.filter(
+    (o) => o.status === "Обработка" || o.status === "В доставке"
+  );
+  const completedOrders = allOrders.filter((o) => o.status === "Получен" || o.status === "Отменён");
   const displayedOrders = activeTab === "current" ? currentOrders : completedOrders;
   const visibleOrders = displayedOrders.slice(0, visibleCount);
 
@@ -81,14 +96,19 @@ export function OrdersList() {
       </div>
 
       {/* Content */}
-      {displayedOrders.length === 0 ? (
+      {isLoading ? (
+        <p className="text-sm text-[var(--color-gray)]">Загрузка заказов...</p>
+      ) : displayedOrders.length === 0 ? (
         <div className="flex flex-col gap-4">
           <div>
             <p className="text-base font-medium text-[var(--color-black)]">
-              У вас пока нет актуальных заказов
+              {activeTab === "current"
+                ? "У вас пока нет актуальных заказов"
+                : "Нет завершённых заказов"}
             </p>
             <p className="mt-2 text-sm text-[var(--color-dark-gray)]">
-              Когда появятся, будут отображаться здесь. Остальные заказы находятся в завершённых
+              Когда появятся, будут отображаться здесь.{" "}
+              {activeTab === "current" && "Остальные заказы находятся в завершённых"}
             </p>
           </div>
           <Link href="/catalog">

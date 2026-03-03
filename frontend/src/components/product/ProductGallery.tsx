@@ -11,12 +11,7 @@ type ProductGalleryProps = {
   className?: string;
 };
 
-export function ProductGallery({
-  images,
-  title,
-  onFavorite,
-  className,
-}: ProductGalleryProps) {
+export function ProductGallery({ images, title, onFavorite, className }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const mainImage = images[activeIndex] || images[0];
   const smallImages = images.slice(1, 9);
@@ -29,25 +24,24 @@ export function ProductGallery({
   return (
     <div className={`${className || ""}`}>
       <div className="relative aspect-square w-full overflow-hidden">
-        <Image
-          src={mainImage}
-          alt={title}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-        <div className="absolute right-3 top-3 flex gap-2 desktop:right-4 desktop:top-4">
+        <Image src={mainImage} alt={title} fill className="object-cover" unoptimized />
+        <div className="desktop:right-4 desktop:top-4 absolute top-3 right-3 flex gap-2">
           <button
             type="button"
             onClick={onFavorite}
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] hover:opacity-80 transition-opacity"
+            className="group flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)]"
             aria-label="Добавить в избранное"
           >
-            <Icon name="favorite" size={18} />
+            <span className="group-hover:hidden">
+              <Icon name="favorite" size={18} />
+            </span>
+            <span className="hidden group-hover:block">
+              <Icon name="favoriteFilled" size={18} />
+            </span>
           </button>
           <button
             type="button"
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] hover:opacity-80 transition-opacity"
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
             aria-label="Сертификат качества"
           >
             <Icon name="diamond" size={18} />
@@ -56,9 +50,9 @@ export function ProductGallery({
       </div>
 
       {pairs.length > 0 && (
-        <div className="mt-2 flex flex-col gap-2 md:mt-1 md:gap-1 desktop:mt-2 desktop:gap-2">
+        <div className="desktop:mt-2 desktop:gap-2 mt-2 flex flex-col gap-2 md:mt-1 md:gap-1">
           {pairs.map((pair, pairIdx) => (
-            <div key={pairIdx} className="grid grid-cols-2 gap-2 md:gap-1 desktop:gap-2">
+            <div key={pairIdx} className="desktop:gap-2 grid grid-cols-2 gap-2 md:gap-1">
               {pair.map((img, imgIdx) => {
                 const globalIdx = 1 + pairIdx * 2 + imgIdx;
                 return (

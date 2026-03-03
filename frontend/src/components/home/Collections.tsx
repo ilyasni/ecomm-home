@@ -65,7 +65,7 @@ export function Collections({
           <Icon name="favorite" size={20} />
         </div>
         <div className="absolute right-4 bottom-4 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-light)]">
-          <Icon name="bag" size={20} />
+          <Icon name="bagCard" size={20} />
         </div>
       </div>
       <div className="mt-3 space-y-2">
@@ -126,7 +126,7 @@ export function Collections({
                   <Icon name="favorite" size={20} />
                 </div>
                 <div className="absolute right-4 bottom-4 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-light)]">
-                  <Icon name="bag" size={20} />
+                  <Icon name="bagCard" size={20} />
                 </div>
               </div>
               <div className="mt-3 space-y-1 text-[var(--color-foreground)]">
@@ -166,6 +166,7 @@ export function Collections({
             prevButtonClassName="hits-prev"
             nextButtonClassName="hits-next"
             breakpoints={{
+              640: { slidesPerView: 1.5, spaceBetween: 12 },
               768: { slidesPerView: 2.2, spaceBetween: 8 },
               1400: { slidesPerView: 3, spaceBetween: 8 },
             }}
@@ -178,7 +179,7 @@ export function Collections({
           <h2 className="desktop:text-[40px] text-center text-3xl leading-[1.1] font-medium">
             Коллекции под любой бюджет
           </h2>
-          <div className="desktop:grid-cols-3 mt-10 grid gap-2 md:grid-cols-3">
+          <div className="desktop:grid-cols-3 mt-10 grid grid-cols-1 gap-2 md:grid-cols-2">
             {budgetCollections.map((item) => (
               <div
                 key={item.id}
@@ -193,7 +194,7 @@ export function Collections({
                     unoptimized
                   />
                 )}
-                <div className="absolute inset-0 bg-[rgba(0,0,0,0.3)]" />
+                <div className="absolute inset-0 bg-[var(--overlay-dark)]" />
                 <div className="absolute bottom-10 left-1/2 w-[260px] -translate-x-1/2 text-center text-[var(--color-light)]">
                   <p className="desktop:text-[32px] text-2xl leading-[1.1] font-medium">
                     {item.title}

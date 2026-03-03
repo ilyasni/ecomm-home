@@ -8,7 +8,7 @@ import type { CartItem } from "@/data/account";
 interface CheckoutSidebarProps {
   items: CartItem[];
   subtotal: string;
-  discount: string;
+  discount?: string;
   promoDiscount?: string;
   bonusDiscount?: string;
   deliveryPrice: string;
@@ -22,7 +22,7 @@ interface CheckoutSidebarProps {
 export function CheckoutSidebar({
   items,
   subtotal,
-  discount,
+  discount = undefined,
   promoDiscount,
   bonusDiscount,
   deliveryPrice,
@@ -33,15 +33,15 @@ export function CheckoutSidebar({
   onSubmit,
 }: CheckoutSidebarProps) {
   return (
-    <aside className="w-full md:w-[447px] shrink-0">
-      <div className="border border-[var(--color-gray-light)] rounded-[5px] p-4 md:p-6 md:sticky md:top-[160px]">
-        <h2 className="text-[20px] md:text-[22px] font-medium mb-4">Ваш заказ</h2>
+    <aside className="w-full shrink-0 md:w-[447px]">
+      <div className="desktop:top-[160px] rounded-[5px] border border-[var(--color-gray-light)] p-4 md:sticky md:top-[180px] md:p-6">
+        <h2 className="mb-4 text-[20px] font-medium md:text-[22px]">Ваш заказ</h2>
 
         {/* Товары */}
-        <div className="space-y-3 mb-4 pb-4 border-b border-[var(--color-gray-light)]">
+        <div className="mb-4 space-y-3 border-b border-[var(--color-gray-light)] pb-4">
           {items.slice(0, 3).map((item) => (
             <div key={item.id} className="flex gap-3">
-              <div className="w-[60px] h-[60px] relative shrink-0 rounded overflow-hidden bg-[var(--color-beige)]">
+              <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded bg-[var(--color-beige)]">
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -50,9 +50,9 @@ export function CheckoutSidebar({
                   unoptimized
                 />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] leading-[1.3] line-clamp-2">{item.title}</p>
-                <p className="text-[13px] text-[var(--color-dark)] mt-0.5">
+              <div className="min-w-0 flex-1">
+                <p className="line-clamp-2 text-[13px] leading-[1.3]">{item.title}</p>
+                <p className="mt-0.5 text-[13px] text-[var(--color-dark)]">
                   {item.quantity} шт. &middot; {item.price}
                 </p>
               </div>
@@ -66,15 +66,17 @@ export function CheckoutSidebar({
         </div>
 
         {/* Расчёт */}
-        <div className="space-y-2 text-[14px] mb-4 pb-4 border-b border-[var(--color-gray-light)]">
+        <div className="mb-4 space-y-2 border-b border-[var(--color-gray-light)] pb-4 text-[14px]">
           <div className="flex justify-between">
             <span>{items.length} товар(ов)</span>
             <span>{subtotal}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Скидка</span>
-            <span className="text-[var(--color-gold)]">- {discount}</span>
-          </div>
+          {discount && (
+            <div className="flex justify-between">
+              <span>Скидка</span>
+              <span className="text-[var(--color-gold)]">- {discount}</span>
+            </div>
+          )}
           {promoDiscount && (
             <div className="flex justify-between">
               <span>Промокод</span>
@@ -95,19 +97,19 @@ export function CheckoutSidebar({
 
         {/* Итого */}
         <div className="mb-4">
-          <div className="flex justify-between items-baseline">
+          <div className="flex items-baseline justify-between">
             <span className="text-[18px] font-medium">Итого</span>
             <span className="text-[22px] font-medium">{total}</span>
           </div>
           {bonusEarned > 0 && (
-            <div className="flex justify-between text-[12px] text-[var(--color-dark)] mt-1">
+            <div className="mt-1 flex justify-between text-[12px] text-[var(--color-dark)]">
               <span>Будет начислено бонусов</span>
-              <span className="text-[var(--color-gold)] font-medium">+ {bonusEarned}</span>
+              <span className="font-medium text-[var(--color-gold)]">+ {bonusEarned}</span>
             </div>
           )}
           <Link
             href="/account/loyalty"
-            className="text-[12px] text-[var(--color-dark)] underline mt-1 inline-block"
+            className="mt-1 inline-block text-[12px] text-[var(--color-dark)] underline"
           >
             Правила программы лояльности
           </Link>
@@ -123,17 +125,21 @@ export function CheckoutSidebar({
           Оформить заказ
         </Button>
 
-        <p className="text-[11px] text-[var(--color-dark)] text-center leading-[1.4] mt-3">
+        <p className="mt-3 text-center text-[11px] leading-[1.4] text-[var(--color-dark)]">
           Нажимая на кнопку, вы соглашаетесь с{" "}
-          <Link href="#" className="underline">условиями оферты</Link>
-          {" "}и{" "}
-          <Link href="#" className="underline">политикой конфиденциальности</Link>
+          <Link href="#" className="underline">
+            условиями оферты
+          </Link>{" "}
+          и{" "}
+          <Link href="#" className="underline">
+            политикой конфиденциальности
+          </Link>
         </p>
       </div>
 
       {/* Мобильная фиксированная кнопка */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[var(--background)] border-t border-[var(--color-gray-light)] p-4 md:hidden z-40">
-        <div className="flex items-center justify-between mb-2">
+      <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-[var(--color-gray-light)] bg-[var(--background)] p-4 md:hidden">
+        <div className="mb-2 flex items-center justify-between">
           <span className="text-[16px] font-medium">Итого</span>
           <span className="text-[18px] font-medium">{total}</span>
         </div>

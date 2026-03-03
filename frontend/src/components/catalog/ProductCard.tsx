@@ -90,19 +90,29 @@ export function ProductCard({
           <button
             type="button"
             onClick={() => onFavorite?.(product.id)}
-            className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-brown)] transition-opacity hover:opacity-80"
+            className="group flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-brown)]"
             aria-label="Добавить в избранное"
           >
-            <Icon name="favorite" size={18} />
+            <span className="group-hover:hidden">
+              <Icon name="favorite" size={18} />
+            </span>
+            <span className="hidden group-hover:block">
+              <Icon name="favoriteFilled" size={18} />
+            </span>
           </button>
         </div>
         <button
           type="button"
           onClick={() => onAddToCart?.(product.id)}
-          className="absolute right-3 bottom-3 flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-light)] transition-opacity hover:opacity-80"
+          className="group absolute right-3 bottom-3 flex h-[35px] w-[35px] items-center justify-center rounded-full bg-[var(--color-light)]"
           aria-label="Добавить в корзину"
         >
-          <Icon name="bag" size={18} />
+          <span className="group-hover:hidden">
+            <Icon name="bagCard" size={18} />
+          </span>
+          <span className="hidden group-hover:block">
+            <Icon name="bagCardHover" size={18} />
+          </span>
         </button>
         {onQuickView && (
           <button
