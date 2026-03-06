@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/design-system/components";
 
 type CertificateProps = {
@@ -23,6 +24,8 @@ export function Certificate({
   image = defaults.image,
   buttonLabel = defaults.buttonLabel,
 }: CertificateProps) {
+  const router = useRouter();
+
   return (
     <section className="desktop:h-[660px] relative overflow-hidden bg-[var(--color-gold)] md:h-auto">
       <div className="desktop:px-0 desktop:py-0 desktop:h-full relative mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
@@ -41,7 +44,11 @@ export function Certificate({
                 </p>
               </div>
               <div>
-                <Button variant="primary" type="button">
+                <Button
+                  variant="primary"
+                  type="button"
+                  onClick={() => router.push("/gift-certificates")}
+                >
                   {buttonLabel}
                 </Button>
               </div>

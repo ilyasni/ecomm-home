@@ -31,6 +31,7 @@ export const categories = [
     title: "Постельное белье",
     count: 205,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/bed-linen",
     isWide: true,
   },
   {
@@ -38,36 +39,42 @@ export const categories = [
     title: "Одеяла",
     count: 10,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/blankets",
   },
   {
     id: "pillows",
     title: "Подушки",
     count: 58,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/pillows",
   },
   {
     id: "throws",
     title: "Пледы",
     count: 20,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/throws",
   },
   {
     id: "home",
     title: "Домашний текстиль",
     count: 205,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/home",
   },
   {
     id: "towels",
     title: "Полотенца",
     count: 28,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/towels",
   },
   {
     id: "boudoir",
     title: "Будуарные наряды",
     count: 85,
     image: "/assets/figma/placeholder.svg",
+    href: "/catalog/boudoir",
   },
 ];
 

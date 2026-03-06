@@ -96,6 +96,7 @@ export default async function Home() {
       title: c.title as string,
       count: (c.count as number) || 0,
       image: mapMediaOrPlaceholder(c.image as never),
+      href: `/catalog/${c.slug as string}`,
       isWide: c.slug === "bed-linen",
     }));
   }, undefined);

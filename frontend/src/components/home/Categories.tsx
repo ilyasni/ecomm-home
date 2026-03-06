@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { categories as defaultCategories } from "@/data/home";
 
 interface CategoryData {
@@ -8,6 +9,7 @@ interface CategoryData {
   title: string;
   count: number;
   image: string;
+  href?: string;
   isWide?: boolean;
 }
 
@@ -17,6 +19,20 @@ interface CategoriesProps {
 
 export function Categories({ items }: CategoriesProps = {}) {
   const categories = items?.length ? items : defaultCategories;
+  const fallbackHrefById: Record<string, string> = {
+    "bed-linen": "/catalog/bed-linen",
+    bed: "/catalog/bed-linen",
+    blankets: "/catalog/blankets",
+    blanket: "/catalog/blankets",
+    pillows: "/catalog/pillows",
+    throws: "/catalog/throws",
+    plaids: "/catalog/throws",
+    home: "/catalog/home",
+    "home-textile": "/catalog/home",
+    towels: "/catalog/towels",
+    boudoir: "/catalog/boudoir",
+  };
+
   return (
     <section className="desktop:px-0 desktop:py-[80px] relative mx-auto max-w-[1400px] px-4 py-10 md:px-[39px]">
       <Image
@@ -32,7 +48,8 @@ export function Categories({ items }: CategoriesProps = {}) {
         {categories.map((item, index) => {
           const isWide = item.isWide && index === 0;
           return (
-            <article
+            <Link
+              href={item.href ?? fallbackHrefById[String(item.id)] ?? "/catalog"}
               className={`relative overflow-hidden ${isWide ? "col-span-2" : ""} desktop:h-[440px] h-[217px] md:h-[232px]`}
               key={item.id}
             >
@@ -46,7 +63,7 @@ export function Categories({ items }: CategoriesProps = {}) {
                   ({item.count})
                 </span>
               </div>
-            </article>
+            </Link>
           );
         })}
       </div>
