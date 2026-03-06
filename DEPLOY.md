@@ -165,6 +165,8 @@ IMGPROXY_MAX_SRC_RESOLUTION=50
 | `IMGPROXY_HOSTNAME` | `media.produmantech.ru` |
 | `IMGPROXY_SOURCE_REWRITE_FROM` | `https://cms.produmantech.ru` |
 | `IMGPROXY_SOURCE_REWRITE_TO` | `http://<minio-internal-host>:9000` |
+| `IMGPROXY_SOURCE_REWRITE_FROM_2` | `http://localhost:9002` |
+| `IMGPROXY_SOURCE_REWRITE_TO_2` | `http://<minio-internal-host>:9000` |
 
 #### Meilisearch
 
