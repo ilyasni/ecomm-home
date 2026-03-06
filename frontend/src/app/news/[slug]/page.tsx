@@ -3,8 +3,38 @@ import { getArticleBySlug } from "@/lib/queries/articles";
 import { withFallback } from "@/lib/with-fallback";
 import { mapMedia } from "@/lib/mappers";
 import { articleData, newsList } from "@/data/news";
-import type { ArticleData } from "@/data/news";
+import type { ArticleData, ArticleSection, ArticleTOCItem } from "@/data/news";
 import { ArticlePageClient } from "./ArticlePageClient";
+
+type StrapiSection = { __component: string; id: number; anchorId?: string; content?: string };
+type StrapiTOCItem = { id: number; anchorId: string; label: string };
+
+function mapStrapiArticle(data: Record<string, unknown>): ArticleData {
+  const rawSections = (data.sections as StrapiSection[] | undefined) ?? [];
+  const rawToc = (data.toc as StrapiTOCItem[] | undefined) ?? [];
+
+  const sections: ArticleSection[] = rawSections.map((s) => {
+    if (s.__component === "article.section-heading") {
+      return { type: "heading", id: s.anchorId, content: s.content ?? "" };
+    }
+    return { type: "text", content: s.content ?? "" };
+  });
+
+  const toc: ArticleTOCItem[] = rawToc.map((t) => ({
+    id: t.anchorId,
+    label: t.label,
+  }));
+
+  return {
+    slug: data.slug as string,
+    category: (data.category as ArticleData["category"]) ?? "новости",
+    title: data.title as string,
+    image: mapMedia(data.image as never) ?? "",
+    date: (data.date as string) ?? "",
+    toc,
+    sections,
+  };
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -39,17 +69,15 @@ export default async function NewsArticlePage({ params }: PageProps) {
   }, null);
 
   if (strapiData) {
-    const title = strapiData.title as string;
-    const category = (strapiData.category as string) ?? "новости";
-    const image = mapMedia(strapiData.image as never) || "/assets/figma/placeholder.svg";
+    const article = mapStrapiArticle(strapiData);
 
     return (
       <ArticlePageClient
         slug={slug}
-        title={title}
-        category={category}
-        image={image}
-        article={null}
+        title={article.title}
+        category={article.category}
+        image={article.image || "/assets/figma/placeholder.svg"}
+        article={article}
         excerpt={(strapiData.excerpt as string) ?? ""}
       />
     );
