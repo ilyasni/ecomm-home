@@ -110,11 +110,15 @@ IMGPROXY_MAX_SRC_RESOLUTION=50
 | Переменная Coolify | Значение |
 |---|---|
 | `MINIO_ENDPOINT_URL` | `http://<minio-internal-host>:9000` |
+| `MINIO_PUBLIC_URL` | `https://cms.produmantech.ru` |
 | `MINIO_ACCESS_KEY` | Access Key из MinIO Console |
 | `MINIO_SECRET_KEY` | Secret Key из MinIO Console |
 | `MINIO_BUCKET` | `strapi-uploads` |
 | `MINIO_REGION` | `us-east-1` |
 
+> **`MINIO_PUBLIC_URL` обязателен**: без него Strapi записывает `http://localhost:9002/...` в `files.url`,
+> что ломает source URL для imgproxy. Значение — публичный домен CMS без слеша и без пути bucket'а.
+>
 > Если MinIO не настроить — загрузки пойдут на локальный диск контейнера.
 > При пересоздании контейнера медиафайлы **потеряются**.
 
@@ -258,6 +262,78 @@ curl -X POST https://produmantech.ru/api/admin/search/reindex \
 - [ ] Поиск возвращает результаты
 - [ ] Форма контакта отправляет email (если SMTP настроен)
 - [ ] Логи Frontend не содержат `[runtime-config]` ошибок
+
+---
+
+## 6.1 Восстановление превью в Strapi Media Library
+
+Симптом: в `files.url`/`files.formats` сохранены внутренние URL (`http://localhost:9002/...`, `http://minio:9000/...`), и браузер не может загрузить превью.
+
+### Шаг 1 — миграция URL в БД
+
+Найди имя CMS-контейнера и запусти скрипт:
+
+```bash
+# Найти имя контейнера
+sudo docker ps --format '{{.Names}}' | grep cms
+
+# Dry-run (без записи)
+sudo docker exec -e STRAPI_PUBLIC_URL=https://cms.produmantech.ru <cms-container-name> \
+  node scripts/fix-upload-urls.mjs --dry-run
+
+# Применить
+sudo docker exec -e STRAPI_PUBLIC_URL=https://cms.produmantech.ru <cms-container-name> \
+  node scripts/fix-upload-urls.mjs
+```
+
+> Если скрипт не найден (`Cannot find module`) — он ещё не задеплоен. Сделай прямой SQL:
+>
+> ```sql
+> UPDATE files SET
+>   url = replace(url, 'http://localhost:9002', 'https://cms.produmantech.ru'),
+>   formats = replace(formats::text, 'http://localhost:9002', 'https://cms.produmantech.ru')::jsonb,
+>   updated_at = NOW()
+> WHERE url LIKE 'http://localhost:9002%';
+> ```
+
+### Шаг 2 — проксирование `/strapi-uploads/` в MinIO
+
+**Coolify использует Traefik (не nginx).** Нужно положить файл в папку Traefik dynamic config:
+
+```bash
+sudo cp strapi-uploads-proxy.yaml /data/coolify/proxy/dynamic/strapi-uploads-proxy.yaml
+```
+
+Файл `strapi-uploads-proxy.yaml` есть в корне репозитория. Traefik подхватит его без перезагрузки (~2–3 сек).
+
+Проверь после применения:
+
+```bash
+curl -o /dev/null -w "%{http_code}" https://cms.produmantech.ru/strapi-uploads/<любой-файл>
+# Ожидаемо: 200
+```
+
+> Если сервер использует nginx (не Coolify/Traefik), добавь в конфиг `cms.produmantech.ru`:
+> ```nginx
+> location /strapi-uploads/ {
+>     proxy_pass http://<minio-internal-host>:9000/strapi-uploads/;
+>     proxy_http_version 1.1;
+>     proxy_set_header Host $host;
+> }
+> ```
+
+### Шаг 3 — проверки
+
+```sql
+SELECT url FROM files LIMIT 5;
+```
+
+Ожидаемо: URL начинаются с `https://cms.produmantech.ru/strapi-uploads/`.
+
+Дополнительно:
+- открыть `https://cms.produmantech.ru/admin`
+- проверить Media Library и поля с изображениями в Content Manager
+- убедиться, что превью загружаются без 404
 
 ---
 

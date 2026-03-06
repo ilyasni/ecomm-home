@@ -1,0 +1,18 @@
+# Routes cms.produmantech.ru/strapi-uploads/ -> MinIO:9000
+# Added to fix Strapi Admin Media Library previews (Traefik replaces nginx proxy)
+http:
+  routers:
+    strapi-uploads-https:
+      entryPoints:
+        - https
+      rule: "Host(`cms.produmantech.ru`) && PathPrefix(`/strapi-uploads/`)"
+      service: minio-strapi-uploads
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+  services:
+    minio-strapi-uploads:
+      loadBalancer:
+        servers:
+          - url: "http://minio-sgkk808w884kks04w8ww84o4:9000"

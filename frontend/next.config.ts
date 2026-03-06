@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
         hostname: process.env.STRAPI_MEDIA_HOSTNAME ?? "localhost",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: process.env.STRAPI_MEDIA_HOSTNAME ?? "localhost",
+        pathname: "/strapi-uploads/**",
+      },
       // MinIO (direct — dev only)
       {
         protocol: "http",
