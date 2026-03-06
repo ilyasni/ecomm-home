@@ -86,7 +86,10 @@ export async function strapiGet<T>(
     throw new StrapiHttpError(res.status, res.statusText, path);
   }
 
-  return res.json();
+  // Node.js 20 bug: res.json() throws "controller[kState].transformAlgorithm is not a function"
+  // on the first request after server start. arrayBuffer() avoids the TransformStream issue.
+  const buffer = await res.arrayBuffer();
+  return JSON.parse(Buffer.from(buffer).toString("utf-8")) as T;
 }
 
 export async function strapiPost<T = Record<string, unknown>>(
@@ -103,7 +106,8 @@ export async function strapiPost<T = Record<string, unknown>>(
   if (!res.ok) {
     throw new Error(`Strapi API error: ${res.status} ${res.statusText} [${path}]`);
   }
-  return res.json();
+  const buffer = await res.arrayBuffer();
+  return JSON.parse(Buffer.from(buffer).toString("utf-8")) as T;
 }
 
 export async function strapiFind<T = Record<string, unknown>>(

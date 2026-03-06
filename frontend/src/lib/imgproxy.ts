@@ -29,19 +29,28 @@ const IMGPROXY_SALT = process.env.IMGPROXY_SALT ?? "";
 const IMGPROXY_PUBLIC_URL = process.env.NEXT_PUBLIC_IMGPROXY_URL || IMGPROXY_URL;
 
 /**
- * Rewrite: заменяет публичный base URL медиа (localhost:1337) на
- * внутренний Docker URL (cms:1337), чтобы imgproxy мог достучаться
- * до источника из Docker-сети.
+ * Rewrite: заменяет публичные base URL медиа на внутренние Docker URL,
+ * чтобы imgproxy мог достучаться до источников из Docker-сети.
  *
- * IMGPROXY_SOURCE_REWRITE_FROM=http://localhost:1337
- * IMGPROXY_SOURCE_REWRITE_TO=http://cms:1337
+ * Пара 1 (Strapi local uploads):
+ *   IMGPROXY_SOURCE_REWRITE_FROM=http://localhost:1337
+ *   IMGPROXY_SOURCE_REWRITE_TO=http://cms:1337
+ *
+ * Пара 2 (MinIO):
+ *   IMGPROXY_SOURCE_REWRITE_FROM_2=http://localhost:9002
+ *   IMGPROXY_SOURCE_REWRITE_TO_2=http://minio:9000
  */
-const REWRITE_FROM = process.env.IMGPROXY_SOURCE_REWRITE_FROM ?? "";
-const REWRITE_TO = process.env.IMGPROXY_SOURCE_REWRITE_TO ?? "";
+const REWRITES: [string, string][] = [
+  [process.env.IMGPROXY_SOURCE_REWRITE_FROM ?? "", process.env.IMGPROXY_SOURCE_REWRITE_TO ?? ""],
+  [
+    process.env.IMGPROXY_SOURCE_REWRITE_FROM_2 ?? "",
+    process.env.IMGPROXY_SOURCE_REWRITE_TO_2 ?? "",
+  ],
+].filter(([from]) => Boolean(from)) as [string, string][];
 
 function resolveSourceUrl(url: string): string {
-  if (REWRITE_FROM && REWRITE_TO && url.startsWith(REWRITE_FROM)) {
-    return REWRITE_TO + url.slice(REWRITE_FROM.length);
+  for (const [from, to] of REWRITES) {
+    if (url.startsWith(from)) return to + url.slice(from.length);
   }
   return url;
 }

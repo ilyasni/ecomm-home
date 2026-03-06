@@ -71,17 +71,5 @@
       "repeatable": true,
       "component": "catalog.category-banner"
     },
-    "parentCategory": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::category.category",
-      "inversedBy": "childCategories"
-    },
-    "childCategories": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::category.category",
-      "mappedBy": "parentCategory"
-    }
   }
 }

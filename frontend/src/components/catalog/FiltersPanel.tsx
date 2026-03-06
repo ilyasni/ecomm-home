@@ -7,7 +7,13 @@ import { Checkbox, Button } from "@/design-system/components";
 type FilterSection = {
   id: string;
   title: string;
-  options: Array<{ id: string; label: string; checked: boolean }>;
+  options: Array<{ id: string; label: string; value: string; checked: boolean }>;
+};
+
+export type FilterSectionInput = {
+  id: string;
+  title: string;
+  options: Array<{ id: string; label: string; value: string }>;
 };
 
 type FiltersPanelProps = {
@@ -19,6 +25,8 @@ type FiltersPanelProps = {
   onApply?: (values: Record<string, string[]>) => void;
   /** Meilisearch facetDistribution: { fabric: { Сатин: 45 }, color: { Белый: 23 } } */
   facetDistribution?: Record<string, Record<string, number>>;
+  sections?: FilterSectionInput[];
+  quickLinks?: string[];
   className?: string;
 };
 
@@ -27,60 +35,74 @@ const initialFilters: FilterSection[] = [
     id: "fabric",
     title: "Ткань",
     options: [
-      { id: "bamboo", label: "Бамбуковое волокно", checked: false },
-      { id: "egyptian", label: "Египетский хлопок", checked: false },
-      { id: "satin", label: "Сатин", checked: false },
-      { id: "silk", label: "Шёлк", checked: false },
+      { id: "bamboo", label: "Бамбуковое волокно", value: "Бамбуковое волокно", checked: false },
+      { id: "egyptian", label: "Египетский хлопок", value: "Египетский хлопок", checked: false },
+      { id: "satin", label: "Сатин", value: "Сатин", checked: false },
+      { id: "silk", label: "Шёлк", value: "Шёлк", checked: false },
     ],
   },
   {
     id: "density",
     title: "Плотность ткани",
     options: [
-      { id: "200tc", label: "200 TC", checked: false },
-      { id: "220tc", label: "220 TC", checked: false },
-      { id: "250tc", label: "250 TC", checked: false },
-      { id: "280tc", label: "280 TC", checked: false },
-      { id: "300tc", label: "300 TC", checked: false },
-      { id: "480tc", label: "480 TC", checked: false },
-      { id: "700tc", label: "700 TC", checked: false },
+      { id: "200tc", label: "200 TC", value: "200 TC", checked: false },
+      { id: "220tc", label: "220 TC", value: "220 TC", checked: false },
+      { id: "250tc", label: "250 TC", value: "250 TC", checked: false },
+      { id: "280tc", label: "280 TC", value: "280 TC", checked: false },
+      { id: "300tc", label: "300 TC", value: "300 TC", checked: false },
+      { id: "480tc", label: "480 TC", value: "480 TC", checked: false },
+      { id: "700tc", label: "700 TC", value: "700 TC", checked: false },
     ],
   },
   {
     id: "size",
     title: "Размер",
     options: [
-      { id: "euro", label: "Евро", checked: false },
-      { id: "family", label: "Семейный", checked: false },
+      { id: "euro", label: "Евро", value: "Евро", checked: false },
+      { id: "family", label: "Семейный", value: "Семейный", checked: false },
     ],
   },
   {
     id: "color",
     title: "Цвет",
     options: [
-      { id: "beige", label: "Бежевый", checked: false },
-      { id: "white", label: "Белый", checked: false },
-      { id: "burgundy", label: "Бордовый", checked: false },
-      { id: "blue", label: "Голубой", checked: false },
-      { id: "yellow", label: "Жёлтый", checked: false },
-      { id: "red", label: "Красный", checked: false },
+      { id: "beige", label: "Бежевый", value: "Бежевый", checked: false },
+      { id: "white", label: "Белый", value: "Белый", checked: false },
+      { id: "burgundy", label: "Бордовый", value: "Бордовый", checked: false },
+      { id: "blue", label: "Голубой", value: "Голубой", checked: false },
+      { id: "yellow", label: "Жёлтый", value: "Жёлтый", checked: false },
+      { id: "red", label: "Красный", value: "Красный", checked: false },
     ],
   },
   {
     id: "price",
     title: "Цена",
     options: [
-      { id: "light", label: "Light (от 10 000 ₽)", checked: false },
-      { id: "medium", label: "Medium (от 20 000 ₽)", checked: false },
-      { id: "premium", label: "Premium (от 35 000 ₽)", checked: false },
+      { id: "light", label: "Light (от 10 000 ₽)", value: "light", checked: false },
+      { id: "medium", label: "Medium (от 20 000 ₽)", value: "medium", checked: false },
+      { id: "premium", label: "Premium (от 35 000 ₽)", value: "premium", checked: false },
     ],
   },
   {
     id: "promo",
     title: "Акции",
-    options: [{ id: "special", label: "Специальные предложения", checked: false }],
+    options: [
+      { id: "special", label: "Специальные предложения", value: "special", checked: false },
+    ],
   },
 ];
+
+function toPanelFilters(sections?: FilterSectionInput[]): FilterSection[] {
+  if (!sections || sections.length === 0) return initialFilters;
+  return sections.map((section) => ({
+    id: section.id,
+    title: section.title,
+    options: section.options.map((option) => ({
+      ...option,
+      checked: false,
+    })),
+  }));
+}
 
 export function FiltersPanel({
   isOpen,
@@ -88,10 +110,12 @@ export function FiltersPanel({
   initialValues,
   onApply,
   facetDistribution,
+  sections,
+  quickLinks = [],
 }: FiltersPanelProps) {
-  const [filters, setFilters] = useState<FilterSection[]>(initialFilters);
+  const [filters, setFilters] = useState<FilterSection[]>(toPanelFilters(sections));
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(initialFilters.map((f) => f.id))
+    new Set(toPanelFilters(sections).map((f) => f.id))
   );
 
   // Синхронизируем состояние чекбоксов с URL-параметрами при каждом открытии панели
@@ -99,15 +123,15 @@ export function FiltersPanel({
     if (!isOpen) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters(
-      initialFilters.map((section) => ({
+      toPanelFilters(sections).map((section) => ({
         ...section,
         options: section.options.map((opt) => ({
           ...opt,
-          checked: (initialValues?.[section.id] ?? []).includes(opt.label),
+          checked: (initialValues?.[section.id] ?? []).includes(opt.value),
         })),
       }))
     );
-  }, [isOpen, initialValues]);
+  }, [isOpen, initialValues, sections]);
 
   useEffect(() => {
     if (isOpen) {
@@ -153,13 +177,13 @@ export function FiltersPanel({
   );
 
   const resetAll = () => {
-    setFilters(initialFilters);
+    setFilters(toPanelFilters(sections));
   };
 
   const handleApply = () => {
     const values: Record<string, string[]> = {};
     filters.forEach((section) => {
-      const checked = section.options.filter((o) => o.checked).map((o) => o.label);
+      const checked = section.options.filter((o) => o.checked).map((o) => o.value);
       if (checked.length > 0) values[section.id] = checked;
     });
     onApply?.(values);
@@ -171,7 +195,7 @@ export function FiltersPanel({
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/30 transition-opacity" onClick={onClose} />
-      <div className="desktop:w-[720px] relative z-10 flex h-full w-full flex-col bg-white md:w-[600px]">
+      <div className="desktop:w-[720px] relative z-10 flex h-full w-full flex-col bg-[var(--background)] md:w-[600px]">
         <div className="flex items-center justify-between border-b border-[var(--color-gray-light)] px-6 py-5">
           <h2 className="text-xl font-medium">Фильтры</h2>
           <button
@@ -204,7 +228,9 @@ export function FiltersPanel({
               {expandedSections.has(section.id) && (
                 <div className="mt-3 space-y-3">
                   {section.options.map((option) => {
-                    const count = facetDistribution?.[section.id]?.[option.label];
+                    const count =
+                      facetDistribution?.[section.id]?.[option.value] ??
+                      facetDistribution?.[section.id]?.[option.label];
                     return (
                       <Checkbox
                         key={option.id}
@@ -221,15 +247,22 @@ export function FiltersPanel({
         </div>
 
         <div className="border-t border-[var(--color-gray-light)] px-6 py-4">
+          {quickLinks.length > 0 && (
+            <div className="mb-4 flex flex-col items-center gap-2 text-[14px] text-[var(--color-dark)] underline">
+              {quickLinks.map((link) => (
+                <span key={link}>{link}</span>
+              ))}
+            </div>
+          )}
           <p className="mb-4 text-center text-sm text-[var(--color-gray)]">
             {selectedCount > 0 ? `${selectedCount} позиций` : "Выберите фильтры"}
           </p>
           <div className="flex gap-3">
-            <Button variant="secondary" fullWidth onClick={resetAll}>
-              Сбросить все
-            </Button>
             <Button variant="primary" fullWidth onClick={handleApply}>
               Применить
+            </Button>
+            <Button variant="secondary" fullWidth onClick={resetAll}>
+              Сбросить все
             </Button>
           </div>
         </div>

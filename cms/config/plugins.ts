@@ -1,5 +1,7 @@
 export default ({ env }: { env: (key: string, defaultValue?: string) => string }) => {
   const minioEndpoint = env("MINIO_ENDPOINT_URL", "");
+  const minioPublicUrl = env("MINIO_PUBLIC_URL", "http://localhost:9002");
+  const minioBucket = env("MINIO_BUCKET", "strapi-uploads");
 
   return {
     "users-permissions": {
@@ -13,6 +15,7 @@ export default ({ env }: { env: (key: string, defaultValue?: string) => string }
             config: {
               provider: "aws-s3",
               providerOptions: {
+                baseUrl: `${minioPublicUrl}/${minioBucket}`,
                 s3Options: {
                   endpoint: minioEndpoint,
                   forcePathStyle: true,
@@ -23,7 +26,7 @@ export default ({ env }: { env: (key: string, defaultValue?: string) => string }
                   },
                 },
                 params: {
-                  Bucket: env("MINIO_BUCKET", "strapi-uploads"),
+                  Bucket: minioBucket,
                 },
               },
               actionOptions: {

@@ -618,10 +618,6 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
   attributes: {
     banners: Schema.Attribute.Component<'catalog.category-banner', true>;
-    childCategories: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::category.category'
-    >;
     count: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -636,10 +632,6 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'api::category.category'
     > &
       Schema.Attribute.Private;
-    parentCategory: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::category.category'
-    >;
     products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     seoDescription: Schema.Attribute.Text;

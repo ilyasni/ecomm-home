@@ -13,6 +13,8 @@ export type Product = {
   price: string;
   oldPrice?: string;
   image: string;
+  /** Полный список изображений (обложка + галерея). Используется на странице товара. */
+  images?: string[];
   badge?: string;
   rating?: number;
   colors?: Array<{ name: string; hex: string }>;
@@ -21,6 +23,7 @@ export type Product = {
   type?: "product" | "giftCertificate";
   subtitle?: string;
   giftCertDescription?: string;
+  category?: { title: string; slug: string };
 };
 
 type ProductCardProps = {
@@ -49,7 +52,9 @@ export function ProductCard({
   const productHref = `/catalog/${product.slug ?? product.id}`;
 
   return (
-    <article className={`group ${className || ""}`}>
+    // group/card — именованная группа, чтобы group-hover/card не конфликтовал
+    // с вложенными group на кнопках favourite/cart
+    <article className={`group/card ${className || ""}`}>
       <div className={`relative w-full overflow-hidden ${imageHeight[variant]}`}>
         {onQuickView ? (
           <button
@@ -62,7 +67,7 @@ export function ProductCard({
               src={product.image}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover/card:scale-105"
               unoptimized
             />
           </button>
@@ -72,7 +77,7 @@ export function ProductCard({
               src={product.image}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover/card:scale-105"
               unoptimized
             />
           </Link>
@@ -118,7 +123,7 @@ export function ProductCard({
           <button
             type="button"
             onClick={() => onQuickView(product)}
-            className="desktop:flex absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[5px] bg-[var(--color-light)] px-6 py-3 text-sm whitespace-nowrap text-[var(--color-dark-gray)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="desktop:flex absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[5px] bg-[var(--color-light)] px-6 py-3 text-sm whitespace-nowrap text-[var(--color-dark-gray)] opacity-0 transition-opacity duration-200 group-hover/card:opacity-100"
           >
             Быстрый просмотр
           </button>

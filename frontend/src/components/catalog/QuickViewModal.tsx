@@ -20,8 +20,12 @@ const sizeOptions = [
   { value: "family", label: "Семейный" },
 ];
 
+/** Максимум строк описания в быстром просмотре */
+const DESCRIPTION_CLAMP = 4;
+
 export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModalProps) {
   const [selectedSize, setSelectedSize] = useState("");
+  const [descExpanded, setDescExpanded] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -35,20 +39,20 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
     };
   }, [onClose]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="desktop:flex-row relative z-10 mx-4 flex w-full max-w-[1305px] flex-col overflow-hidden rounded-lg bg-white shadow-xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 flex items-center justify-center transition-opacity hover:opacity-70"
-          aria-label="Закрыть"
-        >
-          <Icon name="close" size={24} />
-        </button>
+  const isLongDescription = product.description && product.description.length > 200;
 
-        <div className="desktop:w-[480px] desktop:shrink-0 relative aspect-square w-full">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+
+      {/*
+        desktop: flex-row, изображение 480px фиксированное, контент прокручивается
+        mobile:  flex-col, изображение 3/2 (не занимает весь экран), контент прокручивается
+        max-h-[90dvh] — не выходит за экран на любом устройстве
+      */}
+      <div className="desktop:flex-row relative z-10 flex max-h-[90dvh] w-full max-w-[1305px] flex-col overflow-hidden rounded-lg bg-white shadow-xl">
+        {/* Изображение */}
+        <div className="desktop:w-[480px] desktop:aspect-square desktop:shrink-0 relative aspect-[3/2] w-full">
           <Image
             src={product.image}
             alt={product.title}
@@ -79,7 +83,18 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
           </div>
         </div>
 
-        <div className="desktop:flex-1 desktop:p-10 flex flex-col p-6">
+        {/* Контент — прокручивается независимо от высоты */}
+        <div className="desktop:flex-1 desktop:p-10 relative flex flex-col overflow-y-auto p-6">
+          {/* Кнопка закрыть — в контентной панели, не пересекается с кнопками на фото */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 flex items-center justify-center transition-opacity hover:opacity-70"
+            aria-label="Закрыть"
+          >
+            <Icon name="close" size={24} />
+          </button>
+
           {product.sku && (
             <p className="text-sm text-[var(--color-gray)]">Артикул: {product.sku}</p>
           )}
@@ -121,9 +136,24 @@ export function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModal
           )}
 
           {product.description && (
-            <p className="mt-4 text-sm leading-relaxed text-[var(--color-dark-gray)]">
-              {product.description}
-            </p>
+            <div className="mt-4">
+              <p
+                className={`text-sm leading-relaxed text-[var(--color-dark-gray)] ${
+                  !descExpanded ? `line-clamp-${DESCRIPTION_CLAMP}` : ""
+                }`}
+              >
+                {product.description}
+              </p>
+              {isLongDescription && (
+                <button
+                  type="button"
+                  onClick={() => setDescExpanded((prev) => !prev)}
+                  className="mt-1 text-xs text-[var(--color-gray)] underline hover:opacity-70"
+                >
+                  {descExpanded ? "Свернуть" : "Читать далее"}
+                </button>
+              )}
+            </div>
           )}
 
           <div className="mt-6">

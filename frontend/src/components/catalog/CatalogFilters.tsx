@@ -12,28 +12,43 @@ type CatalogFiltersProps = {
   tags?: FilterTag[];
   onClearAll?: () => void;
   onOpenFilters?: () => void;
+  quickFilterValues?: string[];
+  activeQuickFilterValues?: string[];
+  onToggleQuickFilter?: (value: string) => void;
   className?: string;
 };
 
 const defaultQuickFilters = [
-  { id: "discount", label: "Скидки" },
-  { id: "new", label: "Новинки" },
-  { id: "special", label: "Спец. предложения" },
+  { id: "discount", value: "sale", label: "Скидки" },
+  { id: "new", value: "new", label: "Новинки" },
+  { id: "special", value: "special", label: "Спец. предложения" },
 ];
 
 export function CatalogFilters({
   tags = [],
   onClearAll,
   onOpenFilters,
+  quickFilterValues,
+  activeQuickFilterValues = [],
+  onToggleQuickFilter,
   className,
 }: CatalogFiltersProps) {
+  const quickFilters = quickFilterValues
+    ? defaultQuickFilters.filter((filter) => quickFilterValues.includes(filter.value))
+    : defaultQuickFilters;
+
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className || ""}`}>
-      {defaultQuickFilters.map((filter) => (
+      {quickFilters.map((filter) => (
         <button
           key={filter.id}
           type="button"
-          className="rounded-[5px] border border-[var(--color-gray-light)] px-3 py-1 text-sm text-[var(--color-dark-gray)] hover:border-[var(--color-brown)] transition-colors"
+          onClick={() => onToggleQuickFilter?.(filter.value)}
+          className={`rounded-[5px] border px-3 py-1 text-sm transition-colors ${
+            activeQuickFilterValues.includes(filter.value)
+              ? "border-[var(--color-brown)] bg-[var(--color-selection)] text-[var(--color-black)]"
+              : "border-[var(--color-gray-light)] text-[var(--color-dark-gray)] hover:border-[var(--color-brown)]"
+          }`}
         >
           {filter.label}
         </button>
@@ -49,7 +64,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={tag.onRemove}
-              className="flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="flex items-center justify-center transition-opacity hover:opacity-80"
               aria-label="Удалить фильтр"
             >
               <Icon name="close" size={14} />
@@ -62,7 +77,7 @@ export function CatalogFilters({
         <button
           type="button"
           onClick={onClearAll}
-          className="text-sm text-[var(--color-brand)] hover:opacity-80 transition-opacity"
+          className="text-sm text-[var(--color-brand)] transition-opacity hover:opacity-80"
         >
           Очистить все
         </button>
@@ -72,7 +87,7 @@ export function CatalogFilters({
         <button
           type="button"
           onClick={onOpenFilters}
-          className="ml-auto flex items-center gap-1 text-sm text-[var(--color-dark-gray)] hover:text-[var(--color-black)] transition-colors"
+          className="ml-auto flex items-center gap-1 text-sm text-[var(--color-dark-gray)] transition-colors hover:text-[var(--color-black)]"
         >
           <span>Все фильтры</span>
           <Icon name="chevronDown" size={16} className="rotate-[-90deg]" />

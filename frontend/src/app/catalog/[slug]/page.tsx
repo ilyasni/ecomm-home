@@ -6,16 +6,26 @@ import {
   getCategoryBySlug,
   getProductsByCategory,
   getCategories,
+  type StrapiFilterItem,
 } from "@/lib/queries/catalog";
 import { withFallback } from "@/lib/with-fallback";
-import { mapMediaOrPlaceholder, formatPrice } from "@/lib/mappers";
+import { mapMediaOrPlaceholder, mapMediaArray, formatPrice } from "@/lib/mappers";
+import type { StrapiMedia } from "@/types/strapi";
 import { catalogProducts } from "@/data/catalog";
+import { catalogCategories } from "@/data/catalog-menu";
 import type { Product } from "@/components/catalog/ProductCard";
 import { ProductPageClient } from "./ProductPageClient";
 import { CategoryPageClient } from "./CategoryPageClient";
+import {
+  buildCategoryFilterSections,
+  buildStrapiFiltersFromCatalog,
+  mapSortToStrapi,
+  parseCatalogSearchParams,
+} from "@/lib/catalog-filters";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 type StrapiEntity = Record<string, unknown>;
@@ -28,6 +38,7 @@ async function resolveCategoryByLegacySlug(slug: string): Promise<StrapiEntity |
   const legacyKeywordMap: Record<string, string[]> = {
     boudoir: ["будуар", "наряд"],
     "gift-certificates": ["сертификат", "подароч"],
+    "komplekty-postelnogo-belya": ["постельн", "бель"],
   };
 
   const keywords = legacyKeywordMap[slug];
@@ -61,6 +72,11 @@ async function resolveGiftCertificateProductSlug(): Promise<string | null> {
 
 function mapStrapiProduct(raw: Record<string, unknown>): Product {
   const colors = (raw.colors as Array<{ name: string; hex: string }>) ?? [];
+  const image = raw.image as StrapiMedia | null | undefined;
+  const gallery = raw.gallery as StrapiMedia[] | null | undefined;
+  const coverUrl = mapMediaOrPlaceholder(image);
+  const galleryUrls = mapMediaArray(gallery);
+  const category = raw.category as { title: string; slug: string } | null | undefined;
   return {
     id: (raw.documentId as string) ?? (raw.slug as string) ?? String(raw.id),
     slug: (raw.slug as string) ?? undefined,
@@ -68,11 +84,13 @@ function mapStrapiProduct(raw: Record<string, unknown>): Product {
     description: (raw.description as string) ?? "",
     price: raw.price ? formatPrice(raw.price as number) : "",
     oldPrice: raw.oldPrice ? formatPrice(raw.oldPrice as number) : undefined,
-    image: mapMediaOrPlaceholder(raw.image as never),
+    image: coverUrl,
+    images: galleryUrls.length > 0 ? [coverUrl, ...galleryUrls] : [coverUrl],
     sku: (raw.sku as string) ?? undefined,
     inStock: (raw.inStock as boolean) ?? true,
     type: ((raw.type as string) ?? (raw.productType as string) ?? "product") as Product["type"],
     colors,
+    category: category ?? undefined,
   };
 }
 
@@ -106,13 +124,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function CatalogSlugPage({ params }: PageProps) {
+export default async function CatalogSlugPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const rawSearchParams = await searchParams;
 
-  let strapiCategory = await withFallback(async () => {
+  if (slug === "komplekty-postelnogo-belya") {
+    permanentRedirect("/catalog/bed-linen");
+  }
+
+  const strapiCategory = await withFallback(async () => {
     const res = await getCategoryBySlug(slug);
     return res.data as Record<string, unknown>;
   }, null);
+
+  const localCategory = catalogCategories.find((category) => {
+    const categorySlug = category.href.split("/").filter(Boolean).at(-1);
+    return category.id === slug || categorySlug === slug;
+  });
 
   if (!strapiCategory) {
     const legacyCategory = await resolveCategoryByLegacySlug(slug);
@@ -128,17 +156,74 @@ export default async function CatalogSlugPage({ params }: PageProps) {
     }
   }
 
-  if (strapiCategory) {
-    const categoryProducts = await withFallback(async () => {
-      const res = await getProductsByCategory(slug, { pageSize: 24 });
-      return (res.data as Record<string, unknown>[]).map(mapStrapiProduct);
-    }, [] as Product[]);
+  if (strapiCategory || localCategory) {
+    const categoryTitle =
+      (strapiCategory?.title as string | undefined) ?? localCategory?.label ?? slug;
+    const rawCategoryFilters = strapiCategory?.filters
+      ? ((strapiCategory.filters as StrapiFilterItem[] | undefined) ?? []).map((item) => ({
+          title: item.title,
+          options: item.options,
+        }))
+      : ((localCategory?.filters ?? []).map((item) => ({
+          title: item.title,
+          options: item.options,
+        })) as Array<{ title: string; options?: Array<{ label: string; href: string }> }>);
+
+    const categoryFilterSections = buildCategoryFilterSections(rawCategoryFilters);
+    const allowedFilterKeys = [
+      ...categoryFilterSections.map((section) => section.id),
+      "promo",
+      "priceFrom",
+      "priceTo",
+      "inStock",
+    ];
+    const catalogState = parseCatalogSearchParams(rawSearchParams, allowedFilterKeys);
+    const strapiFilters = buildStrapiFiltersFromCatalog(catalogState.filters);
+
+    const categoryProducts = await withFallback(
+      async () => {
+        const res = await getProductsByCategory(slug, {
+          page: catalogState.page,
+          pageSize: catalogState.pageSize,
+          sort: mapSortToStrapi(catalogState.sort),
+          filters: strapiFilters,
+        });
+
+        return {
+          products: (res.data as Record<string, unknown>[]).map(mapStrapiProduct),
+          pagination: res.meta.pagination,
+        };
+      },
+      null as {
+        products: Product[];
+        pagination?: { page: number; pageCount: number; total: number };
+      } | null
+    );
+
+    const products = categoryProducts?.products ?? [];
+    const total = categoryProducts?.pagination?.total ?? products.length;
+    const page = categoryProducts?.pagination?.page ?? catalogState.page;
+    const pageCount = categoryProducts?.pagination?.pageCount ?? 1;
 
     return (
       <CategoryPageClient
-        title={(strapiCategory.title as string) ?? slug}
+        title={categoryTitle}
         slug={slug}
-        products={categoryProducts}
+        products={products}
+        totalCount={total}
+        page={page}
+        totalPages={pageCount}
+        pageSize={catalogState.pageSize}
+        sortValue={catalogState.sort}
+        activeFilters={catalogState.filters}
+        filterSections={categoryFilterSections}
+        quickLinks={
+          strapiCategory?.subcategories
+            ? ((strapiCategory.subcategories as Array<{ label: string }> | undefined) ?? [])
+                .map((item) => item.label)
+                .slice(0, 5)
+            : (localCategory?.subcategories ?? []).map((item) => item.label).slice(0, 5)
+        }
       />
     );
   }

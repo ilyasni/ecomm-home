@@ -22,14 +22,17 @@ export function ProductPageClient({
   recommended,
   recentlyViewed,
 }: ProductPageClientProps) {
-  const images = Array(9).fill(product.image);
+  const images = product.images?.length ? product.images : [product.image];
   const isGiftCert = product.type === "giftCertificate";
 
   const breadcrumbs = isGiftCert
     ? [{ label: "Главная", href: "/" }, { label: "Подарочный сертификат" }]
     : [
         { label: "Главная", href: "/" },
-        { label: "Постельное бельё", href: "/catalog" },
+        { label: "Каталог", href: "/catalog" },
+        ...(product.category
+          ? [{ label: product.category.title, href: `/catalog/${product.category.slug}` }]
+          : []),
         { label: product.title },
       ];
 
