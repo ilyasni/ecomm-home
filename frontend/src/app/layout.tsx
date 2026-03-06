@@ -3,6 +3,7 @@ import { Onest } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { AuthProviderWrapper } from "@/components/auth/AuthProviderWrapper";
+import { ViewportOffsetController } from "@/components/layout/ViewportOffsetController";
 
 const onest = Onest({
   variable: "--font-onest",
@@ -52,6 +53,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-visual",
 };
 
 export default function RootLayout({
@@ -62,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${onest.variable} antialiased`}>
+        <ViewportOffsetController />
         <AuthProviderWrapper>{children}</AuthProviderWrapper>
         <Toaster
           position="bottom-right"

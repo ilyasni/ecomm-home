@@ -17,18 +17,26 @@
 - В данные категорий добавлены явные `href`, а для совместимости оставлен fallback-маппинг по `id`.
 - Кнопка в секции сертификата получила навигацию на страницу подарочных сертификатов.
 - Добавлены безопасные CSS-настройки для мобильных WebView: фиксация text-size-adjust и защита от горизонтального сдвига.
+- Добавлен системный механизм для mobile WebView:
+  - `viewport-fit=cover` и `interactiveWidget=resizes-visual` в Next.js `viewport`.
+  - Контроллер `VisualViewport` (через `requestAnimationFrame`) пишет `--vv-top`.
+  - Финальный offset шапки: `--mobile-header-offset = env(safe-area-inset-top) + --vv-top`.
+  - Для предотвращения перекрытия контента offset зеркалируется в `body` при наличии фиксированной шапки.
 - Измененные файлы:
   - `frontend/src/components/home/Categories.tsx`
   - `frontend/src/components/home/Certificate.tsx`
   - `frontend/src/app/page.tsx`
   - `frontend/src/data/home.ts`
   - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/layout/ViewportOffsetController.tsx`
 
 ## Implementation Notes
 
 - Для источника категорий из Strapi в `home`-маппинге добавлено поле `href` по `slug`.
 - Для fallback-данных (`src/data/home.ts`) добавлены прямые ссылки на соответствующие разделы каталога.
 - Для проверки корректности подхода сверены рекомендации по viewport и mobile-behavior через Context7 (`/vercel/next.js`, `env(safe-area-inset-*)`).
+- `VisualViewport`-слушатели подключены с cleanup, апдейты CSS-переменной троттлятся через `requestAnimationFrame` (уменьшение дрожания при частых событиях).
 
 ## Checks
 

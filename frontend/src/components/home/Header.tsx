@@ -44,7 +44,7 @@ function normalizeCatalogHref(href: string, label: string, availableSlugs: Set<s
   };
   const slugAliasByLabel: Record<string, string> = {
     "домашний текстиль": "home",
-    "пледы": "throws",
+    пледы: "throws",
   };
 
   const normalizedLabel = label.toLowerCase().trim();
@@ -80,6 +80,13 @@ export function Header({ variant = "transparent", navigation, catalogData }: Hea
   }, []);
 
   useEffect(() => {
+    document.body.setAttribute("data-has-fixed-header", "true");
+    return () => {
+      document.body.removeAttribute("data-has-fixed-header");
+    };
+  }, []);
+
+  useEffect(() => {
     const sync = () => {
       setFavoritesCount(getFavoritesCount());
       setCartCount(getCartCount());
@@ -96,17 +103,19 @@ export function Header({ variant = "transparent", navigation, catalogData }: Hea
 
   const topMenuItems = navigation?.topMenuItems ?? defaultTopMenuItems;
   const availableSlugs = new Set((catalogData ?? []).map((category) => category.slug));
-  const catalogCategories = (navigation?.catalogCategories ?? defaultCatalogLinks).map((category) => ({
-    ...category,
-    href: normalizeCatalogHref(category.href, category.label, availableSlugs),
-  }));
+  const catalogCategories = (navigation?.catalogCategories ?? defaultCatalogLinks).map(
+    (category) => ({
+      ...category,
+      href: normalizeCatalogHref(category.href, category.label, availableSlugs),
+    })
+  );
   const phone = navigation?.phone ?? "8 800 888-80-80";
   const topBarText = navigation?.topBarText ?? "Летние коллекции уже в наличии";
   const telegramUrl = navigation?.telegramUrl ?? "#";
   const whatsappUrl = navigation?.whatsappUrl ?? "#";
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full bg-[var(--color-light)] md:bg-transparent">
+    <header className="fixed top-[var(--mobile-header-offset)] left-0 z-50 w-full bg-[var(--color-light)] md:top-0 md:bg-transparent">
       {/* ===== DESKTOP (1400px+): Top bar ===== */}
       <div className="desktop:block hidden bg-[var(--color-brown)] text-[var(--color-light)]">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between py-2">

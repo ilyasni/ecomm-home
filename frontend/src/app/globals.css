@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 :root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --vv-top: 0px;
+  --mobile-header-offset: calc(var(--safe-top) + var(--vv-top));
   --background: #fcfbf9;
   --foreground: #22201d;
   --color-light: #fefaf4;
@@ -39,6 +42,11 @@ body {
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+}
+
+/* Компенсируем мобильный сдвиг fixed-header на контенте */
+body[data-has-fixed-header="true"] {
+  padding-top: var(--mobile-header-offset);
 }
 
 img {
